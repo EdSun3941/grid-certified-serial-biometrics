@@ -320,10 +320,10 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_mlp_system.csv"):   # IJIS v04: M
                 out.append(" & ".join(cells) + r" \\")
         out.append(r"\midrule")
     out[-1] = (r"\bottomrule\end{tabular}\par\smallskip\parbox{\textwidth}{\footnotesize $^{\mathrm{a}}$MLP lower and $^{\mathrm{b}}$MLP higher "
-               r"(corrected resampled $t$-test, unadjusted $p<0.05$; secondary comparison outside the Holm families).}\end{table*}")
+               r"(marks on the value of the compared method; corrected resampled $t$-test, unadjusted $p<0.05$; secondary comparison outside the Holm families).}\end{table*}")
     NEW_CAP["tab:s-mlp"] = (r"Parallel fusion by a multilayer perceptron (MLP; two hidden layers of 16 rectified linear units; secondary baseline): "
                             r"test FRR (mean over the splits) with, in parentheses, the number of splits with test FAR $\le\alpha$, and the test FRR of the "
-                            r"selected proposed design, LLR fusion, and logistic regression on the same splits and with the same calibration")
+                            r"selected proposed design (order selected by training FRR, ties averaged), LLR fusion, and logistic regression on the same splits and with the same calibration")
 text = "\n".join(out) + "\n"
 PAPER = os.environ.get("PAPER", "../paper")
 if "ijis" in PAPER:

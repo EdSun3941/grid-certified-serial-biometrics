@@ -646,27 +646,34 @@ if SPRINGER:
     txd = v2t[(v2t.method == "LR-BB exact dual") & (v2t.obj == "P1")].groupby("dataset").time.mean()
     check("v04: exact-dual LR-BB time min (MIQP rationale)", txd.min(), "0.51", "(0.60--1.93~s against 0.51--1.46~s for the exact-dual LR-BB")
     check("v04: exact-dual LR-BB time max", txd.max(), "1.46")
+    check_true("v04: MIQP rationale names the solver and the slack cardinality constraint",
+               "solved by outer approximation with the general-purpose solver HiGHS" in _norm(SRC["s6_results.tex"]),
+               "the cardinality constraint was slack in 38 of the 40 instances, so additional terms barely improved the fit")
     check_true("v04: framework positioning in intro, contribution 2 and conclusion",
-               "safe by construction, certifiably optimal over an exponent grid, and open to further posynomial constraints" in _norm(SRC["s1_intro.tex"])
-               and "the value of the exact dual lies in the analysis it enables" in _norm(SRC["s1_intro.tex"]),
-               "its value lies in these properties rather than in a lower FRR")
-    check_true("v04: first-person plural for the authors' earlier work", "authors' group" not in ALL and r"In earlier work~\cite{lin2026}, we formulated" in ALL
-               and r"We have applied LR to security resource allocation~\cite{chen2025}" in ALL)
+               "whose envelopes are safe by construction for every recovered threshold on the fitting data, whose envelope fit is certifiably optimal over an exponent grid, and which is open to further posynomial constraints" in _norm(SRC["s1_intro.tex"])
+               and "the value of the exact dual lies in the analysis it enables" in _norm(SRC["s1_intro.tex"])
+               and "the FAR requirement itself rests on the calibration" in _norm(SRC["s7_discussion.tex"]),
+               "the value of the framework lies in these properties rather than in a lower FRR")
+    check_true("v04: first-person plural for the authors' own earlier work", "authors' group" not in ALL and "preliminary study" not in ALL
+               and r"In earlier work~\cite{lin2026}, we formulated" in ALL and r"In an earlier study~\cite{yeh2023}, we fitted" in ALL,
+               r"We have applied LR to security resource allocation~\cite{chen2025}")
     mt4 = _norm(SRC["main.tex"]); esm4 = _norm(SRC["ESM_1.tex"]); url4 = "https://github.com/EdSun3941/grid-certified-serial-biometrics"
     check_true("v04: declarations filled (funding, competing interests, code URL, contributions)",
                "No funding was received for conducting this study." in mt4
                and "The authors have no competing interests to declare that are relevant to the content of this article." in mt4
-               and url4 in mt4 and url4 in esm4 and "To be completed" not in ALL and "to be inserted" not in ALL and "[repository" not in ALL)
-    check_true("v04: AI use stated in one sentence in Sect. 5.4, separate subsection removed",
-               "Use of generative AI" not in ALL and "sec:ai" not in ALL,
-               "A large language model (Claude, Anthropic) assisted in writing the experiment code and drafting the text; the authors verified the code, the results, and the text and take full responsibility for the content.")
+               and url4 in mt4 and url4 in esm4 and "To be completed" not in ALL and "to be inserted" not in ALL and "[repository" not in ALL,
+               r"The first draft of the manuscript was prepared by Chuan-Hsiang Su and Tzu-Lung Sun with the assistance described in Sect.~\ref{sec:stats}")
+    check_true("v04: AI use stated in one sentence in Sect. 5.4 (label sec:stats), separate subsection removed",
+               "Use of generative AI" not in ALL and "sec:ai" not in ALL and "A large language model" in _norm(SRC["s5_setup.tex"]).split("Statistics and implementation")[1],
+               "A large language model (Claude, Anthropic) wrote and ran the experiment code and drafted the text under the authors' direction; the authors verified the code, the results, and the text and take full responsibility for the content.")
     import run_mlp as _rm
     from data import MATCHERS as _MA
-    check_true("v04: MLP architecture in text = code (2 x 16 ReLU, Adam, L2 1e-4)", _rm.HIDDEN == (16, 16) and "alpha=1e-4" in open("run_mlp.py").read()
-               and 'activation="relu", solver="adam"' in open("run_mlp.py").read(),
-               "(MLP; two hidden layers of 16 rectified linear units, Adam, $L_2$ penalty $10^{-4}$)")
+    src_mlp = open("run_mlp.py").read()
+    check_true("v04: MLP architecture and training in text = code", _rm.HIDDEN == (16, 16) and _rm.MAX_ITER == 300 and "alpha=1e-4" in src_mlp
+               and 'activation="relu", solver="adam"' in src_mlp and "random_state=seed" in src_mlp and "200000" in src_mlp,
+               "(MLP; two hidden layers of 16 rectified linear units, Adam, $L_2$ penalty $10^{-4}$, at most 300 epochs, one initialization, no hyperparameter search)")
     nsc = [len(_MA[d]) for d in ["fing_x_face", "fing_x_fing", "face_x_face", "lfw_x_fing"]]
-    check_true(f"v04: two to four scores per claim ({nsc})", min(nsc) == 2 and max(nsc) == 4, "because each claim offers only two to four scores")
+    check_true(f"v04: two to four scores per claim ({nsc})", min(nsc) == 2 and max(nsc) == 4, "Because each claim offers only two to four scores")
     pm = pd.read_csv(f"{R}/logs/mlp_pc/progress_mlp.csv", comment="#", header=None, names=["ds", "seed", "rc", "sec", "ok"])
     check_true(f"v04: all 100 MLP runs on the PC finished ({len(pm)})", len(pm) == 100 and (pm.rc == 0).all() and pm.ok.all()
                and len(glob.glob(f"{R}/E3mlp/mlp_*.csv")) == 100, "as did all MLP runs")
@@ -676,36 +683,50 @@ if SPRINGER:
     check("v04: MLP vs proposed, D2/D3 bootstrap, rel. min %", bm.rel.min(), "7", "by 7\\%--14\\% (significantly in all 12 settings)", scale=100)
     check("v04: ... rel. max %", bm.rel.max(), "14", scale=100)
     check_true("v04: ... 12 settings, all significant, MLP lower in every split", len(bm) == 12 and (bm.p_unadj < 0.05).all() and (bm.n_mlp_lower == bm.n).all(),
-               "it had lower FRR than the proposed design in every split with the bootstrap calibration")
+               "With the bootstrap calibration it had lower FRR than the proposed design in every split")
     x2 = ms[(ms.dataset == "fing_x_fing") & (ms.calib == "xfit") & (ms.other == "LR-P1-N2")]
-    check("v04: MLP vs proposed, D2 held-out, rel. min %", x2.rel.min(), "11", "and on D2 with the held-out calibration by 11\\%--14\\%", scale=100)
+    check("v04: MLP vs proposed, D2 held-out, rel. min %", x2.rel.min(), "11", "held-out calibration by 11\\%--14\\% on D2 (significantly in all three settings)", scale=100)
     check("v04: ... rel. max %", x2.rel.max(), "14", scale=100)
     check_true("v04: ... all three D2 held-out settings significant", len(x2) == 3 and (x2.p_unadj < 0.05).all() and (x2.mean_diff < 0).all())
-    bl = b23[b23.other == "P1-LLR"]
-    check_true(f"v04: MLP within 0.0035 of LLR fusion in the 12 settings (max {bl.mean_diff.abs().max():.5f})",
-               len(bl) == 12 and round(bl.mean_diff.abs().max(), 4) <= 0.0035, "its mean FRR was within 0.0035 of that of LLR fusion")
+    scope = ms[ms.dataset.isin(["fing_x_fing", "face_x_face"]) & ((ms.calib == "boot") | (ms.dataset == "fing_x_fing")) & (ms.other == "P1-LLR")]
+    check_true(f"v04: MLP within 0.0035 of LLR fusion in these 15 settings (max {scope.mean_diff.abs().max():.5f})",
+               len(scope) == 15 and round(scope.mean_diff.abs().max(), 4) <= 0.0035, "in these settings its mean FRR was within 0.0035 of that of LLR fusion")
     sl = ms[(ms.other == "P1-LLR") & (ms.p_unadj < 0.05)]
-    check_true("v04: only significant MLP-LLR difference: D2, original splits, alpha 1e-4", len(sl) == 1 and sl.dataset.iloc[0] == "fing_x_fing"
-               and sl.split_set.iloc[0] == "original 0-9" and np.isclose(sl.alpha.iloc[0], 1e-4),
-               "significantly different only on D2 at $\\alpha=10^{-4}$ of the original splits")
+    check_true("v04: only significant MLP-LLR difference: D2, original splits, alpha 1e-4, MLP lower", len(sl) == 1 and sl.dataset.iloc[0] == "fing_x_fing"
+               and sl.split_set.iloc[0] == "original 0-9" and np.isclose(sl.alpha.iloc[0], 1e-4) and sl.mean_diff.iloc[0] < 0,
+               "and significantly lower only on D2 at $\\alpha=10^{-4}$ of the original splits (0.0885 against 0.0920)")
+    check("v04: ... MLP FRR", sl.frr_mlp.iloc[0], "0.0885"); check("v04: ... LLR FRR", sl.frr_other.iloc[0], "0.0920")
+    d1 = ms[ms.dataset == "fing_x_face"].pivot_table(index=["split_set", "calib", "alpha"], columns="other", values="frr_other")
+    d1m = ms[(ms.dataset == "fing_x_face") & (ms.other == "P1-LLR")].set_index(["split_set", "calib", "alpha"]).frr_mlp
+    check_true("v04: D1, MLP mean FRR between LLR fusion and the proposed design in all 6 settings",
+               len(d1m) == 6 and ((d1m > d1["P1-LLR"]) & (d1m < d1["LR-P1-N2"])).all(),
+               "On D1 its mean FRR lay between those of LLR fusion and the proposed design in every setting")
+    d4 = ms[(ms.dataset == "lfw_x_fing") & (ms.other == "LR-P1-N2")]
+    check_true("v04: D4, MLP never higher than the proposed design in any split", len(d4) == 6 and (d4.n_mlp_higher == 0).all(),
+               "on D4 it was lower than that of the proposed design in every split in which the two differed")
     check_true("v04: no significant MLP difference on D1 and D4", (ms[ms.dataset.isin(["fing_x_face", "lfw_x_fing"])].p_unadj >= 0.05).all(),
-               "On D1 and D4 no difference involving the MLP was significant")
+               "no difference involving the MLP was significant on either subset")
     d3x = ms[(ms.dataset == "face_x_face") & (ms.calib == "xfit")]
-    check_true("v04: no significant held-out difference from the proposed design or LLR fusion on D3",
-               (d3x[d3x.other.isin(["LR-P1-N2", "P1-LLR"])].p_unadj >= 0.05).all(),
-               "and on D3 no held-out difference from the proposed design or from LLR fusion was significant")
+    check_true("v04: D3 held-out: no significant difference from proposed or LLR; MLP lower than proposed in 19 of 20 splits at every alpha",
+               (d3x[d3x.other.isin(["LR-P1-N2", "P1-LLR"])].p_unadj >= 0.05).all() and (d3x[d3x.other == "LR-P1-N2"].n_mlp_lower == 19).all()
+               and (d3x[d3x.other == "LR-P1-N2"].n == 20).all(),
+               "no held-out difference on D3 from the proposed design or from LLR fusion was significant, although the MLP had lower FRR than the proposed design in 19 of the 20 splits at every $\\alpha$")
     mm = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E3mlp/mlp_face_x_face_s*.csv")], ignore_index=True)
-    fx = mm[(mm.calib == "xfit") & np.isclose(mm.alpha, 1e-4)].set_index("seed").frr_test
-    fs_ = tab("T_fresh_selected"); ll = fs_[(fs_.dataset == "face_x_face") & (fs_.calib == "xfit") & np.isclose(fs_.alpha, 1e-4) & (fs_.method == "P1-LLR")].set_index("seed").frr_test
-    worst = fx.idxmax()
-    check("v04: D3 held-out outlier split, MLP FRR", fx[worst], "0.51", "reached an FRR of 0.51 at $\\alpha=10^{-4}$, twice that of LLR fusion (0.25)")
-    check("v04: ... LLR fusion FRR on that split", ll[worst], "0.25")
-    check_true(f"v04: ... ratio {fx[worst] / ll[worst]:.2f} is about two, and the next-worst MLP split is below 0.30",
-               1.9 <= fx[worst] / ll[worst] <= 2.1 and fx.drop(worst).max() < 0.30)
+    fs_ = tab("T_fresh_selected")
+    fx = {a: mm[(mm.calib == "xfit") & np.isclose(mm.alpha, a)].set_index("seed").frr_test for a in (1e-3, 1e-4)}
+    ll = {a: fs_[(fs_.dataset == "face_x_face") & (fs_.calib == "xfit") & np.isclose(fs_.alpha, a) & (fs_.method == "P1-LLR")].set_index("seed").frr_test for a in (1e-3, 1e-4)}
+    worst = fx[1e-4].idxmax()
+    check("v04: D3 held-out outlier split, MLP FRR at 1e-3", fx[1e-3][worst], "0.33",
+          "reached FRRs of 0.33 and 0.51 at $\\alpha=10^{-3}$ and $10^{-4}$, about twice those of LLR fusion (0.15 and 0.25)")
+    check("v04: ... MLP FRR at 1e-4", fx[1e-4][worst], "0.51")
+    check("v04: ... LLR FRR at 1e-3", ll[1e-3][worst], "0.15"); check("v04: ... LLR FRR at 1e-4", ll[1e-4][worst], "0.25")
+    rat = [fx[a][worst] / ll[a][worst] for a in (1e-3, 1e-4)]
+    check_true(f"v04: ... ratios {rat[0]:.2f}, {rat[1]:.2f} are about two; same split is the worst at 1e-3; next-worst split below 0.30 at 1e-4",
+               all(1.9 <= r <= 2.3 for r in rat) and fx[1e-3].idxmax() == worst and fx[1e-4].drop(worst).max() < 0.30)
     check("v04: MLP FAR compliance min %", my.far_ok.min(), "70", "The MLP met $\\alpha$ in 70\\%--100\\% of the test halves", scale=100)
     check("v04: MLP FAR compliance max %", my.far_ok.max(), "100", scale=100)
-    check_true("v04: MLP positioned in intro and discussion", "whether linear or learned by a small neural network" in ALL,
-               "a small neural fusion reached about the FRR of the likelihood-ratio fusion")
+    check_true("v04: MLP positioned in intro and discussion", "including a small neural-network fusion" in ALL,
+               "on D2 and D3 a small neural fusion reached about the FRR of likelihood-ratio fusion, so additional model capacity did not enlarge the advantage of parallel fusion")
     print("=" * 30, "IJIS format checks")
     ab_ = open(f"{P}/sections/s0_abstract.tex").read(); ab_ = ab_.split("\\begin{abstract}")[1].split("\\keywords")[0]
     nw = len(re.split(r"\s+|--", re.sub(r"\$[^$]*\$", "X", ab_).replace("~", " ").strip()))

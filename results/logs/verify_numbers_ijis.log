@@ -387,6 +387,39 @@ OK   v02: splits computed on both machines: computed 7 -> 7.0 vs printed 7
 OK   v02: the seven are those named
 OK   v02: one split differs in 3 of 1484 designs, test rates identical
 OK   v02: 44 files from the PC = 36 of 40 new D2/D3 splits + 8 D4 splits
+============================== IJIS v04: repositioning, MIQP rationale, declarations, MLP baseline
+OK   v04: exact-dual LR-BB time min (MIQP rationale): computed 0.511785 -> 0.51 vs printed 0.51
+OK   v04: exact-dual LR-BB time max: computed 1.45983 -> 1.46 vs printed 1.46
+OK   v04: MIQP rationale names the solver and the slack cardinality constraint
+OK   v04: framework positioning in intro, contribution 2 and conclusion
+OK   v04: first-person plural for the authors' own earlier work
+OK   v04: declarations filled (funding, competing interests, code URL, contributions)
+OK   v04: AI use stated in one sentence in Sect. 5.4 (label sec:stats), separate subsection removed
+OK   v04: MLP architecture and training in text = code
+OK   v04: two to four scores per claim ([4, 2, 2, 3])
+OK   v04: all 100 MLP runs on the PC finished (100)
+OK   v04: MLP vs proposed, D2/D3 bootstrap, rel. min %: computed 7.15001 -> 7.0 vs printed 7
+OK   v04: ... rel. max %: computed 13.7006 -> 14.0 vs printed 14
+OK   v04: ... 12 settings, all significant, MLP lower in every split
+OK   v04: MLP vs proposed, D2 held-out, rel. min %: computed 10.849 -> 11.0 vs printed 11
+OK   v04: ... rel. max %: computed 14.1426 -> 14.0 vs printed 14
+OK   v04: ... all three D2 held-out settings significant
+OK   v04: MLP within 0.0035 of LLR fusion in these 15 settings (max 0.00350)
+OK   v04: only significant MLP-LLR difference: D2, original splits, alpha 1e-4, MLP lower
+OK   v04: ... MLP FRR: computed 0.0885 -> 0.0885 vs printed 0.0885
+OK   v04: ... LLR FRR: computed 0.092 -> 0.092 vs printed 0.0920
+OK   v04: D1, MLP mean FRR between LLR fusion and the proposed design in all 6 settings
+OK   v04: D4, MLP never higher than the proposed design in any split
+OK   v04: no significant MLP difference on D1 and D4
+OK   v04: D3 held-out: no significant difference from proposed or LLR; MLP lower than proposed in 19 of 20 splits at every alpha
+OK   v04: D3 held-out outlier split, MLP FRR at 1e-3: computed 0.333333 -> 0.33 vs printed 0.33
+OK   v04: ... MLP FRR at 1e-4: computed 0.507667 -> 0.51 vs printed 0.51
+OK   v04: ... LLR FRR at 1e-3: computed 0.149333 -> 0.15 vs printed 0.15
+OK   v04: ... LLR FRR at 1e-4: computed 0.245333 -> 0.25 vs printed 0.25
+OK   v04: ... ratios 2.23, 2.07 are about two; same split is the worst at 1e-3; next-worst split below 0.30 at 1e-4
+OK   v04: MLP FAR compliance min %: computed 70 -> 70.0 vs printed 70
+OK   v04: MLP FAR compliance max %: computed 100 -> 100.0 vs printed 100
+OK   v04: MLP positioned in intro and discussion
 ============================== IJIS format checks
 OK   IJIS: abstract has 249 words (150-250)
 OK   IJIS: 6 keywords (4-6)
@@ -398,6 +431,7 @@ OK   IJIS: ESM cites main Table 3 (system) correctly
 OK   IJIS: ESM cites main Sect. 3.5 / 6.4 and Fig. 3 correctly
 OK   IJIS: Fig. 1 artwork refers to the GP as (3)
 OK   IJIS: ESM Sect. S1/S4 cited from main text exist
+OK   v04: MLP table is S19 in ESM_1
 ============================== Ablations (Section VI-F)
 OK   sampled-point dominance FRR: computed 0.00965251 -> 0.0097 vs printed 0.0097
 OK   main FRR (uncalibrated): computed 0.00926641 -> 0.0093 vs printed 0.0093
@@ -406,4 +440,4 @@ OK   FAR-range restriction FRR: computed 0.0432432 -> 0.0432 vs printed 0.0432
 OK   main-paper table bodies unchanged after regeneration
 OK   supplementary tables unchanged after regeneration
 
-396 checks passed, 0 failed
+429 checks passed, 0 failed
