@@ -1,0 +1,30 @@
+python3 run_main.py fing_x_face 0 --noise --tag main
+python3 run_main.py fing_x_face 1 --noise --tag main
+python3 run_main.py fing_x_face 2 --noise --tag main
+python3 run_main.py fing_x_face 3 --noise --tag main
+python3 run_main.py fing_x_face 4 --noise --tag main
+python3 run_main.py fing_x_face 5 --noise --tag main
+python3 run_main.py fing_x_face 6 --noise --tag main
+python3 run_main.py fing_x_face 7 --noise --tag main
+python3 run_main.py fing_x_face 8 --noise --tag main
+python3 run_main.py fing_x_face 9 --noise --tag main
+python3 run_main.py fing_x_fing 0 --tag main
+python3 run_main.py fing_x_fing 1 --tag main
+python3 run_main.py fing_x_fing 2 --tag main
+python3 run_main.py fing_x_fing 3 --tag main
+python3 run_main.py fing_x_fing 4 --tag main
+python3 run_main.py fing_x_fing 5 --tag main
+python3 run_main.py fing_x_fing 6 --tag main
+python3 run_main.py fing_x_fing 7 --tag main
+python3 run_main.py fing_x_fing 8 --tag main
+python3 run_main.py fing_x_fing 9 --tag main
+python3 run_main.py face_x_face 0 --tag main
+python3 run_main.py face_x_face 1 --tag main
+python3 run_main.py face_x_face 2 --tag main
+python3 run_main.py face_x_face 3 --tag main
+python3 run_main.py face_x_face 4 --tag main
+python3 run_main.py face_x_face 5 --tag main
+python3 run_main.py face_x_face 6 --tag main
+python3 run_main.py face_x_face 7 --tag main
+python3 run_main.py face_x_face 8 --tag main
+python3 run_main.py face_x_face 9 --tag main

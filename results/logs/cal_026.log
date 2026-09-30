@@ -1,0 +1,3 @@
+[cal face_x_face s5] alpha 0.01 132s
+[cal face_x_face s5] alpha 0.001 228s
+[cal face_x_face s5] alpha 0.0001 311s

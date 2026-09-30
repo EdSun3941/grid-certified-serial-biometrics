@@ -1,0 +1,2 @@
+[miqp fing_x_fing s3 N2] li_V value=0.0696873 lb=0.0696873 gap=-1.06e-14 it=2 t=0.7s optimal
+[miqp fing_x_fing s3 N2] ri_V value=0.0363348 lb=0.0363348 gap=-8.59e-15 it=2 t=0.6s optimal

@@ -1,0 +1,3 @@
+obj,n,bound_eq_opt,bound_short_mean,bound_short_max,inc_opt,inc_excess_max,nodes_mean,nodes_median,nodes_max,complete,final_excess_max,subgrad_short_mean,subgrad_short_max,source
+P1,40.0,39.0,6.458387417928183e-05,0.0025808146295066645,39.0,0.0009800340086442048,2.0,1.0,41.0,40.0,2.5352728356149414e-14,0.6109550111041177,1.0,"results/E2v2, results/E2 and results/E2ref (independent exact reference)"
+P2,40.0,37.0,0.0005997107261141441,0.01857283376928865,38.0,0.004334238225900199,3.575,1.0,44.0,40.0,2.237099919435658e-15,0.7106783642963672,1.0,"results/E2v2, results/E2 and results/E2ref (independent exact reference)"

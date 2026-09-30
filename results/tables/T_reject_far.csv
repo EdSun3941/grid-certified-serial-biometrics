@@ -1,0 +1,9 @@
+dataset,alpha,n,a_rej_median,frac_a_rej_gt_0p1,a_acc_median,source
+face_x_face,0.0001,20,0.1949948522224963,0.7,5.001458200132383e-05,results/E1/main_*.csv (LR-P1-N2 terms); GP re-solved by reject_far_check.py
+face_x_face,0.001,20,0.9968869246164107,1.0,0.0005000003983190495,results/E1/main_*.csv (LR-P1-N2 terms); GP re-solved by reject_far_check.py
+face_x_face,0.01,20,0.999962975316875,1.0,0.0050000034645184075,results/E1/main_*.csv (LR-P1-N2 terms); GP re-solved by reject_far_check.py
+fing_x_face,0.001,1320,0.8357463879588574,0.9954545454545455,0.0003632710082395644,results/E1/main_*.csv (LR-P1-N2 terms); GP re-solved by reject_far_check.py
+fing_x_face,0.01,1320,0.855563599070974,1.0,0.0029925731433765737,results/E1/main_*.csv (LR-P1-N2 terms); GP re-solved by reject_far_check.py
+fing_x_fing,0.0001,20,0.9999999999999958,1.0,5.00000009144139e-05,results/E1/main_*.csv (LR-P1-N2 terms); GP re-solved by reject_far_check.py
+fing_x_fing,0.001,20,0.9999999999999991,1.0,0.0005000000633767925,results/E1/main_*.csv (LR-P1-N2 terms); GP re-solved by reject_far_check.py
+fing_x_fing,0.01,20,0.9999999999999987,1.0,0.005000000853508263,results/E1/main_*.csv (LR-P1-N2 terms); GP re-solved by reject_far_check.py

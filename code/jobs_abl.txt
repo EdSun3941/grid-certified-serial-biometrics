@@ -1,0 +1,65 @@
+test -f ../results/E3/abl_sample_fing_x_face_s0.csv || python3 run_main.py fing_x_face 0 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s0.csv || python3 run_main.py fing_x_face 0 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s0.csv || python3 run_sprt.py fing_x_face 0
+test -f ../results/E3/sens_b001_fing_x_face_s0.csv || python3 run_main.py fing_x_face 0 --tag sens_b001 --bstep 0.01 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_b005_fing_x_face_s0.csv || python3 run_main.py fing_x_face 0 --tag sens_b005 --bstep 0.05 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb60_fing_x_face_s0.csv || python3 run_main.py fing_x_face 0 --tag sens_nb60 --nbins 60 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb240_fing_x_face_s0.csv || python3 run_main.py fing_x_face 0 --tag sens_nb240 --nbins 240 --methods LR-P1-N2 --rules
+test -f ../results/E3/frac03_fing_x_face_s0.csv || python3 run_main.py fing_x_face 0 --tag frac03 --frac 0.3 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/frac07_fing_x_face_s0.csv || python3 run_main.py fing_x_face 0 --tag frac07 --frac 0.7 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/abl_N_fing_x_face_s0.csv || python3 run_main.py fing_x_face 0 --tag abl_N --methods LR-P1-N4 LR-P1-N5 --rules --tlim 120
+test -f ../results/E3/abl_sample_fing_x_face_s1.csv || python3 run_main.py fing_x_face 1 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s1.csv || python3 run_main.py fing_x_face 1 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s1.csv || python3 run_sprt.py fing_x_face 1
+test -f ../results/E3/sens_b001_fing_x_face_s1.csv || python3 run_main.py fing_x_face 1 --tag sens_b001 --bstep 0.01 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_b005_fing_x_face_s1.csv || python3 run_main.py fing_x_face 1 --tag sens_b005 --bstep 0.05 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb60_fing_x_face_s1.csv || python3 run_main.py fing_x_face 1 --tag sens_nb60 --nbins 60 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb240_fing_x_face_s1.csv || python3 run_main.py fing_x_face 1 --tag sens_nb240 --nbins 240 --methods LR-P1-N2 --rules
+test -f ../results/E3/frac03_fing_x_face_s1.csv || python3 run_main.py fing_x_face 1 --tag frac03 --frac 0.3 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/frac07_fing_x_face_s1.csv || python3 run_main.py fing_x_face 1 --tag frac07 --frac 0.7 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/abl_N_fing_x_face_s1.csv || python3 run_main.py fing_x_face 1 --tag abl_N --methods LR-P1-N4 LR-P1-N5 --rules --tlim 120
+test -f ../results/E3/abl_sample_fing_x_face_s2.csv || python3 run_main.py fing_x_face 2 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s2.csv || python3 run_main.py fing_x_face 2 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s2.csv || python3 run_sprt.py fing_x_face 2
+test -f ../results/E3/sens_b001_fing_x_face_s2.csv || python3 run_main.py fing_x_face 2 --tag sens_b001 --bstep 0.01 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_b005_fing_x_face_s2.csv || python3 run_main.py fing_x_face 2 --tag sens_b005 --bstep 0.05 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb60_fing_x_face_s2.csv || python3 run_main.py fing_x_face 2 --tag sens_nb60 --nbins 60 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb240_fing_x_face_s2.csv || python3 run_main.py fing_x_face 2 --tag sens_nb240 --nbins 240 --methods LR-P1-N2 --rules
+test -f ../results/E3/frac03_fing_x_face_s2.csv || python3 run_main.py fing_x_face 2 --tag frac03 --frac 0.3 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/frac07_fing_x_face_s2.csv || python3 run_main.py fing_x_face 2 --tag frac07 --frac 0.7 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/abl_N_fing_x_face_s2.csv || python3 run_main.py fing_x_face 2 --tag abl_N --methods LR-P1-N4 LR-P1-N5 --rules --tlim 120
+test -f ../results/E3/abl_sample_fing_x_face_s3.csv || python3 run_main.py fing_x_face 3 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s3.csv || python3 run_main.py fing_x_face 3 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s3.csv || python3 run_sprt.py fing_x_face 3
+test -f ../results/E3/sens_b001_fing_x_face_s3.csv || python3 run_main.py fing_x_face 3 --tag sens_b001 --bstep 0.01 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_b005_fing_x_face_s3.csv || python3 run_main.py fing_x_face 3 --tag sens_b005 --bstep 0.05 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb60_fing_x_face_s3.csv || python3 run_main.py fing_x_face 3 --tag sens_nb60 --nbins 60 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb240_fing_x_face_s3.csv || python3 run_main.py fing_x_face 3 --tag sens_nb240 --nbins 240 --methods LR-P1-N2 --rules
+test -f ../results/E3/frac03_fing_x_face_s3.csv || python3 run_main.py fing_x_face 3 --tag frac03 --frac 0.3 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/frac07_fing_x_face_s3.csv || python3 run_main.py fing_x_face 3 --tag frac07 --frac 0.7 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/abl_N_fing_x_face_s3.csv || python3 run_main.py fing_x_face 3 --tag abl_N --methods LR-P1-N4 LR-P1-N5 --rules --tlim 120
+test -f ../results/E3/abl_sample_fing_x_face_s4.csv || python3 run_main.py fing_x_face 4 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s4.csv || python3 run_main.py fing_x_face 4 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s4.csv || python3 run_sprt.py fing_x_face 4
+test -f ../results/E3/sens_b001_fing_x_face_s4.csv || python3 run_main.py fing_x_face 4 --tag sens_b001 --bstep 0.01 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_b005_fing_x_face_s4.csv || python3 run_main.py fing_x_face 4 --tag sens_b005 --bstep 0.05 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb60_fing_x_face_s4.csv || python3 run_main.py fing_x_face 4 --tag sens_nb60 --nbins 60 --methods LR-P1-N2 --rules
+test -f ../results/E3/sens_nb240_fing_x_face_s4.csv || python3 run_main.py fing_x_face 4 --tag sens_nb240 --nbins 240 --methods LR-P1-N2 --rules
+test -f ../results/E3/frac03_fing_x_face_s4.csv || python3 run_main.py fing_x_face 4 --tag frac03 --frac 0.3 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/frac07_fing_x_face_s4.csv || python3 run_main.py fing_x_face 4 --tag frac07 --frac 0.7 --methods HYP MONO LR-P1-N2 LR-P1-N2-rel --rules S1-Marcialis
+test -f ../results/E3/abl_N_fing_x_face_s4.csv || python3 run_main.py fing_x_face 4 --tag abl_N --methods LR-P1-N4 LR-P1-N5 --rules --tlim 120
+test -f ../results/E3/abl_sample_fing_x_face_s5.csv || python3 run_main.py fing_x_face 5 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s5.csv || python3 run_main.py fing_x_face 5 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s5.csv || python3 run_sprt.py fing_x_face 5
+test -f ../results/E3/abl_sample_fing_x_face_s6.csv || python3 run_main.py fing_x_face 6 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s6.csv || python3 run_main.py fing_x_face 6 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s6.csv || python3 run_sprt.py fing_x_face 6
+test -f ../results/E3/abl_sample_fing_x_face_s7.csv || python3 run_main.py fing_x_face 7 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s7.csv || python3 run_main.py fing_x_face 7 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s7.csv || python3 run_sprt.py fing_x_face 7
+test -f ../results/E3/abl_sample_fing_x_face_s8.csv || python3 run_main.py fing_x_face 8 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s8.csv || python3 run_main.py fing_x_face 8 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s8.csv || python3 run_sprt.py fing_x_face 8
+test -f ../results/E3/abl_sample_fing_x_face_s9.csv || python3 run_main.py fing_x_face 9 --tag abl_sample --mode sample --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/E3/abl_region_fing_x_face_s9.csv || python3 run_main.py fing_x_face 9 --tag abl_region --region 1e-5 0.1 --methods MONO LR-P1-N2 LR-P1-N2-rel --rules
+test -f ../results/S3/sprt_fing_x_face_s9.csv || python3 run_sprt.py fing_x_face 9

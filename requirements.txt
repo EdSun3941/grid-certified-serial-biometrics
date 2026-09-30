@@ -1,0 +1,10 @@
+# versions used for the paper (Python 3.11.15; the 24-core PC runs used Python 3.12.5 and pandas 2.3.3)
+numpy==2.4.4
+scipy==1.17.1
+pandas>=2.3
+scikit-learn==1.8.0
+matplotlib==3.10.9
+# only for building subset D4 from the LFW images:
+opencv-python==4.13.*
+# only for the multi-core launchers run_local2.py / run_local_mlp.py:
+psutil

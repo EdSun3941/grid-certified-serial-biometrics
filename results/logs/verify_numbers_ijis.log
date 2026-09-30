@@ -1,0 +1,409 @@
+============================== Data (Section V, Table I)
+OK   D1 face_C EER: computed 0.0444799 -> 0.044 vs printed 0.044
+OK   D1 face_C FRR@1e-3: computed 0.160542 -> 0.161 vs printed 0.161
+OK   D1 face_G EER: computed 0.0580271 -> 0.058 vs printed 0.058
+OK   D1 face_G FRR@1e-3: computed 0.222437 -> 0.222 vs printed 0.222
+OK   D1 li_V EER: computed 0.0851307 -> 0.085 vs printed 0.085
+OK   D1 li_V FRR@1e-3: computed 0.168279 -> 0.168 vs printed 0.168
+OK   D1 ri_V EER: computed 0.0504063 -> 0.05 vs printed 0.050
+OK   D1 ri_V FRR@1e-3: computed 0.10058 -> 0.101 vs printed 0.101
+OK   D2 li_V EER: computed 0.0776843 -> 0.078 vs printed 0.078
+OK   D2 li_V FRR@1e-3: computed 0.188333 -> 0.188 vs printed 0.188
+OK   D2 ri_V EER: computed 0.0526021 -> 0.053 vs printed 0.053
+OK   D2 ri_V FRR@1e-3: computed 0.121 -> 0.121 vs printed 0.121
+OK   D3 face_C EER: computed 0.0528476 -> 0.053 vs printed 0.053
+OK   D3 face_C FRR@1e-3: computed 0.186167 -> 0.186 vs printed 0.186
+OK   D3 face_G EER: computed 0.0626973 -> 0.063 vs printed 0.063
+OK   D3 face_G FRR@1e-3: computed 0.235667 -> 0.236 vs printed 0.236
+OK   D1 counts 517/266,772
+OK   D2 impostors 3.6e7: computed 3.5994 -> 3.6 vs printed 3.6
+OK   D3 impostors 1.8e7: computed 1.7994 -> 1.8 vs printed 1.8
+OK   D1 C-G genuine corr: computed 0.491032 -> 0.49 vs printed 0.49
+OK   D1 L-R genuine corr: computed 0.40803 -> 0.41 vs printed 0.41
+OK   D1 face-finger corr min: computed -0.124372 -> -0.12 vs printed -0.12
+OK   D1 face-finger corr max: computed -0.0232404 -> -0.02 vs printed -0.02
+OK   D2 L-R genuine corr: computed 0.412566 -> 0.41 vs printed 0.41
+OK   D3 C-G genuine corr: computed 0.482101 -> 0.48 vs printed 0.48
+OK   D3 genuine corr (discussion): computed 0.482101 -> 0.48 vs printed 0.48
+OK   same-modality impostor corr min: computed 0.120664 -> 0.12 vs printed 0.12
+OK   same-modality impostor corr max: computed 0.15715 -> 0.16 vs printed 0.16
+OK   D1 probe rows with failure scores: computed 1 -> 1.0 vs printed 1
+OK   D3 face C failure share %: computed 0.1999 -> 0.2 vs printed 0.2
+OK   D3 face C failed genuine: computed 12 -> 12.0 vs printed 12
+OK   no failure scores in D3 face G / D2
+OK   D1 test genuine about 260 (258 or 259)
+OK   D1 training genuine: computed 258 -> 258.0 vs printed 258
+OK   D1 test impostors 6.7e4: computed 6.65637 -> 6.7 vs printed 6.7
+OK   D1 FRR resolution: computed 0.003861 -> 0.004 vs printed 0.004
+OK   D1 ordered subsets: computed 64 -> 64.0 vs printed 64
+OK   corrected t variance factor: computed 11 -> 11.0 vs printed 11
+============================== Envelope tightness (Section VI-A, introduction)
+OK   HYP SSE ratio D1 (x1e5): computed 7.96764 -> 8.0 vs printed 8.0
+OK   HYP SSE ratio D2 (x1e11): computed 2.19591 -> 2.2 vs printed 2.2
+OK   HYP SSE ratio D3 (x1e6): computed 2.66823 -> 2.7 vs printed 2.7
+OK   intro HYP ratio low (x1e5): computed 7.96764 -> 8.0 vs printed 8
+OK   intro HYP ratio high (x1e11): computed 2.19591 -> 2.0 vs printed 2
+OK   MONO SSE ratio min: computed 0.999744 -> 1.0 vs printed 1.00
+OK   MONO SSE ratio max: computed 1.02555 -> 1.03 vs printed 1.03
+OK   NLS-N2 SSE ratio min: computed 0.839132 -> 0.84 vs printed 0.84
+OK   NLS-N2 SSE ratio max: computed 1.17103 -> 1.17 vs printed 1.17
+OK   MAXMONO-K3 SSE ratio min: computed 4.28886 -> 4.3 vs printed 4.3
+OK   MAXMONO-K3 SSE ratio max: computed 1058.13 -> 1058.0 vs printed 1058
+OK   DE SSE ratio (all): computed 0.989421 -> 0.99 vs printed 0.99
+OK   DE SSE ratio max: computed 0.992665 -> 0.99 vs printed 0.99
+OK   test corners above envelope D1 %: computed 15.253 -> 15.3 vs printed 15.3
+OK   test corners above envelope D2 %: computed 15.1479 -> 15.1 vs printed 15.1
+OK   test corners above envelope D3 %: computed 1.21166 -> 1.2 vs printed 1.2
+============================== Solvers (Sections IV, VI-B), against the independent exact reference
+OK   subgradient root bound shortfall P1 mean %: computed 61.0955 -> 61.0 vs printed 61
+OK   subgradient root bound shortfall P2 mean %: computed 71.0678 -> 71.0 vs printed 71
+OK   abstract: subgradient 61%-71%: computed 61.0955 -> 61.0 vs printed 61
+OK   Sec. IV: subgradient 61% / 71%: computed 71.0678 -> 71.0 vs printed 71
+OK   subgradient root bound often zero
+OK   subgradient primal worst %: computed 28.3257 -> 28.3 vs printed 28.3
+OK   first-version enumeration wrong instances: computed 2 -> 2.0 vs printed 2
+OK   first-version excess 1 %: computed 0.0435622 -> 0.04 vs printed 0.04
+OK   first-version excess 2 %: computed 0.160477 -> 0.16 vs printed 0.16
+OK   first-version LR-BB wrong in the same instances and claimed zero gap
+OK   P1 root bound = optimum: computed 39 -> 39.0 vs printed 39
+OK   P1 root shortfall other %: computed 0.258081 -> 0.26 vs printed 0.26
+OK   P1 nodes of that instance: computed 41 -> 41.0 vs printed 41
+OK   abstract: root gap 39 of 40: computed 39 -> 39.0 vs printed 39
+OK   intro: root gap 39 of 40: computed 39 -> 39.0 vs printed 39
+OK   conclusion: root gap 39 of 40: computed 39 -> 39.0 vs printed 39
+OK   P2 root bound = optimum: computed 37 -> 37.0 vs printed 37
+OK   P2 root shortfall max %: computed 1.85728 -> 1.86 vs printed 1.86
+OK   P2 mean nodes: computed 3.575 -> 3.6 vs printed 3.6
+OK   P2 max nodes: computed 44 -> 44.0 vs printed 44
+OK   every exact-dual run reproduced the optimum and certified it
+OK   MILP within 1e-4 of optimum
+OK   DE P1 mean below optimum %: computed 0.492253 -> 0.5 vs printed 0.5
+OK   DE P1 always below the grid optimum
+OK   DE P2 min %: computed 1.94545 -> 1.9 vs printed 1.9
+OK   DE P2 max %: computed 2.77219 -> 2.8 vs printed 2.8
+OK   P1 instances with one or two adjacent exponents: computed 38 -> 38.0 vs printed 38
+OK   D1 face C support -0.26 -0.24
+OK   continuous monomial never worse in the compact instances
+OK   continuous monomial best improvement %: computed 1.37148 -> 1.4 vs printed 1.4
+OK   continuous monomial worse 1 %: computed 6.57667 -> 6.6 vs printed 6.6
+OK   continuous monomial worse 2 %: computed 23.3689 -> 23.4 vs printed 23.4
+OK   the gap instance is one of the two non-compact ones
+OK   steep/shallow example -1.62 -0.28
+OK   IJIS: the 6.6% instance is D3 face G with three support exponents and is the duality-gap instance
+OK   discussion: continuous monomial up to 1.4%: computed 1.37148 -> 1.4 vs printed 1.4
+OK   P1 N=2..5 certified at root
+OK   P1 values identical N=2..5
+OK   E7 D2 P1 time min: computed 0.457796 -> 0.46 vs printed 0.46
+OK   E7 D2 P1 time max: computed 0.619353 -> 0.62 vs printed 0.62
+OK   E7 D1 P1 time min: computed 0.742633 -> 0.74 vs printed 0.74
+OK   E7 D1 P1 time max: computed 1.02525 -> 1.03 vs printed 1.03
+OK   all P2 runs certified
+OK   LR-BB P2 max time <= 2.1 s
+OK   MILP max time <= 5.2 s
+OK   P1 time m=601 min: computed 44.5739 -> 45.0 vs printed 45
+OK   P1 time m=601 max: computed 58.8124 -> 59.0 vs printed 59
+OK   subgradient LR-BB and enumeration not certified for N>=4 in 600 s
+OK   main envelopes identical after refit: computed 75 -> 75.0 vs printed 75
+OK   main envelopes: largest difference %: computed 0.747832 -> 0.75 vs printed 0.75
+OK   all refits certified
+============================== System-level results (Section VI-C, abstract)
+OK   HYP infeasible at alpha<=1e-3
+OK   HYP: no feasible design in any order/split at alpha<=1e-3
+OK   HYP/proposed ratio min: computed 1.09606 -> 1.1 vs printed 1.1
+OK   HYP/proposed ratio max: computed 5.98762 -> 6.0 vs printed 6.0
+OK   D2 1e-3 proposed: computed 0.0686167 -> 0.0686 vs printed 0.0686
+OK   D2 1e-3 Marcialis: computed 0.0959333 -> 0.0959 vs printed 0.0959
+OK   D2 1e-3 CI low: computed -0.0324638 -> -0.032 vs printed -0.032
+OK   D2 1e-3 CI high: computed -0.0221695 -> -0.022 vs printed -0.022
+OK   Marcialis significant settings (D2,D3): computed 5 -> 5.0 vs printed 5
+OK   symmetric significant settings (D2,D3): computed 3 -> 3.0 vs printed 3
+OK   symmetric = Marcialis thresholds in the three significant settings
+OK   Marcialis reduction min %: computed 12.7862 -> 13.0 vs printed 13
+OK   Marcialis reduction max %: computed 35.239 -> 35.0 vs printed 35
+OK   abstract: 13%-35% in five of six settings
+OK   direct search min Holm p: computed 0.0611405 -> 0.06 vs printed 0.06
+OK   direct search never significant
+OK   largest difference to direct search: computed 0.02035 -> 0.02 vs printed 0.020
+OK   ... on D3 at 1e-4
+OK   largest |difference| is that one
+OK   SPRT lower and significant in all four D2/D3 alpha<=1e-3 settings
+OK   SPRT advantage min %: computed 7.16541 -> 7.0 vs printed 7
+OK   SPRT advantage max %: computed 13.45 -> 13.0 vs printed 13
+OK   parallel significant comparisons: computed 10 -> 10.0 vs printed 10
+OK   parallel advantage min %: computed 7.21399 -> 7.0 vs printed 7
+OK   parallel advantage max %: computed 12.8386 -> 13.0 vs printed 13
+OK   abstract: SPRT/parallel min %: computed 7.16541 -> 7.0 vs printed 7
+OK   abstract: SPRT/parallel max %: computed 13.45 -> 13.0 vs printed 13
+OK   conclusion: 7%-13%: computed 13.45 -> 13.0 vs printed 13
+OK   SPRT + parallel significant (D2/D3, alpha <= 1e-3) out of 16: computed 14 -> 14.0 vs printed 14
+OK   16 = 4 SPRT + 12 parallel comparisons
+OK   stages per genuine claim min: computed 1.16622 -> 1.17 vs printed 1.17
+OK   stages per genuine claim max: computed 1.29277 -> 1.29 vs printed 1.29
+OK   no significant difference on D1
+OK   LLR lower in 9 of 10 D1 splits at both alpha
+OK   envelope families max |diff|: computed 0.00143501 -> 0.0014 vs printed 0.0014
+OK   CI within 0.011 on D1
+OK   CI within 0.006 on D2, D3
+OK   relative variant max |diff|: computed 0.00811667 -> 0.008 vs printed 0.008
+OK   relative variant both directions, extremes at 1e-4 on D2/D3
+OK   MAXMONO D2 1e-4 diff: computed -0.01925 -> -0.019 vs printed -0.019
+OK   MAXMONO CI lo: computed -0.0298756 -> -0.03 vs printed -0.030
+OK   MAXMONO CI hi: computed -0.00862441 -> -0.009 vs printed -0.009
+============================== Conservativeness (Section VI-D, discussion)
+OK   all calibrated designs meet alpha on training
+OK   bootstrap D1 compliance min %: computed 92.7451 -> 93.0 vs printed 93
+OK   bootstrap D1 compliance max %: computed 93.9462 -> 94.0 vs printed 94
+OK   bootstrap D2 compliance %: computed 100 -> 100.0 vs printed 100
+OK   CP D1 min %: computed 82.2884 -> 82.0 vs printed 82
+OK   CP D1 max %: computed 82.5949 -> 83.0 vs printed 83
+OK   CP D2 min %: computed 92.5 -> 92.5 vs printed 92.5
+OK   CP D2 max %: computed 100 -> 100.0 vs printed 100
+OK   uncalibrated D1 min %: computed 37.1875 -> 37.0 vs printed 37
+OK   uncalibrated D1 max %: computed 60.3125 -> 60.0 vs printed 60
+OK   bootstrap D3 min %: computed 65 -> 65.0 vs printed 65
+OK   bootstrap D3 max %: computed 70 -> 70.0 vs printed 70
+OK   CP D3 min %: computed 35 -> 35.0 vs printed 35
+OK   CP D3 max %: computed 55 -> 55.0 vs printed 55
+OK   D3 median FAR/alpha min: computed 0.897265 -> 0.9 vs printed 0.90
+OK   D3 median FAR/alpha max: computed 0.952591 -> 0.95 vs printed 0.95
+OK   benchmark compliance of a correct 95% bound %: computed 87.7603 -> 88.0 vs printed 88
+OK   D3 bootstrap SD min: computed 0.0490276 -> 0.05 vs printed 0.05
+OK   D3 bootstrap SD max: computed 0.127783 -> 0.13 vs printed 0.13
+OK   bootstrap SD matches split-to-split spread (within 0.02 alpha)
+OK   D3 shift proposed min: computed 0.0424494 -> 0.04 vs printed 0.04
+OK   D3 shift proposed max: computed 0.12386 -> 0.12 vs printed 0.12
+OK   D3 shift others max: computed 0.205915 -> 0.21 vs printed 0.21
+OK   D3 shift positive for every method
+OK   no shift on D2
+OK   D1 prediction ratio min: computed 4.99702 -> 5.0 vs printed 5.0
+OK   D1 prediction ratio max: computed 6.57851 -> 6.6 vs printed 6.6
+OK   D3 prediction too low at alpha<=1e-3
+OK   discussion: D1 ratio range: computed 6.57851 -> 6.6 vs printed 6.6
+OK   selected D1 prediction coverage %: computed 100 -> 100.0 vs printed 100
+OK   selected D2 coverage min %: computed 75 -> 75.0 vs printed 75
+OK   selected D2 coverage max %: computed 100 -> 100.0 vs printed 100
+OK   selected D3 coverage 0 at alpha<=1e-3
+OK   selected D3 chains all correlated pairs
+OK   corner-dominance designs: computed 2044 -> 2044.0 vs printed 2044
+OK   all satisfy prediction
+OK   sampled-point dominance share %: computed 88.75 -> 88.75 vs printed 88.75
+OK   sampled-point max excess: computed 0.0055258 -> 0.0055 vs printed 0.0055
+OK   envelope term dominates on D1
+OK   dependence largest on D3
+============================== Security and cost (Section VI-E)
+OK   trait spoof proposed D1: computed 0.855504 -> 0.86 vs printed 0.86
+OK   trait spoof: proposed highest on D1
+OK   trait spoof others D1 min: computed 0.741396 -> 0.74 vs printed 0.74
+OK   trait spoof others D1 max: computed 0.820541 -> 0.82 vs printed 0.82
+OK   trait spoof proposed D2: computed 0.862347 -> 0.86 vs printed 0.86
+OK   trait spoof D2 min: computed 0.828783 -> 0.83 vs printed 0.83
+OK   trait spoof D2 max: computed 0.862347 -> 0.86 vs printed 0.86
+OK   trait spoof proposed D3: computed 0.834942 -> 0.83 vs printed 0.83
+OK   trait spoof D3 min: computed 0.810767 -> 0.81 vs printed 0.81
+OK   trait spoof D3 max: computed 0.855741 -> 0.86 vs printed 0.86
+OK   per-algorithm spoof, parallel fusion D3 min: computed 0.296563 -> 0.3 vs printed 0.30
+OK   per-algorithm spoof, parallel fusion D3 max: computed 0.601302 -> 0.6 vs printed 0.60
+OK   trait spoof: on D1 and D2 every method accepts most attempts of its worst trait
+OK   trait spoof: on D1, D2 and D4 every method accepts most attempts of its worst trait (conclusion)
+OK   reject median stage FAR above 0.99 on D2 and D3 at 1e-3
+OK   median accept FAR min (x1e-4): computed 3.63271 -> 3.6 vs printed 3.6
+OK   median accept FAR max (x1e-4): computed 5 -> 5.0 vs printed 5.0
+OK   min genuine acceptance at FAR 1e-4 %: computed 64.05 -> 64.0 vs printed 64
+OK   impostor stages D1 min: computed 2.79873 -> 2.8 vs printed 2.8
+OK   impostor stages D1 max: computed 2.82808 -> 2.8 vs printed 2.8
+OK   impostor stages D2 min: computed 1.97445 -> 2.0 vs printed 2.0
+OK   impostor stages D2 max: computed 1.99293 -> 2.0 vs printed 2.0
+OK   impostor stages D3 min: computed 1.11217 -> 1.1 vs printed 1.1
+OK   impostor stages D3 max: computed 1.9924 -> 2.0 vs printed 2.0
+OK   reject FAR median D1 1e-3: computed 0.835746 -> 0.84 vs printed 0.84
+OK   reject FAR > 0.1 share %: computed 99.5455 -> 99.5 vs printed 99.5
+OK   mean realized impostor stages exceed kappa by at most 1e-4
+OK   D2 FRR no cap: computed 0.0687333 -> 0.0687 vs printed 0.0687
+OK   D2 FRR kappa 1.2: computed 0.0758333 -> 0.0758 vs printed 0.0758
+OK   D2 SPRT kappa 1.1: computed 0.0843 -> 0.0843 vs printed 0.0843
+OK   D2 GP kappa 1.1: computed 0.0789 -> 0.0789 vs printed 0.0789
+OK   GP lower than SPRT only at the tightest D1 and D2 budgets
+OK   D1 SPRT kappa 1.3: computed 0.0382239 -> 0.0382 vs printed 0.0382
+OK   D1 GP kappa 1.3: computed 0.0281853 -> 0.0282 vs printed 0.0282
+OK   IJIS: stage cap leaves GP trait-spoof acceptance at 0.87-0.88 (D1), 0.86 (D2), 0.83-0.84 (D3): {'D1': [np.float64(0.87), np.float64(0.88)], 'D2': [np.float64(0.86)], 'D3': [np.float64(0.83), np.float64(0.84)]}
+OK   IJIS: Table 6 covers all feasible stage-capped designs
+============================== IJIS revision claims
+OK   IJIS: HYP envelopes are single terms C a^-1
+OK   IJIS: smallest hyperbola constant C_s = 0.002495 > 0.0024
+OK   IJIS: C_s > 1e-3 for all matchers and splits (HYP infeasible at alpha <= 1e-3)
+OK   IJIS: HYP feasible in six D2 splits at 1e-2
+OK   IJIS: P1 root bound within 1e-4 in 39, within 1e-6 in 38
+OK   IJIS: N=1 root gap D1 face C %: computed 5.99293 -> 6.0 vs printed 6.0
+OK   IJIS: N=1 root gap D2 left index %: computed 0.171349 -> 0.17 vs printed 0.17
+OK   IJIS: N=1 needed 18 nodes
+OK   IJIS: P2 best value decrease N=2..5 max %: computed 0.382684 -> 0.4 vs printed 0.4
+OK   IJIS: ... on D1 face C
+OK   IJIS: direct D3 1e-4 CI lo: computed 0.00396693 -> 0.004 vs printed 0.004
+OK   IJIS: direct D3 1e-4 CI hi: computed 0.0367331 -> 0.037 vs printed 0.037
+OK   IJIS: direct search lower in all ten splits
+OK   IJIS: D3 1e-4 FAR/alpha proposed: computed 0.9006 -> 0.9 vs printed 0.90
+OK   IJIS: D3 1e-4 FAR/alpha direct: computed 0.987325 -> 0.99 vs printed 0.99
+OK   IJIS: 59 primary comparisons
+OK   IJIS: global Holm - Marcialis 4 of 6 (D2, D3)
+OK   IJIS: global Holm - SPRT 3 of 4, parallel 6 of 12 (D2, D3, alpha <= 1e-3)
+OK   IJIS: HYP tested in 3 settings only
+OK   IJIS: family has 8 tests where HYP feasible, 7 otherwise
+OK   IJIS: deployed compliance D1 1e-3: computed 8.66667 -> 8.67 vs printed 8.67
+OK   IJIS: deployed compliance D1 1e-2: computed 9.9 -> 9.9 vs printed 9.9
+OK   IJIS: deployed compliance D2 all, D3 5-7
+OK   IJIS: D3 single-matcher 70%, pairs 60-70%
+OK   IJIS: largest corrected t of the shift: computed 1.12779 -> 1.13 vs printed 1.13
+OK   IJIS: D1 1e-3 shift proposed: computed 0.176185 -> 0.18 vs printed 0.18
+OK   IJIS: single-monomial designs within 0.0014: computed 0.00143501 -> 0.0014 vs printed 0.0014
+OK   IJIS: subgradient settings (mu=0 start, step factor 2, patience 15, 2 x 300 iterations)
+OK   IJIS: smallest optimal exponent P1: computed -1.62 -> -1.62 vs printed -1.62
+OK   IJIS: smallest optimal exponent P2: computed -1.48 -> -1.48 vs printed -1.48
+OK   IJIS: D2 bootstrap p95 min: computed 0.814425 -> 0.81 vs printed 0.81
+OK   IJIS: D2 bootstrap p95 max: computed 0.905998 -> 0.91 vs printed 0.91
+OK   IJIS: D3 bootstrap p95 about 1.00
+============================== IJIS v02 claims (title, MIQP, matched FAR, new splits, cross-fitting, D4)
+OK   v03: title
+OK   v02: MIQP N=2 reproduces all 40 optima, max rel. diff 2.54e-14 rounds to 3e-14
+OK   v02: MIQP gap <= 1e-4 (max 9.89e-05) and at most 3 iterations
+OK   v02: MIQP time min: computed 0.604362 -> 0.6 vs printed 0.60
+OK   v02: MIQP time max: computed 1.9252 -> 1.93 vs printed 1.93
+OK   v02: N=3 LR-BB matches MIQP in all 40 (max rel. diff 2.36e-08)
+OK   v02: N=3 max rel. diff (1e-8): computed 2.35597 -> 2.4 vs printed 2.4
+OK   v02: N=3 root bound closes the gap in every instance (max 2.4e-08)
+OK   v02: three terms improve on two in one instance only
+OK   v02: N=3 improvement %: computed 0.258081 -> 0.26 vs printed 0.26
+OK   v02: matched FAR - 59 comparisons, all keep their sign
+OK   v02: matched FAR - significance kept: computed 54 -> 54.0 vs printed 54
+OK   v02: matched FAR - the five lost significance, p to 0.05-0.09
+OK   v02: matched FAR D3 1e-4 direct: computed 0.0181833 -> 0.018 vs printed 0.018
+OK   v02: D4 face_S EER: computed 0.00714286 -> 0.007 vs printed 0.007
+OK   v02: D4 face_S FRR@1e-3: computed 0.0130952 -> 0.013 vs printed 0.013
+OK   v02: D4 li_V EER: computed 0.0817669 -> 0.082 vs printed 0.082
+OK   v02: D4 li_V FRR@1e-3: computed 0.180357 -> 0.18 vs printed 0.180
+OK   v02: D4 ri_V EER: computed 0.05526 -> 0.055 vs printed 0.055
+OK   v02: D4 ri_V FRR@1e-3: computed 0.12381 -> 0.124 vs printed 0.124
+OK   v02: D4 1680 subjects
+OK   v02: D4 impostors 2.8e6: computed 2.82072 -> 2.8 vs printed 2.8
+OK   v02: D4 face-finger genuine corr [-0.01, 0.02]
+OK   v02: D4 L-R genuine corr: computed 0.412845 -> 0.41 vs printed 0.41
+OK   v02: D4 face FRR at 1e-3 quoted in Sect. 6.3
+OK   v02: D4 test halves 840 genuine, 7.0e5 impostors
+OK   v02: YuNet found a face in every image
+OK   v02: 20 new splits of D1-D3, 10 of D4, 70 files
+OK   v02: new splits - Marcialis significant settings: computed 5 -> 5.0 vs printed 5
+OK   v02: Marcialis reduction min %: computed 11.5732 -> 12.0 vs printed 12
+OK   v02: Marcialis reduction max %: computed 36.004 -> 36.0 vs printed 36
+OK   v02: sixth setting p: computed 0.0669665 -> 0.07 vs printed 0.07
+OK   v02: new splits - SPRT/parallel significant of 16: computed 14 -> 14.0 vs printed 14
+OK   v02: SPRT/parallel adv min %: computed 9.00659 -> 9.0 vs printed 9
+OK   v02: SPRT/parallel adv max %: computed 13.2081 -> 13.0 vs printed 13
+OK   v02: pooled abstract ranges 12-36 (Marcialis) and 7-13 (SPRT/parallel)
+OK   v02: 14 of 16 on both sets of splits
+OK   v02: new splits - nothing significant on D1
+OK   v02: direct search significant only on D3 at 1e-4, lower in all 20
+OK   v02: direct D3 1e-4 diff: computed 0.0176917 -> 0.018 vs printed 0.018
+OK   v02: direct CI lo: computed 0.00404513 -> 0.004 vs printed 0.004
+OK   v02: direct CI hi: computed 0.0313382 -> 0.031 vs printed 0.031
+OK   v02: other direct p min: computed 0.311798 -> 0.31 vs printed 0.31
+OK   v02: direct search never significant on original splits or D4
+OK   v02: Marcialis significant at matched FAR, original splits: computed 4 -> 4.0 vs printed 4
+OK   v02: D3 1e-3 matched p: computed 0.0634429 -> 0.06 vs printed 0.06
+OK   v02: Marcialis significant at matched FAR, new splits: computed 5 -> 5.0 vs printed 5
+OK   v02: Marcialis significant with held-out calibration: computed 4 -> 4.0 vs printed 4
+OK   v02: held-out SPRT/parallel significant of 16: computed 12 -> 12.0 vs printed 12
+OK   v02: ... of 16
+OK   v02: abstract 'four of six in most sensitivity analyses' (global Holm 4, matched original 4, matched new 5, held-out 4)
+OK   v02: matched FAR new splits - comparisons: computed 82 -> 82.0 vs printed 82
+OK   v02: ... kept sign: computed 80 -> 80.0 vs printed 80
+OK   v02: ... kept significance: computed 77 -> 77.0 vs printed 77
+OK   v02: matched FAR direct D3 1e-4 on 19 splits
+OK   v02: matched FAR new splits - direct D3 1e-4 p: computed 0.108225 -> 0.11 vs printed 0.11
+OK   v02: D4 matched FAR - proposed not lower than decision-level rules at alpha>=1e-3; only sum fusion significant
+OK   v02: most D4 baselines met alpha in fewer halves (17 of 21)
+OK   v02: D4 proposed stages min: computed 1.02083 -> 1.02 vs printed 1.02
+OK   v02: D4 proposed stages max: computed 1.05349 -> 1.05 vs printed 1.05
+OK   v02: D4 proposed FRR min: computed 0.00229762 -> 0.0023 vs printed 0.0023
+OK   v02: D4 proposed FRR max: computed 0.00416667 -> 0.0042 vs printed 0.0042
+OK   v02: D4 SPRT/LLR/LogReg min: computed 0.000714286 -> 0.0007 vs printed 0.0007
+OK   v02: D4 SPRT/LLR/LogReg max: computed 0.00113095 -> 0.0011 vs printed 0.0011
+OK   v02: D4 decision-level rules alpha>=1e-3 min: computed 0.00113095 -> 0.0011 vs printed 0.0011
+OK   v02: D4 decision-level max: computed 0.002 -> 0.002 vs printed 0.0020
+OK   v02: D4 proposed higher than every decision-level rule at alpha>=1e-3
+OK   v02: D4 one error: computed 0.00119048 -> 0.0012 vs printed 0.0012
+OK   v02: D4 only sum fusion significant (1e-3, 1e-4), proposed lower
+OK   v02: D4 sum 1e-3: computed 0.0171429 -> 0.0171 vs printed 0.0171
+OK   v02: D4 sum 1e-4: computed 0.0388095 -> 0.0388 vs printed 0.0388
+OK   v02: D4 SPRT and LLR never worse than proposed
+OK   v02: D4 - only sum fusion significant (Discussion)
+OK   v02: D4 face C_s min (1e-4): computed 4.79836 -> 4.8 vs printed 4.8
+OK   v02: D4 face C_s max (1e-4): computed 8.14445 -> 8.1 vs printed 8.1
+OK   v02: D4 HYP feasible in all splits at 1e-3, infeasible at 1e-4
+OK   v02: D4 HYP 1e-3 FRR: computed 0.00741071 -> 0.0074 vs printed 0.0074
+OK   v02: abstract - D4 SPRT/LLR about 0.001 (0.0007-0.0011), proposed 0.002-0.004, not significant
+OK   v02: conclusion - proposed higher mean FRR than most serial rules on D4
+OK   v02: conclusion - all serial rules except HYP below 0.005
+OK   v02: boot D2 19 of 20
+OK   v02: boot D1 about 16 of 20 ([15.96, 15.96])
+OK   v02: boot D3 14 to 17 of 20
+OK   v02: boot D4 min of 10: computed 8.13333 -> 8.1 vs printed 8.1
+OK   v02: boot D4 max of 10: computed 9.13333 -> 9.1 vs printed 9.1
+OK   v02: xfit D1-D3 18 to 20 of 20 ([18.0, 18.2, 18.48, 19.0, 20.0, 20.0, 20.0, 20.0])
+OK   v02: xfit D4 all ten
+OK   v02: expected compliance bootstrap %: computed 87.7624 -> 88.0 vs printed 88
+OK   v02: expected compliance cross-fitted %: computed 91.0386 -> 91.0 vs printed 91
+OK   v02: boot D1/D3 compliance min %: computed 70 -> 70.0 vs printed 70
+OK   v02: boot D1/D3 compliance max %: computed 85 -> 85.0 vs printed 85
+OK   v02: abstract compliance 70-95 (boot, new splits and D4: 70.0-95.0) / 90-100 held-out
+OK   v02: boot below 88% on D1, D3 and D4 at 1e-3 only
+OK   v02: held-out 90-100 on D1-D3, all ten D4
+OK   v02: held-out FAR/alpha min: computed 0.422366 -> 0.42 vs printed 0.42
+OK   v02: held-out FAR/alpha max: computed 0.850354 -> 0.85 vs printed 0.85
+OK   v02: boot FAR/alpha min: computed 0.730529 -> 0.73 vs printed 0.73
+OK   v02: boot FAR/alpha max: computed 0.920552 -> 0.92 vs printed 0.92
+OK   v02: SPRT/fusion compliance boot min %: computed 60 -> 60.0 vs printed 60
+OK   v02: SPRT/fusion compliance held-out min %: computed 70 -> 70.0 vs printed 70
+OK   v02: SPRT/fusion compliance max 100% under both
+OK   v02: conclusion - SPRT/fusion 70-100 with held-out
+OK   v02: xfit cost D2 min %: computed 1.15415 -> 1.0 vs printed 1
+OK   v02: xfit cost D2 max %: computed 2.08729 -> 2.0 vs printed 2
+OK   v02: xfit cost D3 min %: computed 3.48109 -> 3.0 vs printed 3
+OK   v02: xfit cost D3 max %: computed 4.57148 -> 5.0 vs printed 5
+OK   v02: xfit cost D1 min %: computed 58.4556 -> 58.0 vs printed 58
+OK   v02: xfit cost D1 max %: computed 96.062 -> 96.0 vs printed 96
+OK   v02: xfit cost D1 abs min: computed 0.00578482 -> 0.006 vs printed 0.006
+OK   v02: xfit cost D1 abs max: computed 0.0065768 -> 0.007 vs printed 0.007
+OK   v02: xfit cost D4 min %: computed 65.3508 -> 65.0 vs printed 65
+OK   v02: xfit cost D4 max %: computed 84.1715 -> 84.0 vs printed 84
+OK   v02: xfit cost D4 max abs: computed 0.00347222 -> 0.0035 vs printed 0.0035
+OK   v02: D4 face spoof proposed: computed 0.963471 -> 0.96 vs printed 0.96
+OK   v02: D4 face spoof others min: computed 0.89944 -> 0.9 vs printed 0.90
+OK   v02: D4 face spoof others max: computed 0.979097 -> 0.98 vs printed 0.98
+OK   v02: D4 sum fusion right-index spoof: computed 0.816463 -> 0.82 vs printed 0.82
+OK   v02: D4 sum fusion face spoof low
+OK   v02: D4 face genuine z median: computed 6.62219 -> 6.6 vs printed 6.6
+OK   v02: D4 finger z min: computed 17.5976 -> 18.0 vs printed 18
+OK   v02: D4 finger z max: computed 22.1158 -> 22.0 vs printed 22
+OK   v02: splits computed on both machines: computed 7 -> 7.0 vs printed 7
+OK   v02: the seven are those named
+OK   v02: one split differs in 3 of 1484 designs, test rates identical
+OK   v02: 44 files from the PC = 36 of 40 new D2/D3 splits + 8 D4 splits
+============================== IJIS format checks
+OK   IJIS: abstract has 249 words (150-250)
+OK   IJIS: 6 keywords (4-6)
+OK   IJIS: tab:s-calib is S2 in ESM_1
+OK   IJIS: tab:s-decomp is S6 in ESM_1
+OK   IJIS: tab:s-abl is S11 in ESM_1
+OK   IJIS: ESM cites main Tables 6 and 7 correctly
+OK   IJIS: ESM cites main Table 3 (system) correctly
+OK   IJIS: ESM cites main Sect. 3.5 / 6.4 and Fig. 3 correctly
+OK   IJIS: Fig. 1 artwork refers to the GP as (3)
+OK   IJIS: ESM Sect. S1/S4 cited from main text exist
+============================== Ablations (Section VI-F)
+OK   sampled-point dominance FRR: computed 0.00965251 -> 0.0097 vs printed 0.0097
+OK   main FRR (uncalibrated): computed 0.00926641 -> 0.0093 vs printed 0.0093
+OK   FAR-range restriction FRR: computed 0.0432432 -> 0.0432 vs printed 0.0432
+============================== Generated tables are current
+OK   main-paper table bodies unchanged after regeneration
+OK   supplementary tables unchanged after regeneration
+
+396 checks passed, 0 failed

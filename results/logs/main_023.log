@@ -1,0 +1,26 @@
+[face_x_face s2] fit face_C HYP 0.0s gap=nan
+[face_x_face s2] fit face_C MONO 0.0s gap=nan
+[face_x_face s2] fit face_C MONO-rel 0.0s gap=nan
+[face_x_face s2] fit face_C LR-P1-N2 1.6s gap=0.0
+[face_x_face s2] fit face_C LR-P1-N2-rel 1.8s gap=0.0
+[face_x_face s2] fit face_C LR-P2-N2 3.8s gap=0.0
+[face_x_face s2] fit face_C LR-P2-N2-rel 7.8s gap=0.0
+[face_x_face s2] fit face_C LR-P1-N3 78.4s gap=0.0
+[face_x_face s2] fit face_C NLS-N2 0.3s gap=nan
+[face_x_face s2] fit face_C DE-N2 0.9s gap=nan
+[face_x_face s2] fit face_C MAXMONO-K3 0.0s gap=nan
+[face_x_face s2] fit face_G HYP 0.0s gap=nan
+[face_x_face s2] fit face_G MONO 0.0s gap=nan
+[face_x_face s2] fit face_G MONO-rel 0.0s gap=nan
+[face_x_face s2] fit face_G LR-P1-N2 1.8s gap=0.0
+[face_x_face s2] fit face_G LR-P1-N2-rel 2.1s gap=0.0
+[face_x_face s2] fit face_G LR-P2-N2 3.0s gap=0.0
+[face_x_face s2] fit face_G LR-P2-N2-rel 12.1s gap=0.0
+[face_x_face s2] fit face_G LR-P1-N3 81.7s gap=0.0
+[face_x_face s2] fit face_G NLS-N2 0.3s gap=nan
+[face_x_face s2] fit face_G DE-N2 0.9s gap=nan
+[face_x_face s2] fit face_G MAXMONO-K3 0.1s gap=nan
+[face_x_face s2] alpha 0.01 done 286s
+[face_x_face s2] alpha 0.001 done 356s
+[face_x_face s2] alpha 0.0001 done 422s
+[face_x_face s2] finished in 422s

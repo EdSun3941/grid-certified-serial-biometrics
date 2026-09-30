@@ -1,0 +1,106 @@
+fing_x_face 0
+fing_x_face 1
+fing_x_face 2
+fing_x_face 3
+fing_x_face 4
+fing_x_face 5
+fing_x_face 6
+fing_x_face 7
+fing_x_face 8
+fing_x_face 9
+fing_x_fing 0
+fing_x_fing 1
+fing_x_fing 2
+fing_x_fing 3
+fing_x_fing 4
+fing_x_fing 5
+fing_x_fing 6
+fing_x_fing 7
+fing_x_fing 8
+fing_x_fing 9
+face_x_face 0
+face_x_face 1
+face_x_face 2
+face_x_face 3
+face_x_face 4
+face_x_face 5
+face_x_face 6
+face_x_face 7
+face_x_face 8
+face_x_face 9
+reconstruction mismatches with the stored results: 0 []
+method                 HYP  LR-P1-N2  P0-Parallel  P1-LLR  P2-LogReg  S1-Marcialis  S2-Symmetric  S3-SPRT  S4-Direct
+dataset     alpha                                                                                                   
+face_x_face 0.0001     NaN    0.2743       0.2442  0.2405     0.2457        0.2866        0.2866   0.2385     0.2562
+            0.0010     NaN    0.1621       0.1540  0.1447     0.1567        0.1840        0.1840   0.1422     0.1616
+            0.0100  0.0809    0.0740       0.0845  0.0710     0.0823        0.0963        0.0849   0.0694     0.0764
+fing_x_face 0.0010     NaN    0.0107       0.0147  0.0019     0.0081        0.0138        0.0138   0.0081     0.0158
+            0.0100  0.0357    0.0055       0.0023  0.0000     0.0035        0.0093        0.0088   0.0054     0.0095
+fing_x_fing 0.0001     NaN    0.0987       0.0892  0.0887     0.0882        0.1222        0.1222   0.0877     0.0986
+            0.0010     NaN    0.0673       0.0611  0.0617     0.0608        0.0909        0.0909   0.0619     0.0674
+            0.0100  0.0754    0.0424       0.0387  0.0391     0.0383        0.0646        0.0417   0.0396     0.0427
+        dataset   alpha        method   n  mean_diff   ci_lo   ci_hi  p_holm  n_better  n_worse
+0   face_x_face  0.0001           HYP   0        NaN     NaN     NaN     NaN       NaN      NaN
+1   face_x_face  0.0001  S1-Marcialis  10    -0.0122 -0.0346  0.0101  0.4948       9.0      1.0
+2   face_x_face  0.0001  S2-Symmetric  10    -0.0122 -0.0346  0.0101  0.4948       9.0      1.0
+3   face_x_face  0.0001     S4-Direct  10     0.0182  0.0002  0.0362  0.1451       0.0     10.0
+4   face_x_face  0.0001       S3-SPRT  10     0.0358  0.0202  0.0515  0.0041       0.0     10.0
+5   face_x_face  0.0001   P0-Parallel  10     0.0301  0.0133  0.0470  0.0147       0.0     10.0
+6   face_x_face  0.0001        P1-LLR  10     0.0338  0.0179  0.0497  0.0058       0.0     10.0
+7   face_x_face  0.0001     P2-LogReg  10     0.0286  0.0104  0.0468  0.0249       0.0     10.0
+8   face_x_face  0.0010           HYP   0        NaN     NaN     NaN     NaN       NaN      NaN
+9   face_x_face  0.0010  S1-Marcialis  10    -0.0219 -0.0373 -0.0065  0.0634      10.0      0.0
+10  face_x_face  0.0010  S2-Symmetric  10    -0.0219 -0.0373 -0.0065  0.0634      10.0      0.0
+11  face_x_face  0.0010     S4-Direct  10     0.0006 -0.0109  0.0121  0.9498       6.0      3.0
+12  face_x_face  0.0010       S3-SPRT  10     0.0199  0.0075  0.0323  0.0387       0.0     10.0
+13  face_x_face  0.0010   P0-Parallel  10     0.0082 -0.0059  0.0222  0.6614       0.0     10.0
+14  face_x_face  0.0010        P1-LLR  10     0.0174  0.0043  0.0305  0.0634       0.0     10.0
+15  face_x_face  0.0010     P2-LogReg  10     0.0054 -0.0110  0.0218  0.9498       1.0      9.0
+16  face_x_face  0.0100           HYP  10    -0.0069 -0.0137 -0.0001  0.1866      10.0      0.0
+17  face_x_face  0.0100  S1-Marcialis  10    -0.0222 -0.0323 -0.0122  0.0060      10.0      0.0
+18  face_x_face  0.0100  S2-Symmetric  10    -0.0109 -0.0306  0.0089  0.7350      10.0      0.0
+19  face_x_face  0.0100     S4-Direct  10    -0.0024 -0.0091  0.0043  0.7350       9.0      1.0
+20  face_x_face  0.0100       S3-SPRT  10     0.0046  0.0009  0.0083  0.0998       0.0     10.0
+21  face_x_face  0.0100   P0-Parallel  10    -0.0105 -0.0158 -0.0052  0.0102      10.0      0.0
+22  face_x_face  0.0100        P1-LLR  10     0.0030 -0.0025  0.0086  0.7350       1.0      9.0
+23  face_x_face  0.0100     P2-LogReg  10    -0.0082 -0.0144 -0.0020  0.0895      10.0      0.0
+24  fing_x_face  0.0010           HYP   0        NaN     NaN     NaN     NaN       NaN      NaN
+25  fing_x_face  0.0010  S1-Marcialis  10    -0.0031 -0.0183  0.0121  1.0000       7.0      3.0
+26  fing_x_face  0.0010  S2-Symmetric  10    -0.0031 -0.0183  0.0120  1.0000       7.0      3.0
+27  fing_x_face  0.0010     S4-Direct   9    -0.0052 -0.0199  0.0095  1.0000       7.0      2.0
+28  fing_x_face  0.0010       S3-SPRT  10     0.0026 -0.0142  0.0194  1.0000       3.0      7.0
+29  fing_x_face  0.0010   P0-Parallel  10    -0.0040 -0.0259  0.0180  1.0000       6.0      3.0
+30  fing_x_face  0.0010        P1-LLR  10     0.0088 -0.0047  0.0223  1.0000       0.0     10.0
+31  fing_x_face  0.0010     P2-LogReg  10     0.0026 -0.0115  0.0167  1.0000       3.0      5.0
+32  fing_x_face  0.0100           HYP  10    -0.0302 -0.0625  0.0020  0.5049      10.0      0.0
+33  fing_x_face  0.0100  S1-Marcialis  10    -0.0038 -0.0129  0.0053  1.0000       9.0      1.0
+34  fing_x_face  0.0100  S2-Symmetric  10    -0.0033 -0.0124  0.0058  1.0000       9.0      1.0
+35  fing_x_face  0.0100     S4-Direct  10    -0.0040 -0.0143  0.0063  1.0000       8.0      2.0
+36  fing_x_face  0.0100       S3-SPRT  10     0.0001 -0.0120  0.0121  1.0000       5.0      5.0
+37  fing_x_face  0.0100   P0-Parallel  10     0.0032 -0.0126  0.0189  1.0000       3.0      7.0
+38  fing_x_face  0.0100        P1-LLR  10     0.0055 -0.0045  0.0155  1.0000       0.0      9.0
+39  fing_x_face  0.0100     P2-LogReg  10     0.0020 -0.0058  0.0098  1.0000       2.0      6.0
+40  fing_x_fing  0.0001           HYP   0        NaN     NaN     NaN     NaN       NaN      NaN
+41  fing_x_fing  0.0001  S1-Marcialis  10    -0.0235 -0.0297 -0.0172  0.0001      10.0      0.0
+42  fing_x_fing  0.0001  S2-Symmetric  10    -0.0235 -0.0297 -0.0172  0.0001      10.0      0.0
+43  fing_x_fing  0.0001     S4-Direct  10     0.0001 -0.0063  0.0065  0.9724       5.0      4.0
+44  fing_x_fing  0.0001       S3-SPRT  10     0.0110  0.0054  0.0165  0.0031       0.0     10.0
+45  fing_x_fing  0.0001   P0-Parallel  10     0.0095  0.0059  0.0131  0.0011       0.0     10.0
+46  fing_x_fing  0.0001        P1-LLR  10     0.0100  0.0055  0.0144  0.0026       0.0     10.0
+47  fing_x_fing  0.0001     P2-LogReg  10     0.0105  0.0056  0.0153  0.0026       0.0     10.0
+48  fing_x_fing  0.0010           HYP   0        NaN     NaN     NaN     NaN       NaN      NaN
+49  fing_x_fing  0.0010  S1-Marcialis  10    -0.0236 -0.0281 -0.0191  0.0000      10.0      0.0
+50  fing_x_fing  0.0010  S2-Symmetric  10    -0.0236 -0.0281 -0.0191  0.0000      10.0      0.0
+51  fing_x_fing  0.0010     S4-Direct  10    -0.0002 -0.0026  0.0023  0.8822       5.0      4.0
+52  fing_x_fing  0.0010       S3-SPRT  10     0.0054  0.0019  0.0089  0.0245       0.0     10.0
+53  fing_x_fing  0.0010   P0-Parallel  10     0.0062  0.0022  0.0101  0.0245       0.0     10.0
+54  fing_x_fing  0.0010        P1-LLR  10     0.0056  0.0017  0.0095  0.0245       0.0     10.0
+55  fing_x_fing  0.0010     P2-LogReg  10     0.0064  0.0032  0.0096  0.0071       0.0     10.0
+56  fing_x_fing  0.0100           HYP   6    -0.0319 -0.0371 -0.0267  0.0001       6.0      0.0
+57  fing_x_fing  0.0100  S1-Marcialis  10    -0.0222 -0.0341 -0.0102  0.0162      10.0      0.0
+58  fing_x_fing  0.0100  S2-Symmetric  10     0.0007 -0.0015  0.0029  0.9933       2.0      7.0
+59  fing_x_fing  0.0100     S4-Direct  10    -0.0004 -0.0030  0.0023  0.9933       5.0      3.0
+60  fing_x_fing  0.0100       S3-SPRT  10     0.0029  0.0004  0.0053  0.0878       0.0     10.0
+61  fing_x_fing  0.0100   P0-Parallel  10     0.0037  0.0011  0.0064  0.0521       0.0     10.0
+62  fing_x_fing  0.0100        P1-LLR  10     0.0033  0.0006  0.0060  0.0821       0.0     10.0
+63  fing_x_fing  0.0100     P2-LogReg  10     0.0041  0.0013  0.0069  0.0521       0.0     10.0

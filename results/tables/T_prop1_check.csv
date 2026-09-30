@@ -1,0 +1,37 @@
+dominance,dataset,method,n_designs,frac_realized_le_pred,max_excess,source
+corner (main),face_x_face,DE-N2,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,HYP,18,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,LR-P1-N2,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,LR-P1-N2-rel,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,LR-P1-N3,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,LR-P2-N2,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,LR-P2-N2-rel,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,MAXMONO-K3,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,MONO,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,MONO-rel,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),face_x_face,NLS-N2,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,DE-N2,80,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,HYP,21,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,LR-P1-N2,80,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,LR-P1-N2-rel,80,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,LR-P1-N3,80,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,LR-P2-N2,80,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,LR-P2-N2-rel,80,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,MAXMONO-K3,79,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,MONO,80,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,MONO-rel,80,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_face,NLS-N2,80,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,DE-N2,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,HYP,6,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,LR-P1-N2,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,LR-P1-N2-rel,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,LR-P1-N3,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,LR-P2-N2,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,LR-P2-N2-rel,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,MAXMONO-K3,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,MONO,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,MONO-rel,60,1.0,0.0,../results/E3/main_*.csv
+corner (main),fing_x_fing,NLS-N2,60,1.0,0.0,../results/E3/main_*.csv
+sample points (ablation),fing_x_face,LR-P1-N2,80,0.8875,0.005525798025249717,../results/E3/abl_sample_*.csv
+sample points (ablation),fing_x_face,LR-P1-N2-rel,80,0.9625,0.0015897097497118984,../results/E3/abl_sample_*.csv
+sample points (ablation),fing_x_face,MONO,80,0.8875,0.005504276547161013,../results/E3/abl_sample_*.csv

@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this code or these results, please cite the article below."
+title: "Grid-certified posynomial FAR-FRR envelopes for serial multibiometric threshold design: code and per-split results"
+authors:
+  - family-names: Su
+    given-names: Chuan-Hsiang
+  - family-names: Lin
+    given-names: Frank Yeong-Sung
+  - family-names: Sun
+    given-names: Tzu-Lung
+  - family-names: Yeh
+    given-names: Chih-Chun
+  - family-names: Hsiao
+    given-names: Chiu-Han
+license: MIT
+repository-code: "https://github.com/EdSun3941/grid-certified-serial-biometrics"
+preferred-citation:
+  type: article
+  title: "Grid-Certified Posynomial FAR-FRR Envelopes for Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound"
+  authors:
+    - family-names: Su
+      given-names: Chuan-Hsiang
+    - family-names: Lin
+      given-names: Frank Yeong-Sung
+    - family-names: Sun
+      given-names: Tzu-Lung
+    - family-names: Yeh
+      given-names: Chih-Chun
+    - family-names: Hsiao
+      given-names: Chiu-Han
+  journal: "International Journal of Information Security"
+  status: submitted

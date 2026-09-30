@@ -1,0 +1,26 @@
+[fing_x_fing s1] fit li_V HYP 0.0s gap=nan
+[fing_x_fing s1] fit li_V MONO 0.0s gap=nan
+[fing_x_fing s1] fit li_V MONO-rel 0.0s gap=nan
+[fing_x_fing s1] fit li_V LR-P1-N2 0.6s gap=0.0
+[fing_x_fing s1] fit li_V LR-P1-N2-rel 1.0s gap=0.0
+[fing_x_fing s1] fit li_V LR-P2-N2 1.9s gap=0.0
+[fing_x_fing s1] fit li_V LR-P2-N2-rel 3.6s gap=0.0
+[fing_x_fing s1] fit li_V LR-P1-N3 20.9s gap=0.0
+[fing_x_fing s1] fit li_V NLS-N2 0.2s gap=nan
+[fing_x_fing s1] fit li_V DE-N2 0.3s gap=nan
+[fing_x_fing s1] fit li_V MAXMONO-K3 0.0s gap=nan
+[fing_x_fing s1] fit ri_V HYP 0.0s gap=nan
+[fing_x_fing s1] fit ri_V MONO 0.0s gap=nan
+[fing_x_fing s1] fit ri_V MONO-rel 0.0s gap=nan
+[fing_x_fing s1] fit ri_V LR-P1-N2 0.7s gap=0.0
+[fing_x_fing s1] fit ri_V LR-P1-N2-rel 0.9s gap=0.0
+[fing_x_fing s1] fit ri_V LR-P2-N2 1.8s gap=0.0
+[fing_x_fing s1] fit ri_V LR-P2-N2-rel 4.4s gap=0.0
+[fing_x_fing s1] fit ri_V LR-P1-N3 30.8s gap=0.0
+[fing_x_fing s1] fit ri_V NLS-N2 0.1s gap=nan
+[fing_x_fing s1] fit ri_V DE-N2 0.4s gap=nan
+[fing_x_fing s1] fit ri_V MAXMONO-K3 0.0s gap=nan
+[fing_x_fing s1] alpha 0.01 done 263s
+[fing_x_fing s1] alpha 0.001 done 432s
+[fing_x_fing s1] alpha 0.0001 done 590s
+[fing_x_fing s1] finished in 590s

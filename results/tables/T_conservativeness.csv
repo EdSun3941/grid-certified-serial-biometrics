@@ -1,0 +1,105 @@
+regime,dataset,alpha,chain,method,n,far_ok_train,far_ok_test,far_ratio_median,far_ratio_p95,frr_ok_test,source
+plain,face_x_face,0.0001,correlated-pair,all GP,200,0.0,0.0,5.222370469201,11.448743606848998,0.455,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.0001,correlated-pair,LR-P1-N2,20,0.0,0.0,3.1409828774735,5.6042917500551,0.05,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.0001,single,all GP,200,1.0,0.25,1.181899043806,1.489215032243448,0.875,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.0001,single,LR-P1-N2,20,1.0,0.25,1.181899043806,1.48921503224345,0.75,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.001,correlated-pair,all GP,200,0.44,0.11,1.2314876584389,3.38262174783188,0.25,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.001,correlated-pair,LR-P1-N2,20,0.7,0.2,1.1114076050700001,1.24505225706024,0.1,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.001,single,all GP,200,1.0,0.3,1.1251945741605,1.2716477651767295,0.97,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.001,single,LR-P1-N2,20,1.0,0.3,1.1251945741605,1.27164776517673,0.95,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.01,correlated-pair,all GP,217,0.9078341013824884,0.6405529953917051,0.97996442072492,1.7144051589948797,0.7235023041474654,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.01,correlated-pair,LR-P1-N2,20,1.0,0.7,0.97411607738492,1.0741483211029559,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.01,single,all GP,218,1.0,0.39908256880733944,1.0402824104958799,1.1519690905047795,0.9357798165137615,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.01,single,LR-P1-N2,20,1.0,0.4,1.0402824104958799,1.1498632421614399,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.001,correlated-pair,all GP,5187,0.3624445729708888,0.2689415847310584,1.197210499536,2.3345604740953,0.9552727973780606,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.001,correlated-pair,LR-P1-N2,520,0.5134615384615384,0.3326923076923077,1.1373499745592,1.8264942683547092,0.95,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.001,cross-modal,all GP,798,0.6365914786967418,0.5125313283208021,0.9876986621172,1.5563736493969,0.9949874686716792,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.001,cross-modal,LR-P1-N2,80,0.7625,0.525,0.9876986621172,1.4912753284846294,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.001,single,all GP,399,1.0,0.5739348370927319,0.972733530873,1.5429050312771142,0.7393483709273183,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.001,single,LR-P1-N2,40,1.0,0.575,0.9652509652509,1.5346742090928094,0.55,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.01,correlated-pair,all GP,5464,0.6136530014641288,0.5276354319180088,0.98470563586842,1.357112926880366,0.9705344070278185,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.01,correlated-pair,LR-P1-N2,520,0.7269230769230769,0.6,0.94878932088234,1.2468947352668236,0.9730769230769231,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.01,cross-modal,all GP,841,0.915576694411415,0.6504161712247325,0.93382418963814,1.1987070126605,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.01,cross-modal,LR-P1-N2,80,0.95,0.625,0.93606895932477,1.1790278650743673,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.01,single,all GP,421,1.0,0.5938242280285035,0.8275717578043099,1.310945496992,0.7434679334916865,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.01,single,LR-P1-N2,40,1.0,0.6,0.81709616593337,1.272559935350627,0.7,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.0001,correlated-pair,all GP,200,0.6,0.6,0.9325330665777479,1.918083805712449,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.0001,correlated-pair,LR-P1-N2,20,1.0,1.0,0.7852617539179726,0.952595309547627,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.0001,single,all GP,200,1.0,0.95,0.8019339779926642,0.9922196287651134,0.76,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.0001,single,LR-P1-N2,20,1.0,0.95,0.8019339779926642,0.9922196287651145,0.55,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.001,correlated-pair,all GP,200,0.74,0.79,0.9037456930087,1.2638824052461546,0.975,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.001,correlated-pair,LR-P1-N2,20,1.0,1.0,0.90057797043455,0.937668111592695,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.001,single,all GP,200,1.0,1.0,0.90274535956425,0.9852339668777699,0.96,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.001,single,LR-P1-N2,20,1.0,1.0,0.90274535956425,0.98523396687777,0.95,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.01,correlated-pair,all GP,206,1.0,0.9757281553398058,0.734166944537065,0.88270534622652,0.9563106796116505,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.01,correlated-pair,LR-P1-N2,20,1.0,0.95,0.720290096698895,0.8845993108813966,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.01,single,all GP,206,1.0,0.8543689320388349,0.714460375680775,1.01685006113148,0.912621359223301,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.01,single,LR-P1-N2,20,1.0,0.85,0.714460375680775,1.0173935756363148,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.0001,all,all GP,400,0.5,0.125,1.603291082944,10.913053146541248,0.665,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.0001,all,LR-P1-N2,40,0.5,0.125,1.6966866800084999,5.406493217700649,0.4,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.001,all,all GP,400,0.72,0.205,1.1714476317545,3.081343117633973,0.61,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.001,all,LR-P1-N2,40,0.85,0.25,1.1184122748498502,1.2716477651767297,0.525,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.01,all,all GP,435,0.9540229885057471,0.5195402298850574,0.9896152990882799,1.16986880142317,0.8298850574712644,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,face_x_face,0.01,all,LR-P1-N2,40,1.0,0.55,0.988092061374245,1.136684456304199,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.001,all,all GP,6384,0.43656015037593987,0.31845238095238093,1.1523151058034,2.2148394241417,0.9467418546365914,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.001,all,LR-P1-N2,640,0.575,0.371875,1.0999371464487,1.8107808805482999,0.93125,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.01,all,all GP,6726,0.6755872732679156,0.5471305382099316,0.97423004399748,1.3274071413606199,0.9600059470710675,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_face,0.01,all,LR-P1-N2,640,0.771875,0.603125,0.94504803807129,1.24659543264194,0.959375,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.0001,all,all GP,400,0.8,0.775,0.8224963876847838,1.7932644214729994,0.88,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.0001,all,LR-P1-N2,40,1.0,0.975,0.7891519395354007,0.9554295876403244,0.775,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.001,all,all GP,400,0.87,0.895,0.9037456930087,1.1957485828608698,0.9675,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.001,all,LR-P1-N2,40,1.0,1.0,0.90057797043455,0.9801378237189449,0.975,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.01,all,all GP,412,1.0,0.9150485436893204,0.71951761698343,1.0118150494609301,0.9344660194174758,results/E3/main_*.csv; results/E3cal/main_*.csv
+plain,fing_x_fing,0.01,all,LR-P1-N2,40,1.0,0.9,0.718533955763025,1.0120668000444577,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.0001,correlated-pair,all GP,200,1.0,0.47,1.059595285746,1.3453413386699997,0.385,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.0001,correlated-pair,LR-P1-N2,20,1.0,0.5,1.0217923059816083,1.3364465199019997,0.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.0001,single,all GP,200,1.0,0.4,1.0707138092055,1.375917278185048,0.875,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.0001,single,LR-P1-N2,20,1.0,0.4,1.0707138092055,1.3759172781850502,0.75,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.001,correlated-pair,all GP,200,1.0,0.335,1.0312430509227999,1.2212474983321449,0.14,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.001,correlated-pair,LR-P1-N2,20,1.0,0.4,1.0180120080053001,1.18581276406492,0.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.001,single,all GP,200,1.0,0.3,1.1016233044250998,1.2448298865910046,0.97,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.001,single,LR-P1-N2,20,1.0,0.3,1.1016233044250998,1.244829886591005,0.95,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.01,correlated-pair,all GP,217,1.0,0.6728110599078341,0.96889037135868,1.0691349788748,0.7235023041474654,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.01,correlated-pair,LR-P1-N2,20,1.0,0.7,0.96392039137202,1.064170558149872,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.01,single,all GP,218,1.0,0.39908256880733944,1.03172114743162,1.1435112297086873,0.944954128440367,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.01,single,LR-P1-N2,20,1.0,0.4,1.03172114743162,1.1414253947075759,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.001,correlated-pair,all GP,4708,1.0,0.8041631265930331,0.7632216934542,1.2421058932686,0.9530586236193713,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.001,correlated-pair,LR-P1-N2,518,1.0,0.8223938223938224,0.74825656221,1.1844901379784296,0.9459459459459459,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.001,cross-modal,all GP,798,1.0,0.8546365914786967,0.7332914309658,1.2293855317110296,0.9974937343358395,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.001,cross-modal,LR-P1-N2,80,1.0,0.8625,0.7332914309658,1.1844901379784298,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.001,single,all GP,399,1.0,0.7493734335839599,0.6883960372332,1.2750291820058388,0.7819548872180451,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.001,single,LR-P1-N2,40,1.0,0.75,0.6809134716111,1.27353266888142,0.625,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.01,correlated-pair,all GP,5247,1.0,0.8227558604917096,0.8470264284217699,1.1268743826883298,0.9622641509433962,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.01,correlated-pair,LR-P1-N2,512,1.0,0.83203125,0.8305647840531499,1.125228218251468,0.962890625,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.01,cross-modal,all GP,841,1.0,0.8406658739595719,0.8290682709287299,1.05653826584059,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.01,cross-modal,LR-P1-N2,80,1.0,0.85,0.8245787315554699,1.049280177187153,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.01,single,all GP,421,1.0,0.6959619952494062,0.7811798509472899,1.27053964263266,0.7838479809976246,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.01,single,LR-P1-N2,40,1.0,0.7,0.7796833378228699,1.27053964263266,0.75,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.0001,correlated-pair,all GP,200,1.0,0.975,0.7869289763254418,0.9769923307769256,0.775,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.0001,correlated-pair,LR-P1-N2,20,1.0,1.0,0.7569189729909969,0.7915416249861065,0.6,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.0001,single,all GP,200,1.0,1.0,0.7530287873735688,0.8618984105813042,0.895,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.0001,single,LR-P1-N2,20,1.0,1.0,0.7530287873735688,0.8618984105813048,0.8,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.001,correlated-pair,all GP,200,1.0,1.0,0.86734467044565,0.9374235856396,0.93,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.001,correlated-pair,LR-P1-N2,20,1.0,1.0,0.90035567411355,0.936050905857425,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.001,single,all GP,200,1.0,1.0,0.87395798599525,0.9852339668777699,0.985,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.001,single,LR-P1-N2,20,1.0,1.0,0.87395798599525,0.98523396687777,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.01,correlated-pair,all GP,206,1.0,1.0,0.7199510948093799,0.8782371901745,0.9077669902912622,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.01,correlated-pair,LR-P1-N2,20,1.0,1.0,0.713059908858505,0.8515166166499916,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.01,single,all GP,206,1.0,0.8543689320388349,0.7130821384906,1.01685006113148,0.9951456310679612,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.01,single,LR-P1-N2,20,1.0,0.85,0.7087140157830301,1.0173935756363148,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.0001,all,all GP,400,1.0,0.435,1.059595285746,1.369802090282,0.63,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.0001,all,LR-P1-N2,40,1.0,0.45,1.0696019568595,1.3702468312204001,0.375,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.001,all,all GP,400,1.0,0.3175,1.0501445408049,1.2439404047142,0.555,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.001,all,LR-P1-N2,40,1.0,0.35,1.0439181676673,1.2057038025349747,0.475,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.01,all,all GP,435,1.0,0.535632183908046,0.9808316655548099,1.14038247720702,0.8344827586206897,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,face_x_face,0.01,all,LR-P1-N2,40,1.0,0.55,0.979397376028455,1.127200355792749,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.001,all,all GP,5905,1.0,0.8072819644369179,0.7632216934542,1.2570710245128,0.947502116850127,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.001,all,LR-P1-N2,638,1.0,0.822884012539185,0.7407739965879,1.2121756307802,0.932601880877743,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.01,all,all GP,6509,1.0,0.8168689506836687,0.84403340217293,1.1268743826883298,0.9555999385466277,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_face,0.01,all,LR-P1-N2,632,1.0,0.8259493670886076,0.8260752446798899,1.1268743826883298,0.9541139240506329,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.0001,all,all GP,400,1.0,0.9875,0.7835945315105034,0.9171946204290317,0.835,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.0001,all,LR-P1-N2,40,1.0,1.0,0.7535845281760587,0.8602867622540846,0.7,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.001,all,all GP,400,1.0,1.0,0.8708458375013,0.9814049127486448,0.9575,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.001,all,LR-P1-N2,40,1.0,1.0,0.8860731354895499,0.9801378237189449,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.01,all,all GP,412,1.0,0.9271844660194175,0.71592753139935,1.00422363009892,0.9514563106796117,results/E3/main_*.csv; results/E3cal/main_*.csv
+calibrated,fing_x_fing,0.01,all,LR-P1-N2,40,1.0,0.925,0.71300989218628,1.004854951650548,1.0,results/E3/main_*.csv; results/E3cal/main_*.csv

@@ -1,0 +1,11 @@
+[fing_x_face s4] fit face_C LR-P1-N4 120.1s gap=0.37236241040965146
+[fing_x_face s4] fit face_C LR-P1-N5 120.1s gap=0.4687285442353313
+[fing_x_face s4] fit face_G LR-P1-N4 120.0s gap=0.24512743188693936
+[fing_x_face s4] fit face_G LR-P1-N5 120.1s gap=0.3263149362524135
+[fing_x_face s4] fit li_V LR-P1-N4 120.0s gap=0.1689419991117477
+[fing_x_face s4] fit li_V LR-P1-N5 120.1s gap=0.32931409589936284
+[fing_x_face s4] fit ri_V LR-P1-N4 120.1s gap=0.2234829933763675
+[fing_x_face s4] fit ri_V LR-P1-N5 120.1s gap=0.2827095462557448
+[fing_x_face s4] alpha 0.01 done 965s
+[fing_x_face s4] alpha 0.001 done 969s
+[fing_x_face s4] finished in 969s

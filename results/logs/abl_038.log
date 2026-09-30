@@ -1,0 +1,19 @@
+[fing_x_face s3] fit face_C HYP 0.0s gap=nan
+[fing_x_face s3] fit face_C MONO 0.0s gap=nan
+[fing_x_face s3] fit face_C LR-P1-N2 1.0s gap=0.0
+[fing_x_face s3] fit face_C LR-P1-N2-rel 3.1s gap=0.0
+[fing_x_face s3] fit face_G HYP 0.0s gap=nan
+[fing_x_face s3] fit face_G MONO 0.0s gap=nan
+[fing_x_face s3] fit face_G LR-P1-N2 3.0s gap=0.0
+[fing_x_face s3] fit face_G LR-P1-N2-rel 4.1s gap=0.0
+[fing_x_face s3] fit li_V HYP 0.0s gap=nan
+[fing_x_face s3] fit li_V MONO 0.0s gap=nan
+[fing_x_face s3] fit li_V LR-P1-N2 0.8s gap=0.0
+[fing_x_face s3] fit li_V LR-P1-N2-rel 1.1s gap=0.0
+[fing_x_face s3] fit ri_V HYP 0.0s gap=nan
+[fing_x_face s3] fit ri_V MONO 0.0s gap=nan
+[fing_x_face s3] fit ri_V LR-P1-N2 0.8s gap=0.0
+[fing_x_face s3] fit ri_V LR-P1-N2-rel 1.1s gap=0.0
+[fing_x_face s3] alpha 0.01 done 25s
+[fing_x_face s3] alpha 0.001 done 36s
+[fing_x_face s3] finished in 36s

@@ -1,0 +1,3 @@
+dataset,seed,method,kind,n_stages,B,alpha,calib,n_iter,fit_time,feasible,far_train,frr_train,far_test,frr_test,stages_gen,stages_imp,thr
+fing_x_face,5,P3-MLP,parallel,4,300,0.01,boot,41,2.655298948287964,True,0.007344735016438934,0.0,0.007168297865972285,0.003861003861003861,4.0,4.0,[-9.469232989297]
+fing_x_face,5,P3-MLP,parallel,4,300,0.001,boot,41,2.655298948287964,True,0.0006032636563810213,0.0,0.0005686749872796385,0.015444015444015444,4.0,4.0,[-2.7393913133749104]

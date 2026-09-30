@@ -1,0 +1,47 @@
+[fing_x_face s2] fit face_C HYP 0.0s gap=nan
+[fing_x_face s2] fit face_C MONO 0.0s gap=nan
+[fing_x_face s2] fit face_C MONO-rel 0.0s gap=nan
+[fing_x_face s2] fit face_C LR-P1-N2 2.8s gap=0.0
+[fing_x_face s2] fit face_C LR-P1-N2-rel 2.6s gap=0.0
+[fing_x_face s2] fit face_C LR-P2-N2 4.2s gap=0.0
+[fing_x_face s2] fit face_C LR-P2-N2-rel 10.1s gap=0.0
+[fing_x_face s2] fit face_C LR-P1-N3 130.7s gap=0.0
+[fing_x_face s2] fit face_C NLS-N2 0.3s gap=nan
+[fing_x_face s2] fit face_C DE-N2 0.9s gap=nan
+[fing_x_face s2] fit face_C MAXMONO-K3 0.0s gap=nan
+[fing_x_face s2] fit face_G HYP 0.0s gap=nan
+[fing_x_face s2] fit face_G MONO 0.0s gap=nan
+[fing_x_face s2] fit face_G MONO-rel 0.0s gap=nan
+[fing_x_face s2] fit face_G LR-P1-N2 1.8s gap=0.0
+[fing_x_face s2] fit face_G LR-P1-N2-rel 4.1s gap=0.0
+[fing_x_face s2] fit face_G LR-P2-N2 1.8s gap=0.0
+[fing_x_face s2] fit face_G LR-P2-N2-rel 11.6s gap=0.0
+[fing_x_face s2] fit face_G LR-P1-N3 138.0s gap=0.0
+[fing_x_face s2] fit face_G NLS-N2 0.4s gap=nan
+[fing_x_face s2] fit face_G DE-N2 1.9s gap=nan
+[fing_x_face s2] fit face_G MAXMONO-K3 0.0s gap=nan
+[fing_x_face s2] fit li_V HYP 0.0s gap=nan
+[fing_x_face s2] fit li_V MONO 0.0s gap=nan
+[fing_x_face s2] fit li_V MONO-rel 0.0s gap=nan
+[fing_x_face s2] fit li_V LR-P1-N2 1.4s gap=0.0
+[fing_x_face s2] fit li_V LR-P1-N2-rel 2.1s gap=0.0
+[fing_x_face s2] fit li_V LR-P2-N2 3.9s gap=0.0
+[fing_x_face s2] fit li_V LR-P2-N2-rel 5.6s gap=0.0
+[fing_x_face s2] fit li_V LR-P1-N3 40.4s gap=0.0
+[fing_x_face s2] fit li_V NLS-N2 0.1s gap=nan
+[fing_x_face s2] fit li_V DE-N2 0.5s gap=nan
+[fing_x_face s2] fit li_V MAXMONO-K3 0.0s gap=nan
+[fing_x_face s2] fit ri_V HYP 0.0s gap=nan
+[fing_x_face s2] fit ri_V MONO 0.0s gap=nan
+[fing_x_face s2] fit ri_V MONO-rel 0.0s gap=nan
+[fing_x_face s2] fit ri_V LR-P1-N2 0.6s gap=0.0
+[fing_x_face s2] fit ri_V LR-P1-N2-rel 0.9s gap=0.0
+[fing_x_face s2] fit ri_V LR-P2-N2 2.1s gap=0.0
+[fing_x_face s2] fit ri_V LR-P2-N2-rel 2.6s gap=0.0
+[fing_x_face s2] fit ri_V LR-P1-N3 35.2s gap=0.0
+[fing_x_face s2] fit ri_V NLS-N2 0.2s gap=nan
+[fing_x_face s2] fit ri_V DE-N2 0.6s gap=nan
+[fing_x_face s2] fit ri_V MAXMONO-K3 0.0s gap=nan
+[fing_x_face s2] alpha 0.01 done 464s
+[fing_x_face s2] alpha 0.001 done 517s
+[fing_x_face s2] finished in 517s

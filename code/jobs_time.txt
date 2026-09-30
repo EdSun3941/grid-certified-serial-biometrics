@@ -1,0 +1,21 @@
+test -f ../results/E2/e2_fing_x_face_s0_N2.csv || python3 run_e2.py fing_x_face 0 2
+test -f ../results/E2/e2_fing_x_face_s1_N2.csv || python3 run_e2.py fing_x_face 1 2
+test -f ../results/E2/e2_fing_x_face_s2_N2.csv || python3 run_e2.py fing_x_face 2 2
+test -f ../results/E2/e2_fing_x_face_s3_N2.csv || python3 run_e2.py fing_x_face 3 2
+test -f ../results/E2/e2_fing_x_face_s4_N2.csv || python3 run_e2.py fing_x_face 4 2
+test -f ../results/E2/e2_fing_x_fing_s0_N2.csv || python3 run_e2.py fing_x_fing 0 2
+test -f ../results/E2/e2_fing_x_fing_s1_N2.csv || python3 run_e2.py fing_x_fing 1 2
+test -f ../results/E2/e2_fing_x_fing_s2_N2.csv || python3 run_e2.py fing_x_fing 2 2
+test -f ../results/E2/e2_fing_x_fing_s3_N2.csv || python3 run_e2.py fing_x_fing 3 2
+test -f ../results/E2/e2_fing_x_fing_s4_N2.csv || python3 run_e2.py fing_x_fing 4 2
+test -f ../results/E2/e2_face_x_face_s0_N2.csv || python3 run_e2.py face_x_face 0 2
+test -f ../results/E2/e2_face_x_face_s1_N2.csv || python3 run_e2.py face_x_face 1 2
+test -f ../results/E2/e2_face_x_face_s2_N2.csv || python3 run_e2.py face_x_face 2 2
+test -f ../results/E2/e2_face_x_face_s3_N2.csv || python3 run_e2.py face_x_face 3 2
+test -f ../results/E2/e2_face_x_face_s4_N2.csv || python3 run_e2.py face_x_face 4 2
+test -f ../results/E7/e7_fing_x_fing_li_V_N.csv || python3 run_e7.py fing_x_fing li_V 0 N 600
+test -f ../results/E7/e7_fing_x_face_face_C_N.csv || python3 run_e7.py fing_x_face face_C 0 N 600
+test -f ../results/E7/e7_fing_x_fing_li_V_D.csv || python3 run_e7.py fing_x_fing li_V 0 D 600
+test -f ../results/E7/e7_fing_x_face_face_C_D.csv || python3 run_e7.py fing_x_face face_C 0 D 600
+test -f ../results/E7/e7_fing_x_fing_li_V_B.csv || python3 run_e7.py fing_x_fing li_V 0 B 600
+test -f ../results/E7/e7_fing_x_face_face_C_B.csv || python3 run_e7.py fing_x_face face_C 0 B 600

@@ -1,0 +1,78 @@
+lfw_x_fing 0
+lfw_x_fing 1
+lfw_x_fing 2
+lfw_x_fing 3
+lfw_x_fing 4
+lfw_x_fing 5
+lfw_x_fing 6
+lfw_x_fing 7
+lfw_x_fing 8
+lfw_x_fing 9
+fing_x_face 10
+fing_x_face 11
+fing_x_face 12
+fing_x_face 13
+fing_x_face 14
+fing_x_face 15
+fing_x_face 16
+fing_x_face 17
+fing_x_face 18
+fing_x_face 19
+fing_x_face 20
+fing_x_face 21
+fing_x_face 22
+fing_x_face 23
+fing_x_face 24
+fing_x_face 25
+fing_x_face 26
+fing_x_face 27
+fing_x_face 28
+fing_x_face 29
+fing_x_fing 10
+fing_x_fing 11
+fing_x_fing 12
+fing_x_fing 13
+fing_x_fing 14
+fing_x_fing 15
+fing_x_fing 16
+fing_x_fing 17
+fing_x_fing 18
+fing_x_fing 19
+fing_x_fing 20
+fing_x_fing 21
+fing_x_fing 22
+fing_x_fing 23
+fing_x_fing 24
+fing_x_fing 25
+fing_x_fing 26
+fing_x_fing 27
+fing_x_fing 28
+fing_x_fing 29
+face_x_face 10
+face_x_face 11
+face_x_face 12
+face_x_face 13
+face_x_face 14
+face_x_face 15
+face_x_face 16
+face_x_face 17
+face_x_face 18
+face_x_face 19
+face_x_face 20
+face_x_face 21
+face_x_face 22
+face_x_face 23
+face_x_face 24
+face_x_face 25
+face_x_face 26
+face_x_face 27
+face_x_face 28
+face_x_face 29
+reconstruction mismatches with the stored results: 41 [('lfw_x_fing', 4, 'S3-SPRT', 'li_V>face_S>ri_V'), ('lfw_x_fing', 4, 'S3-SPRT', 'li_V>face_S'), ('lfw_x_fing', 4, 'S3-SPRT', 'li_V>face_S>ri_V'), ('lfw_x_fing', 4, 'S3-SPRT', 'li_V>face_S'), ('lfw_x_fing', 4, 'S3-SPRT', 'li_V>face_S>ri_V')]
+Traceback (most recent call last):
+  File "/home/claude/work/tifs/code/matched_far.py", line 121, in <module>
+    main(fresh="--fresh" in sys.argv)
+  File "/home/claude/work/tifs/code/matched_far.py", line 92, in main
+    assert not MISMATCH, "test scores do not reproduce the stored results"
+           ^^^^^^^^^^^^
+AssertionError: test scores do not reproduce the stored results

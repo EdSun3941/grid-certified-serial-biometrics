@@ -1,0 +1,15 @@
+[fing_x_face s7] fit face_C MONO 0.0s gap=nan
+[fing_x_face s7] fit face_C LR-P1-N2 2.5s gap=0.0
+[fing_x_face s7] fit face_C LR-P1-N2-rel 3.6s gap=0.0
+[fing_x_face s7] fit face_G MONO 0.0s gap=nan
+[fing_x_face s7] fit face_G LR-P1-N2 2.3s gap=0.0
+[fing_x_face s7] fit face_G LR-P1-N2-rel 3.7s gap=0.0
+[fing_x_face s7] fit li_V MONO 0.0s gap=nan
+[fing_x_face s7] fit li_V LR-P1-N2 0.7s gap=0.0
+[fing_x_face s7] fit li_V LR-P1-N2-rel 1.3s gap=0.0
+[fing_x_face s7] fit ri_V MONO 0.0s gap=nan
+[fing_x_face s7] fit ri_V LR-P1-N2 0.8s gap=0.0
+[fing_x_face s7] fit ri_V LR-P1-N2-rel 1.2s gap=0.0
+[fing_x_face s7] alpha 0.01 done 23s
+[fing_x_face s7] alpha 0.001 done 29s
+[fing_x_face s7] finished in 29s

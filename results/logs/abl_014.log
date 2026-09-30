@@ -1,0 +1,7 @@
+[fing_x_face s1] fit face_C LR-P1-N2 3.1s gap=0.0
+[fing_x_face s1] fit face_G LR-P1-N2 7.5s gap=0.0
+[fing_x_face s1] fit li_V LR-P1-N2 2.0s gap=0.0
+[fing_x_face s1] fit ri_V LR-P1-N2 2.5s gap=0.0
+[fing_x_face s1] alpha 0.01 done 18s
+[fing_x_face s1] alpha 0.001 done 20s
+[fing_x_face s1] finished in 20s

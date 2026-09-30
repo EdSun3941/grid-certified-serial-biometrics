@@ -1,0 +1,25 @@
+dataset,method,spoof_max,spoof_mean,n,source
+face_x_face,LR-P1-N2,0.7793425839448521,0.7322456304202802,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+face_x_face,P0-Parallel,0.2965631976873471,0.22079263953746944,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+face_x_face,P1-LLR,0.6013016010673782,0.554001089615299,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+face_x_face,P2-LogReg,0.3384335779408495,0.22362884144985545,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+face_x_face,S1-Marcialis,0.8063128530131198,0.4639106960195686,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+face_x_face,S2-Symmetric,0.8063128530131198,0.4639106960195686,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+face_x_face,S3-SPRT,0.7459575494774293,0.5854378585723816,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+face_x_face,S4-Direct,0.7342427173671336,0.4225726873471203,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_face,LR-P1-N2,0.8544400297307273,0.606537922889667,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_face,P0-Parallel,0.8210888629493281,0.3979651162790698,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_face,P1-LLR,0.5694441950255904,0.4546294633503936,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_face,P2-LogReg,0.744314746640328,0.31919390320553115,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_face,S1-Marcialis,0.64867845420171,0.5754677668740169,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_face,S2-Symmetric,0.6503080738545854,0.5758797210832094,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_face,S3-SPRT,0.5984195689428248,0.3476510662276858,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_face,S4-Direct,0.7016492999881704,0.4649277495934473,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_fing,LR-P1-N2,0.8623622429698787,0.8232431866177615,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_fing,P0-Parallel,0.8287990330110035,0.7911750472379683,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_fing,P1-LLR,0.8325391352673114,0.7918930143381127,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_fing,P2-LogReg,0.8350863176614427,0.7881662665332889,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_fing,S1-Marcialis,0.8618365121707235,0.7245111426030899,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_fing,S2-Symmetric,0.8618365121707235,0.7245111426030899,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_fing,S3-SPRT,0.8423871735022785,0.7979641213737912,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py
+fing_x_fing,S4-Direct,0.8532205846393243,0.7984378292764255,10,results/E3b/main_*.csv thresholds + test scores; spoof_rev.py

@@ -1,0 +1,2 @@
+[miqp face_x_face s3 N2] face_C value=0.29474 lb=0.294737 gap=8.98e-06 it=2 t=2.4s optimal
+[miqp face_x_face s3 N2] face_G value=0.403112 lb=0.403112 gap=8.54e-13 it=2 t=2.4s optimal

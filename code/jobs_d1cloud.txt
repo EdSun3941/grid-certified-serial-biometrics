@@ -1,0 +1,5 @@
+test -f ../results/E3fresh/fresh_fing_x_face_s29.csv || python3 run_fresh.py fing_x_face 29
+test -f ../results/E3fresh/fresh_fing_x_face_s28.csv || python3 run_fresh.py fing_x_face 28
+test -f ../results/E3fresh/fresh_fing_x_face_s27.csv || python3 run_fresh.py fing_x_face 27
+test -f ../results/E3fresh/fresh_fing_x_face_s26.csv || python3 run_fresh.py fing_x_face 26
+test -f ../results/E3fresh/fresh_fing_x_face_s25.csv || python3 run_fresh.py fing_x_face 25

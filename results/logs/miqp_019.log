@@ -1,0 +1,4 @@
+[miqp fing_x_face s3 N3] face_C value=0.0468136 lb=0.046813 gap=1.29e-05 it=3 t=8.3s optimal
+[miqp fing_x_face s3 N3] face_G value=0.182884 lb=0.182884 gap=9.96e-08 it=2 t=2.7s optimal
+[miqp fing_x_face s3 N3] li_V value=0.0251878 lb=0.0251878 gap=-2.45e-14 it=2 t=0.9s optimal
+[miqp fing_x_face s3 N3] ri_V value=0.0118373 lb=0.0118361 gap=9.89e-05 it=3 t=1.4s optimal

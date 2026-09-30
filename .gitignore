@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+data/*.npz
+data/processed/
+data/lfw_src/
+results/locks/
+results/logs_local/

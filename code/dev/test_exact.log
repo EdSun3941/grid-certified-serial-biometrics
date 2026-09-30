@@ -1,0 +1,6 @@
+fing_x_face face_C P1 N=1: U=0.122448 enum=0.122448 gap=0.0000% rootgap=5.9929% nodes=10 t=1.82s terms=[(0.0303, -0.26)]
+fing_x_face face_C P1 N=2: U=0.115109 enum=0.115109 gap=0.0000% rootgap=0.0000% nodes=1 t=1.17s terms=[(0.0163, -0.26), (0.0159, -0.24)]
+fing_x_face face_C P1 N=3: U=0.115109 gap=0.0000% rootgap=0.0000% nodes=1 t=1.09s terms=[(0.0163, -0.26), (0.0159, -0.24)]
+fing_x_face face_C P1 N=5: U=0.115109 gap=0.0000% rootgap=0.0000% nodes=1 t=1.31s terms=[(0.0163, -0.26), (0.0159, -0.24)]
+fing_x_face face_C P2 N=1: U=0.0861672 enum=0.0861672 gap=0.0000% rootgap=4.5550% nodes=47 t=0.58s terms=[(0.0358, -0.24)]
+fing_x_face face_C P2 N=2: U=0.0731197 enum=0.0731197 gap=0.0000% rootgap=15.4668% nodes=80 t=0.84s terms=[(0.0007, -0.56), (0.0631, -0.12)]
