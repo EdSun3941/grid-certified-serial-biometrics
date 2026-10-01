@@ -239,7 +239,7 @@ check("envelope families max |diff|", fam.mean_diff.abs().max(), IJ("0.001", "0.
 ci = lambda ds: max(fam[fam.dataset == DS[ds]].ci_lo.abs().max(), fam[fam.dataset == DS[ds]].ci_hi.abs().max())
 check_true("CI within 0.011 on D1", ci("D1") <= 0.011, "within $\\pm0.011$ on D1"); check_true("CI within 0.006 on D2, D3", max(ci("D2"), ci("D3")) <= 0.006, "$\\pm0.006$ on D2 and D3")
 rl = st[(st.family == "secondary") & (st.method == "LR-P1-N2-rel")]
-check("relative variant max |diff|", rl.mean_diff.abs().max(), "0.008", IJ("differed by up to 0.008 in either direction", "The relative-error variant differed by up to 0.008 (higher FRR on D2, but lower in all ten splits on D3, CI $[0.0002,0.0130]$, at $\\alpha=10^{-4}$)"))
+check("relative variant max |diff|", rl.mean_diff.abs().max(), "0.008", IJ("differed by up to 0.008 in either direction", "The relative-error variant differed by up to 0.008 at $\\alpha=10^{-4}$: its FRR was higher in all ten splits on D2 (difference $-0.0081$, CI $[-0.0164,0.0002]$) and lower in all ten on D3 (difference $+0.0066$, CI $[0.0002,0.0130]$)"))
 check_true("relative variant both directions, extremes at 1e-4 on D2/D3", rl.mean_diff.max() > 0 > rl.mean_diff.min() and
            set(rl.loc[[rl.mean_diff.idxmax(), rl.mean_diff.idxmin()], "dataset"]) == {DS["D2"], DS["D3"]} and np.allclose(rl.loc[[rl.mean_diff.idxmax(), rl.mean_diff.idxmin()], "alpha"], 1e-4))
 mm = st[(st.family == "secondary") & (st.method == "MAXMONO-K3") & (st.dataset == DS["D2"]) & np.isclose(st.alpha, 1e-4)].iloc[0]
@@ -415,7 +415,7 @@ if SPRINGER:
     es = open("envelope_solvers.py").read()
     check_true("IJIS: subgradient settings (mu=0 start, step factor 2, patience 15, 2 x 300 iterations)",
                "mu0 = np.zeros(" in es and "lam=2.0, patience=15" in es and "K_root=300" in es and es.count("node.run(root_iv") == 2,
-               "in two passes of 300 iterations from $\\mu=0$, each with a step factor starting at 2 and halved after 15 (then 17, 19, \\dots) non-improving iterations")
+               "in two passes of 300 iterations, the first from $\\mu=0$ and the second from the best multipliers of the first, each with a step factor starting at 2 and halved after 15 (then 17, 19, \\dots) non-improving iterations")
     refx = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2ref/ref_*.csv")], ignore_index=True)
     bmin = refx[["b1", "b2"]].where(refx[["c1", "c2"]].values > 1e-12).min(axis=1); refx["bmin"] = bmin
     bm = refx.groupby("obj").bmin.min()
@@ -519,7 +519,7 @@ if SPRINGER:
     check("v02: Marcialis significant with held-out calibration", int(((xm_.p_holm < 0.05) & (xm_.mean_diff < 0)).sum()), "4", "and with the held-out calibration in four of six")
     xs_ = fst[(fst.calib == "xfit") & fst.dataset.isin([DS["D2"], DS["D3"]]) & (fst.alpha <= 1e-3) & fst.method.isin(["S3-SPRT", "P0-Parallel", "P1-LLR", "P2-LogReg"])]
     check("v02: held-out SPRT/parallel significant of 16", int(((xs_.p_holm < 0.05) & (xs_.mean_diff > 0)).sum()), "12",
-          "where the SPRT and parallel fusion remained significantly better in 12 of the 16 comparisons at $\\alpha\\le10^{-3}$")
+          "with the held-out calibration, the SPRT and parallel fusion remained significantly better in 12 of the 16 comparisons at $\\alpha\\le10^{-3}$")
     check_true("v02: ... of 16", len(xs_) == 16)
     gh = pr[pr.p_corr_t.notna()].copy(); pv_g = gh.p_corr_t.values; og = np.argsort(pv_g); mg = len(pv_g); ag = np.empty(mg); rn = 0
     for r_, i_ in enumerate(og): rn = max(rn, (mg - r_) * pv_g[i_]); ag[i_] = min(1, rn)
@@ -665,7 +665,7 @@ if SPRINGER:
                r"The first draft of the manuscript was prepared by Chuan-Hsiang Su and Tzu-Lung Sun in the human--AI collaboration described in Sect.~\ref{sec:stats}")
     check_true("v04: AI use stated in one sentence in Sect. 5.4 (label sec:stats), separate subsection removed",
                "Use of generative AI" not in ALL and "sec:ai" not in ALL and "large language model (Claude, Anthropic)" in _norm(SRC["s5_setup.tex"]).split("Statistics and implementation")[1],
-               "The work was carried out in human--AI collaboration: the authors designed the study and directed and checked each step, and a large language model (Claude, Anthropic) wrote and ran the experiment code and drafted the text under their direction; the authors verified the code, the results, and the text and take full responsibility for the content.")
+               "The work was carried out in human--AI collaboration: the authors designed the study and directed and checked each step, and a large language model (Claude, Anthropic) wrote and ran the experiment code and drafted the text; the authors verified the code, the results, and the text and take full responsibility for the content.")
     import run_mlp as _rm
     from data import MATCHERS as _MA
     src_mlp = open("run_mlp.py").read()
@@ -735,7 +735,7 @@ if SPRINGER:
                "The \\emph{corner points} are $(x_{k+1},y_k)$, $k=0,\\dots,K$, and $[\\underline{x}_s,\\overline{x}_s]=[x_1,x_{K+1}]$.")
     check_true("v05: Prop. 1 stated on (0, x_(K+1)] for k = 0..K",
                "if and only if $g(x_{k+1})\\ge y_k$ for $k=0,\\dots,K$" in _norm(SRC["s3_model.tex"]),
-               "because the step-(ii) threshold lies at an accepted impostor score rather than at the most permissive score with the same FAR, this is a prediction rather than a bound for the final stage")
+               "when step (ii) raises the final threshold, it lies at an accepted impostor score rather than at the most permissive score with the same FAR, so the recomputed value is a prediction rather than a bound at the final stage")
     src_es = open("envelope_solvers.py").read()
     check_true("v05: Prop. 5 early-stop bound (1 - eps) U in text and code",
                "U if not heap else U * (1 - eps)" in src_es and "U if not (heap or open_leaves) else U * (1 - eps)" in src_es,
@@ -755,7 +755,7 @@ if SPRINGER:
     top_ = sorted(cnt_.values(), reverse=True)
     check_true(f"v05: D1 order of Table 7 is one of three orders selected in three splits each ({cnt_['ri_V>face_C>face_G>li_V']}; top {top_[:4]})",
                cnt_["ri_V>face_C>face_G>li_V"] == 3 and top_[:3] == [3, 3, 3] and top_[3] < 3,
-               "(on D1, one of three orders selected in three splits each)")
+               "(on D1, one of three orders that were each selected in three splits)")
     st5 = tab("T_rev_stats"); rr = st5[(st5.dataset == "face_x_face") & np.isclose(st5.alpha, 1e-4) & (st5.method == "LR-P1-N2-rel")].iloc[0]
     check("v05: relative-error variant D3 1e-4 CI low", rr.ci_lo, "0.0002"); check("v05: ... CI high", rr.ci_hi, "0.0130")
     refs5 = open(f"{P}/references.tex").read()
@@ -768,6 +768,12 @@ if SPRINGER:
                and "\\url{http://vis-www.cs.umass.edu/lfw/}" in SRC["main.tex"] and "\\url{https://github.com/opencv/opencv_zoo}" in SRC["main.tex"]
                and "\\section*{Supplementary Information}" in SRC["main.tex"])
     check_true("v05: US spelling", not re.search(r"analys(ed|e\b)|favour|colour|behaviour|modelling", ALL))
+    doi5 = "10.5281/zenodo.23072674"
+    check_true("v05: Zenodo DOI of the code release in Code availability (reference), ESM S4 and the reference list",
+               "the version used for this article is archived at Zenodo~\\cite{su2026code}" in SRC["main.tex"] and doi5 in SRC["ESM_1.tex"]
+               and f"\\url{{https://doi.org/{doi5}}}" in open(f"{P}/references.tex").read())
+    check_true("v05: logarithmic change of variables (no z overload); tolerance of the certificate stated",
+               "$z=\\log" not in ALL, "within a relative tolerance of $10^{-4}$")
     print("=" * 30, "IJIS format checks")
     ab_ = open(f"{P}/sections/s0_abstract.tex").read(); ab_ = ab_.split("\\begin{abstract}")[1].split("\\keywords")[0]
     nw = len(re.split(r"\s+|--", re.sub(r"\$[^$]*\$", "X", ab_).replace("~", " ").strip()))

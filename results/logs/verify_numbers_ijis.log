@@ -433,6 +433,8 @@ OK   v05: ... CI high: computed 0.0129685 -> 0.013 vs printed 0.0130
 OK   v05: reference list in Springer basic style (no '?.', no final period, full author list of chen2025, dated online document)
 OK   v05: declarations (ethics, consent to participate, consent for publication, data URLs) and ESM description
 OK   v05: US spelling
+OK   v05: Zenodo DOI of the code release in Code availability (reference), ESM S4 and the reference list
+OK   v05: logarithmic change of variables (no z overload); tolerance of the certificate stated
 ============================== IJIS format checks
 OK   IJIS: abstract has 250 words (150-250)
 OK   IJIS: 6 keywords (4-6)
@@ -453,4 +455,4 @@ OK   FAR-range restriction FRR: computed 0.0432432 -> 0.0432 vs printed 0.0432
 OK   main-paper table bodies unchanged after regeneration
 OK   supplementary tables unchanged after regeneration
 
-441 checks passed, 0 failed
+443 checks passed, 0 failed

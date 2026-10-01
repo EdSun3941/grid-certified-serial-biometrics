@@ -344,7 +344,7 @@ if "ijis" in PAPER:
         "tab:s-scal": r"Scalability (seed 0, P1, single core, 600-s limit per solver). Enumeration times marked $^{e}$ are extrapolated from the enumerated fraction",
         "tab:s-reject": r"Stage FAR at the accept and reject thresholds of the uncalibrated proposed GP designs (all multi-stage orders, ten splits)",
         "tab:s-abl": r"Ablations on D1 at $\alpha=10^{-3}$ (uncalibrated; test FRR, variant versus main setting on the same splits; Wilcoxon $p$ where differences exist)",
-        "tab:s-noise": r"Robustness of D1 designs to additive Gaussian test-score noise (SD = 5\% or 10\% of the impostor-score SD; uncalibrated): test FAR / FRR (means over all orders and splits)",
+        "tab:s-noise": r"Robustness of D1 designs to additive Gaussian test-score noise (SD = 5\% or 10\% of the impostor-score SD; uncalibrated): test FAR / FRR (means over all feasible orders and splits)",
         "tab:s-farstage": r"Selected designs under subject-bootstrap calibration: mean test FAR$/\alpha$ and stages per genuine / impostor claim (means over ten splits; parallel fusion acquires all modalities)",
         "tab:s-refit": r"Envelopes fitted by the subgradient LR-BB of the preliminary implementation (used in the uncalibrated and Clopper--Pearson analyses) compared with their refit by the exact-dual LR-BB (used in the calibrated designs): number of envelopes, share with identical curves (largest relative difference $<10^{-6}$), and largest relative curve difference",
     }
