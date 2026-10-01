@@ -24,6 +24,8 @@ def select(df):
 
 def main():
     fs = sorted(glob.glob(f"{R}/E3fresh/fresh_*.csv")); df = pd.concat([pd.read_csv(f) for f in fs], ignore_index=True)
+    # files written before the v05 fix of run_fresh.py record one stage for parallel fusion, which acquires every modality
+    par = df.kind == "parallel"; df.loc[par, "stages_gen"] = df.loc[par, "n_stages"].astype(float); df.loc[par, "stages_imp"] = df.loc[par, "n_stages"].astype(float)
     src = f"results/E3fresh/fresh_*.csv ({len(fs)} files)"
     sel = select(df); sel["source"] = src; sel.to_csv(f"{OUT}/T_fresh_selected.csv", index=False)
     nseeds = sel.groupby(["dataset", "calib"]).seed.nunique()

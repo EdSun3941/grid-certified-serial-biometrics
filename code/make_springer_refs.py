@@ -129,7 +129,9 @@ def entry(key, typ, f):
         acc = f.get("note", "").replace("Accessed: ", "")
         m = re.match(r"(\w+)\. (\d+), (\d+)", acc)
         mon = {"Sep": "September"}.get(m.group(1), m.group(1)) if m else ""
-        return f"{a}: {t}. \\url{{{url}}}. Accessed {m.group(2)} {mon} {m.group(3)}"
+        return f"{a}: {t}. \\url{{{url}}} ({y}). Accessed {m.group(2)} {mon} {m.group(3)}"   # online document (Springer example)
+    if typ == "misc" and f.get("publisher") == "Zenodo":                 # software / data archive with a DOI
+        return f"{a}: {t}, {f['version']}. Zenodo ({y}).{doi(f)}"
     raise ValueError(f"unhandled entry {key} ({typ})")
 
 
@@ -159,7 +161,9 @@ if __name__ == "__main__":
              f"\\begin{{thebibliography}}{{{len(order)}}}"]
     for k in order:
         typ, f = bib[k]
-        lines.append(f"\\bibitem{{{k}}} {entry(k, typ, f)}")
+        e = entry(k, typ, f).replace("?. ", "? ")                          # no period after a question mark
+        if e.endswith("."): e = e[:-1]                                        # Springer basic style: no final period
+        lines.append(f"\\bibitem{{{k}}} {e}")
     lines.append("\\end{thebibliography}")
     open(f"{P}/references.tex", "w").write("\n".join(lines) + "\n")
     print(f"{len(order)} references written; not cited: {unused}")

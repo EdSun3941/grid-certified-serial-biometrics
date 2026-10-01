@@ -305,7 +305,8 @@ def fit_lr(x, y, B, N, obj, mode="bb", time_limit=60.0, eps=1e-4, K_root=300, K_
         for ch in (left, right):
             if all(a <= b for a, b in ch):
                 heapq.heappush(heap, (nlb, next(cnt), tuple(ch), mu2))
-    lb = min([closed_lb, U] + [n[0] for n in heap])
+    # an interrupted search has only excluded values below (1 - eps) U in the discarded nodes (Prop. 5)
+    lb = min([closed_lb, U if not heap else U * (1 - eps)] + [n[0] for n in heap])
     out_terms = [(float(a), float(B[i])) for a, i in zip(best_al, best_key) if a > 0]
     return out_terms, U, {"lb": lb, "gap": max(0.0, (U - lb) / U) if U > 0 else 0.0, "time": time.time() - t0,
                           "nodes": nodes, "n_qp": cache.n_solves, "root_lb": root_lb, "root_ub": hist["root_ub"],
@@ -474,7 +475,8 @@ def fit_exact_dual(x, y, B, N, obj, time_limit=600.0, eps=1e-4, enum_leaf=16, re
                 if zc < U * (1 - eps) - 1e-15: heapq.heappush(heap, (zc, next(cnt), tuple(ch)))
     # leaves recorded as open may have been closed by a later, better incumbent
     open_leaves = [z for z in open_leaves if z < U * (1 - eps) - 1e-15]
-    lbf = min([closed, U] + [hh[0] for hh in heap] + open_leaves)
+    # an interrupted search has only excluded values below (1 - eps) U in the discarded nodes (Prop. 5)
+    lbf = min([closed, U if not (heap or open_leaves) else U * (1 - eps)] + [hh[0] for hh in heap] + open_leaves)
     out_terms = [(float(a), float(B[i])) for a, i in zip(best_al, best_key) if a > 0]
     return out_terms, U, {"lb": lbf, "gap": max(0.0, (U - lbf) / U) if U > 0 else 0.0, "root_lb": root_lb,
                           "root_ub": root_ub, "root_gap": root_gap, "nodes": nodes, "time": time.time() - t0,

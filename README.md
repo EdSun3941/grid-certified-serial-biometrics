@@ -23,6 +23,7 @@ compares the designs with decision-level serial rules, a sequential probability 
 | `results/` | per-split CSV outputs of every experiment (`E1`, `E1xd`, `E2`, `E2ref`, `E2v2`, `E2miqp`, `E3`, `E3b`, `E3cal`, `E3fresh`, `E3mlp`, `E7`, `E7v2`, `E8`, `S3`), the table CSVs in `results/tables` (each with a `source` column naming its inputs), the figures, and the run logs |
 | `results/E3b_round1` | E3b rows before the refit of the system envelopes by the exact-dual LR-BB (kept for comparison, see `code/README.md`) |
 | `results/E3fresh_provenance.csv` | which machine computed each file of `E3fresh` and the outcome of the cross-machine comparison |
+| `results/E3fresh_pc_overlap/` | the second machine's copies of the seven splits computed on both machines |
 | `data/` | instructions for obtaining the data (the score files are not redistributed) and the build log of subset D4 |
 
 ## Requirements

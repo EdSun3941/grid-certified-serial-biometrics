@@ -77,7 +77,7 @@ check("D1 training genuine", 517 // 2, "258", "hold only 258 genuine comparisons
 check("D1 test impostors 6.7e4", (517 / 2) * (517 / 2 - 1) / 1e4, "6.7", "$6.7\\times10^{4}$ impostor comparisons")
 check("D1 FRR resolution", 1 / 259, "0.004", "an FRR resolution of 0.004")
 check("D1 ordered subsets", 4 + 12 + 24 + 24, "64", "All 64 ordered subsets")
-check("corrected t variance factor", 1 + 10 * 1.0, "11", "=11$ for $K=10$ splits")
+check("corrected t variance factor", 1 + 10 * 1.0, "11", IJ("=11$ for $K=10$ splits", "=11$ for $J=10$ splits"))
 
 print("=" * 30, "Envelope tightness (Section VI-A, introduction)")
 fit = tab("T_fit"); fv = lambda ds, m, c: fit[(fit.dataset == DS[ds]) & (fit.method == m)][c].iloc[0]
@@ -118,8 +118,8 @@ ex = v2[v2.method == "LR-BB exact dual"]; p1 = ex[ex.obj == "P1"]; p2 = ex[ex.ob
 check("P1 root bound = optimum", int((p1.short <= 1e-4).sum()), "39", "the root bound of P1 equaled the optimum in 39 of the 40 instances")
 check("P1 root shortfall other %", p1.short.max(), "0.26", "fell short by 0.26\\% in the other, which LR-BB closed after 41 nodes", scale=100)
 check("P1 nodes of that instance", p1.loc[p1.short.idxmax()].nodes, "41")
-check("abstract: root gap 39 of 40", int((p1.short <= 1e-4).sum()), "39", IJ("least-squares problem in 39 of 40 instances, whereas", "the exact dual closed the root gap in 39 of 40 instances (earlier"))
-check("intro: root gap 39 of 40", int((p1.short <= 1e-4).sum()), "39", "closed the root gap in 39 of 40 instances and left 0.26\\% in the other")
+check("abstract: root gap 39 of 40", int((p1.short <= 1e-4).sum()), "39", IJ("least-squares problem in 39 of 40 instances, whereas", "the exact dual closed the least-squares root gap in 39 of 40 instances (earlier"))
+check("intro: root gap 39 of 40", int((p1.short <= 1e-4).sum()), "39", IJ("closed the root gap in 39 of 40 instances and left 0.26\\% in the other", "closed the P1 root gap in 39 of 40 instances and left 0.26\\% in the other"))
 check("conclusion: root gap 39 of 40", int((p1.short <= 1e-4).sum()), "39", IJ("in 39 of 40 BSSR1 instances, left 0.26\\% in the other", "in 39 of 40 BSSR1 instances, mostly because two adjacent grid exponents can emulate an intermediate one, left 0.26\\% in the other"))
 check("P2 root bound = optimum", int((p2.short <= 1e-4).sum()), "37", "For P2 the root bound equaled the optimum in 37 instances (at most 1.86\\% below)")
 check("P2 root shortfall max %", p2.short.max(), "1.86", scale=100)
@@ -239,7 +239,7 @@ check("envelope families max |diff|", fam.mean_diff.abs().max(), IJ("0.001", "0.
 ci = lambda ds: max(fam[fam.dataset == DS[ds]].ci_lo.abs().max(), fam[fam.dataset == DS[ds]].ci_hi.abs().max())
 check_true("CI within 0.011 on D1", ci("D1") <= 0.011, "within $\\pm0.011$ on D1"); check_true("CI within 0.006 on D2, D3", max(ci("D2"), ci("D3")) <= 0.006, "$\\pm0.006$ on D2 and D3")
 rl = st[(st.family == "secondary") & (st.method == "LR-P1-N2-rel")]
-check("relative variant max |diff|", rl.mean_diff.abs().max(), "0.008", "differed by up to 0.008 in either direction")
+check("relative variant max |diff|", rl.mean_diff.abs().max(), "0.008", IJ("differed by up to 0.008 in either direction", "The relative-error variant differed by up to 0.008 (higher FRR on D2, but lower in all ten splits on D3, CI $[0.0002,0.0130]$, at $\\alpha=10^{-4}$)"))
 check_true("relative variant both directions, extremes at 1e-4 on D2/D3", rl.mean_diff.max() > 0 > rl.mean_diff.min() and
            set(rl.loc[[rl.mean_diff.idxmax(), rl.mean_diff.idxmin()], "dataset"]) == {DS["D2"], DS["D3"]} and np.allclose(rl.loc[[rl.mean_diff.idxmax(), rl.mean_diff.idxmin()], "alpha"], 1e-4))
 mm = st[(st.family == "secondary") & (st.method == "MAXMONO-K3") & (st.dataset == DS["D2"]) & np.isclose(st.alpha, 1e-4)].iloc[0]
@@ -399,7 +399,7 @@ if SPRINGER:
     check_true("IJIS: family has 8 tests where HYP feasible, 7 otherwise", all(fam_n[k] == (8 if k in hyp_ok.index else 7) for k in fam_n.index),
                "(seven where HYP is infeasible)")
     dep = sy[sy.method == "LR-P1-N2"].set_index(["dataset", "alpha"]).far_ok * 10
-    check("IJIS: deployed compliance D1 1e-3", dep[(DS["D1"], 1e-3)], "8.67", "met $\\alpha$ in 8.67 and 9.9 of the 10 test halves on D1 (tie-averaged)")
+    check("IJIS: deployed compliance D1 1e-3", dep[(DS["D1"], 1e-3)], "8.67", "met $\\alpha$ in 8.67 and 9.9 of the 10 test halves on D1 ($\\alpha=10^{-3}$ and $10^{-2}$; tie-averaged)")
     check("IJIS: deployed compliance D1 1e-2", dep[(DS["D1"], 1e-2)], "9.9")
     check_true("IJIS: deployed compliance D2 all, D3 5-7", all(dep[(DS["D2"], a)] == 10 for a in (1e-2, 1e-3, 1e-4))
                and sorted(round(dep[(DS["D3"], a)]) for a in (1e-2, 1e-3, 1e-4)) == [5, 6, 7], "and in 5 to 7 on D3")
@@ -415,7 +415,7 @@ if SPRINGER:
     es = open("envelope_solvers.py").read()
     check_true("IJIS: subgradient settings (mu=0 start, step factor 2, patience 15, 2 x 300 iterations)",
                "mu0 = np.zeros(" in es and "lam=2.0, patience=15" in es and "K_root=300" in es and es.count("node.run(root_iv") == 2,
-               "starting from $\\mu=0$ with a step factor of 2 that was halved after 15 non-improving iterations")
+               "in two passes of 300 iterations from $\\mu=0$, each with a step factor starting at 2 and halved after 15 (then 17, 19, \\dots) non-improving iterations")
     refx = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2ref/ref_*.csv")], ignore_index=True)
     bmin = refx[["b1", "b2"]].where(refx[["c1", "c2"]].values > 1e-12).min(axis=1); refx["bmin"] = bmin
     bm = refx.groupby("obj").bmin.min()
@@ -519,7 +519,7 @@ if SPRINGER:
     check("v02: Marcialis significant with held-out calibration", int(((xm_.p_holm < 0.05) & (xm_.mean_diff < 0)).sum()), "4", "and with the held-out calibration in four of six")
     xs_ = fst[(fst.calib == "xfit") & fst.dataset.isin([DS["D2"], DS["D3"]]) & (fst.alpha <= 1e-3) & fst.method.isin(["S3-SPRT", "P0-Parallel", "P1-LLR", "P2-LogReg"])]
     check("v02: held-out SPRT/parallel significant of 16", int(((xs_.p_holm < 0.05) & (xs_.mean_diff > 0)).sum()), "12",
-          "while the SPRT and parallel fusion remained significantly better in 12 of the 16 comparisons at $\\alpha\\le10^{-3}$")
+          "where the SPRT and parallel fusion remained significantly better in 12 of the 16 comparisons at $\\alpha\\le10^{-3}$")
     check_true("v02: ... of 16", len(xs_) == 16)
     gh = pr[pr.p_corr_t.notna()].copy(); pv_g = gh.p_corr_t.values; og = np.argsort(pv_g); mg = len(pv_g); ag = np.empty(mg); rn = 0
     for r_, i_ in enumerate(og): rn = max(rn, (mg - r_) * pv_g[i_]); ag[i_] = min(1, rn)
@@ -597,7 +597,7 @@ if SPRINGER:
     ball = fco[(fco.calib == "boot") & (fco.split_set != "original 0-9")].far_ok
     check_true(f"v02: abstract compliance 70-95 (boot, new splits and D4: {100 * ball.min():.1f}-{100 * ball.max():.1f}) / 90-100 held-out",
                round(100 * ball.min()) == 70 and round(100 * ball.max()) == 95 and round(100 * xa.min()) == 90 and xa.max() == 1,
-               "Deployed proposed designs met the FAR requirement in 70\\%--95\\% of new test halves (88\\% expected) and in 90\\%--100\\% with held-out calibration")
+               "The deployed proposed designs met the FAR requirement in 70\\%--95\\% of new test halves (88\\% expected) and in 90\\%--100\\% with held-out calibration")
     check_true("v02: boot below 88% on D1, D3 and D4 at 1e-3 only", (bD1.far_ok < 0.8776).all() and (bD3.far_ok < 0.8776).all() and (bD2.far_ok > 0.8776).all()
                and sorted(bD4[bD4.far_ok < 0.8776].alpha.round(6)) == [0.001], "below the 88\\% expected for a correct bound on D1 and D3 and at $\\alpha=10^{-3}$ on D4")
     check_true("v02: held-out 90-100 on D1-D3, all ten D4", round(100 * xa.min()) == 90 and fco[fco.calib == "xfit"].dataset.nunique() == 4,
@@ -650,7 +650,7 @@ if SPRINGER:
                "solved by outer approximation with the general-purpose solver HiGHS" in _norm(SRC["s6_results.tex"]),
                "the cardinality constraint was slack in 38 of the 40 instances, so additional terms barely improved the fit")
     check_true("v04: framework positioning in intro, contribution 2 and conclusion",
-               "whose envelopes are safe by construction for every recovered threshold on the fitting data, whose envelope fit is certifiably optimal over an exponent grid, and which is open to further posynomial constraints" in _norm(SRC["s1_intro.tex"])
+               "whose envelopes are safe by construction for every recovered threshold on the training data, whose envelope fit is certifiably optimal over an exponent grid, and which is open to further posynomial constraints" in _norm(SRC["s1_intro.tex"])
                and "the value of the exact dual lies in the analysis it enables" in _norm(SRC["s1_intro.tex"])
                and "the FAR requirement itself rests on the calibration" in _norm(SRC["s7_discussion.tex"]),
                "the value of the framework lies in these properties rather than in a lower FRR")
@@ -662,10 +662,10 @@ if SPRINGER:
                "No funding was received for conducting this study." in mt4
                and "The authors have no competing interests to declare that are relevant to the content of this article." in mt4
                and url4 in mt4 and url4 in esm4 and "To be completed" not in ALL and "to be inserted" not in ALL and "[repository" not in ALL,
-               r"The first draft of the manuscript was prepared by Chuan-Hsiang Su and Tzu-Lung Sun with the assistance described in Sect.~\ref{sec:stats}")
+               r"The first draft of the manuscript was prepared by Chuan-Hsiang Su and Tzu-Lung Sun in the human--AI collaboration described in Sect.~\ref{sec:stats}")
     check_true("v04: AI use stated in one sentence in Sect. 5.4 (label sec:stats), separate subsection removed",
-               "Use of generative AI" not in ALL and "sec:ai" not in ALL and "A large language model" in _norm(SRC["s5_setup.tex"]).split("Statistics and implementation")[1],
-               "A large language model (Claude, Anthropic) wrote and ran the experiment code and drafted the text under the authors' direction; the authors verified the code, the results, and the text and take full responsibility for the content.")
+               "Use of generative AI" not in ALL and "sec:ai" not in ALL and "large language model (Claude, Anthropic)" in _norm(SRC["s5_setup.tex"]).split("Statistics and implementation")[1],
+               "The work was carried out in human--AI collaboration: the authors designed the study and directed and checked each step, and a large language model (Claude, Anthropic) wrote and ran the experiment code and drafted the text under their direction; the authors verified the code, the results, and the text and take full responsibility for the content.")
     import run_mlp as _rm
     from data import MATCHERS as _MA
     src_mlp = open("run_mlp.py").read()
@@ -727,6 +727,47 @@ if SPRINGER:
     check("v04: MLP FAR compliance max %", my.far_ok.max(), "100", scale=100)
     check_true("v04: MLP positioned in intro and discussion", "including a small neural-network fusion" in ALL,
                "on D2 and D3 a small neural fusion reached about the FRR of likelihood-ratio fusion, so additional model capacity did not enlarge the advantage of parallel fusion")
+    print("=" * 30, "IJIS v05: mathematical review, data review, journal compliance")
+    from data import staircase_points as _sp
+    xs_, ys_ = _sp(np.array([0.0, 1/6, 1/3, 1/2, 2/3, 5/6, 1.0]), np.array([1.0, 0.8, 0.6, 0.4, 0.2, 0.0, 0.0]))
+    check_true(f"v05: corner set includes (x_1, y_0) and (x_(K+1), y_K) as in Sect. 3.3 (code corners {list(np.round(xs_, 3))})",
+               np.isclose(xs_.min(), 1/6) and np.isclose(ys_.max(), 1.0) and np.isclose(xs_.max(), 5/6) and np.isclose(ys_.min(), 0.2),
+               "The \\emph{corner points} are $(x_{k+1},y_k)$, $k=0,\\dots,K$, and $[\\underline{x}_s,\\overline{x}_s]=[x_1,x_{K+1}]$.")
+    check_true("v05: Prop. 1 stated on (0, x_(K+1)] for k = 0..K",
+               "if and only if $g(x_{k+1})\\ge y_k$ for $k=0,\\dots,K$" in _norm(SRC["s3_model.tex"]),
+               "because the step-(ii) threshold lies at an accepted impostor score rather than at the most permissive score with the same FAR, this is a prediction rather than a bound for the final stage")
+    src_es = open("envelope_solvers.py").read()
+    check_true("v05: Prop. 5 early-stop bound (1 - eps) U in text and code",
+               "U if not heap else U * (1 - eps)" in src_es and "U if not (heap or open_leaves) else U * (1 - eps)" in src_es,
+               "the minimum of $(1-\\epsilon)U$ and the bounds of the open nodes and leaves is a valid lower bound")
+    check_true("v05: P2 dual reference, node description, d_mu, midpoint q, J splits",
+               "\\ref{eq:zd}) is again evaluated" not in ALL and "g_\\mu" not in ALL and "midpoint $m$" not in ALL and "$K=10$ splits" not in ALL
+               and "0\\le\\sigma\\le\\bar\\sigma" in _norm(SRC["ESM_1.tex"]),
+               "holds the ordered tuples $\\beta_1\\le\\dots\\le\\beta_N$ in these intervals")
+    check_true("v05: staircase drawn with where='pre' (corners close each level)", 'ax.step(x, y, where="pre"' in open("figures.py").read())
+    rs_ = tab("T_rev_selected"); fs5 = tab("T_fresh_selected"); fs5 = fs5[(fs5.dataset == "lfw_x_fing") & (fs5.calib == "boot")]
+    par_ = pd.concat([rs_[rs_.method.isin(["P0-Parallel", "P1-LLR", "P2-LogReg"])], fs5[fs5.method.isin(["P0-Parallel", "P1-LLR", "P2-LogReg"])]])
+    check_true(f"v05: parallel fusion stages per genuine claim {par_.stages_gen.min():.2f}-{par_.stages_gen.max():.2f} (Table 3)",
+               np.isclose(par_.stages_gen.min(), 2) and np.isclose(par_.stages_gen.max(), 4), None)
+    import collections
+    x1_ = rs_[(rs_.dataset == "fing_x_face") & (rs_.method == "LR-P1-N2") & np.isclose(rs_.alpha, 1e-3)]
+    cnt_ = collections.Counter(o for oo in x1_.orders for o in set(str(oo).split("|")))
+    top_ = sorted(cnt_.values(), reverse=True)
+    check_true(f"v05: D1 order of Table 7 is one of three orders selected in three splits each ({cnt_['ri_V>face_C>face_G>li_V']}; top {top_[:4]})",
+               cnt_["ri_V>face_C>face_G>li_V"] == 3 and top_[:3] == [3, 3, 3] and top_[3] < 3,
+               "(on D1, one of three orders selected in three splits each)")
+    st5 = tab("T_rev_stats"); rr = st5[(st5.dataset == "face_x_face") & np.isclose(st5.alpha, 1e-4) & (st5.method == "LR-P1-N2-rel")].iloc[0]
+    check("v05: relative-error variant D3 1e-4 CI low", rr.ci_lo, "0.0002"); check("v05: ... CI high", rr.ci_hi, "0.0130")
+    refs5 = open(f"{P}/references.tex").read()
+    check_true("v05: reference list in Springer basic style (no '?.', no final period, full author list of chen2025, dated online document)",
+               "?." not in refs5 and not any(l.rstrip().endswith(".") for l in refs5.splitlines() if l.startswith("\\bibitem"))
+               and "Tai, K.-Y., Hsiao, C.-H., Wang, W.-H., Tsai, M.-C., Sun, T.-L." in refs5
+               and "nist-biometric-scores-set-bssr1} (2017). Accessed 29 September 2026" in refs5)
+    check_true("v05: declarations (ethics, consent to participate, consent for publication, data URLs) and ESM description",
+               "\\paragraph{Consent to participate} Not applicable." in SRC["main.tex"] and "\\paragraph{Consent for publication}" in SRC["main.tex"]
+               and "\\url{http://vis-www.cs.umass.edu/lfw/}" in SRC["main.tex"] and "\\url{https://github.com/opencv/opencv_zoo}" in SRC["main.tex"]
+               and "\\section*{Supplementary Information}" in SRC["main.tex"])
+    check_true("v05: US spelling", not re.search(r"analys(ed|e\b)|favour|colour|behaviour|modelling", ALL))
     print("=" * 30, "IJIS format checks")
     ab_ = open(f"{P}/sections/s0_abstract.tex").read(); ab_ = ab_.split("\\begin{abstract}")[1].split("\\keywords")[0]
     nw = len(re.split(r"\s+|--", re.sub(r"\$[^$]*\$", "X", ab_).replace("~", " ").strip()))

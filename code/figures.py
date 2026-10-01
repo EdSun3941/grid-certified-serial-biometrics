@@ -36,7 +36,7 @@ def fig_envelopes(dataset="fing_x_face", matcher="face_C", seed=0, tag="main",
     G = tr["_G"]; S = tr[matcher][0]
     _, far, frr = roc(S[G], S[~G]); x, y = staircase_points(far, frr, "corner")
     fig, ax = plt.subplots(figsize=(W1, 2.5))
-    ax.step(x, y, where="post", color="#0b0b0b", lw=0.9, label="Empirical staircase (train)", zorder=5)
+    ax.step(x, y, where="pre", color="#0b0b0b", lw=0.9, label="Empirical staircase (train)", zorder=5)   # corners (x_{k+1}, y_k): level y_k ends at x_{k+1}
     xs = np.geomspace(x.min(), x.max(), 400)
     for m in methods:
         r = e1[(e1.matcher == matcher) & (e1.method == m)].iloc[0]; terms = json.loads(r.terms)

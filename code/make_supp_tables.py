@@ -1,5 +1,6 @@
 """Generate the LaTeX tables of the supplementary material directly from results/tables/*.csv
 (no manual transcription).  Output: ../paper/supp_tables.tex"""
+import os
 import numpy as np, pandas as pd
 
 T = "../results/tables"; DS = {"fing_x_face": "D1", "fing_x_fing": "D2", "face_x_face": "D3"}
@@ -131,6 +132,7 @@ st = pd.read_csv(f"{T}/T_rev_stats.csv"); sec = st[st.family == "secondary"]
 labs = {"MONO": "MONO", "MONO-cont": "MONO-c", "DE-N2": "DE", "NLS-N2": "NLS", "MAXMONO-K3": "MAXMONO", "LR-P1-N3": "$N=3$", "LR-P2-N2": "P2", "LR-P1-N2-rel": "P1-rel"}
 out.append(r"\begin{table*}[!t]\centering\caption{Envelope Families: Mean Test-FRR Difference (Proposed Minus Family) With 95\% Corrected-Resampled Confidence Interval, Subject-Bootstrap Calibration, Selection by Training FRR}\label{tab:s-sec}\footnotesize\setlength{\tabcolsep}{1.2pt}")
 combos = [(ds, a) for ds in DS for a in sorted(sec[sec.dataset == ds].alpha.unique(), reverse=True)]
+CID = 4 if "ijis" in os.environ.get("PAPER", "") else 3   # IJIS v05: CIs to 4 decimals (one CI bound is 0.0002)
 fmt = lambda v, d: (f"{v:+.{d}f}".replace("-0." + "0" * d, "0." + "0" * d).replace("+0." + "0" * d, "0." + "0" * d)).replace("-", "$-$")
 out.append(r"\begin{tabular}{@{}l" + "c" * len(combos) + r"@{}}\toprule & " + " & ".join(f"{DS[ds]}, {ALPHA[a]}" for ds, a in combos) + r" \\\midrule")
 for m, lab in labs.items():
@@ -138,7 +140,7 @@ for m, lab in labs.items():
     for ds, a in combos:
         r = sec[(sec.dataset == ds) & np.isclose(sec.alpha, a) & (sec.method == m)]
         cells.append("--" if len(r) == 0 or pd.isna(r.mean_diff.iloc[0]) else
-                     f"\\makecell{{{fmt(r.mean_diff.iloc[0], 4)}\\\\{{}}[{fmt(r.ci_lo.iloc[0], 3).lstrip('+')}, {fmt(r.ci_hi.iloc[0], 3).lstrip('+')}]}}")
+                     f"\\makecell{{{fmt(r.mean_diff.iloc[0], 4)}\\\\{{}}[{fmt(r.ci_lo.iloc[0], CID).lstrip('+')}, {fmt(r.ci_hi.iloc[0], CID).lstrip('+')}]}}")
     out.append(f"{lab} & " + " & ".join(cells) + r" \\")
 out.append(r"\bottomrule\end{tabular}\end{table*}")
 
@@ -342,7 +344,7 @@ if "ijis" in PAPER:
         "tab:s-scal": r"Scalability (seed 0, P1, single core, 600-s limit per solver). Enumeration times marked $^{e}$ are extrapolated from the enumerated fraction",
         "tab:s-reject": r"Stage FAR at the accept and reject thresholds of the uncalibrated proposed GP designs (all multi-stage orders, ten splits)",
         "tab:s-abl": r"Ablations on D1 at $\alpha=10^{-3}$ (uncalibrated; test FRR, variant versus main setting on the same splits; Wilcoxon $p$ where differences exist)",
-        "tab:s-noise": r"Robustness of D1 designs to additive Gaussian test-score noise (SD = 5\% or 10\% of the impostor-score SD; uncalibrated): test FAR / FRR",
+        "tab:s-noise": r"Robustness of D1 designs to additive Gaussian test-score noise (SD = 5\% or 10\% of the impostor-score SD; uncalibrated): test FAR / FRR (means over all orders and splits)",
         "tab:s-farstage": r"Selected designs under subject-bootstrap calibration: mean test FAR$/\alpha$ and stages per genuine / impostor claim (means over ten splits; parallel fusion acquires all modalities)",
         "tab:s-refit": r"Envelopes fitted by the subgradient LR-BB of the preliminary implementation (used in the uncalibrated and Clopper--Pearson analyses) compared with their refit by the exact-dual LR-BB (used in the calibrated designs): number of envelopes, share with identical curves (largest relative difference $<10^{-6}$), and largest relative curve difference",
     }
@@ -359,7 +361,8 @@ if "ijis" in PAPER:
         b = b[:i] + CAP[lab] + b[j:]
         b = b.replace("$^{\\ast}$", "$^{\\mathrm{a}}$")
         if lab == "tab:s-calib": b = b.replace("\\begin{table}[!t]", "\\begin{table*}[!t]").replace("\\end{table}", "\\end{table*}").replace("\\setlength{\\tabcolsep}{2.2pt}", "\\setlength{\\tabcolsep}{5pt}")
-        if lab == "tab:s-sec": b = b.replace("\\footnotesize\\setlength{\\tabcolsep}{1.2pt}", "\\scriptsize\\setlength{\\tabcolsep}{2pt}")
+        if lab == "tab:s-plain": b = b.replace(" & Parallel \\\\", " & Sum \\\\")   # column is sum fusion (P0-Parallel)
+        if lab == "tab:s-sec": b = b.replace("\\footnotesize\\setlength{\\tabcolsep}{1.2pt}", "\\scriptsize\\setlength{\\tabcolsep}{1.5pt}")
         new.append(b)
     text = "\n".join(new) + "\n"
 open(f"{PAPER}/supp_tables.tex", "w").write(text)

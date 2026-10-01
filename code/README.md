@@ -149,3 +149,17 @@ The MLP uses the split seed as `random_state` and for the impostor subsample (at
 genuine comparisons, class-balanced sample weights, as for logistic regression). Calibrations: `boot` for all splits,
 `xfit` (held-out, fold split seed 5000 + split, fold-B bootstrap seed 4000 + split) for the new splits and D4.
 All 100 MLP jobs ran on the 24-core PC.
+
+## IJIS v05 corrections (mathematical and data review)
+- `envelope_solvers.py`: when the search is interrupted, the reported lower bound is the minimum of (1 - eps) U and the
+  bounds of the open nodes and leaves (Prop. 5); complete runs are unchanged. No reported result was affected (no
+  interrupted run had a bound between (1 - eps) U and U).
+- `run_fresh.py` / `analyze_fresh.py`: parallel fusion acquires every modality, so its stages per claim equal the number
+  of matchers; files written before this fix record one stage, which `analyze_fresh.py` corrects on loading (only the
+  stage columns of `T_fresh_selected.csv` and `T_fresh_system.csv` change; Table 3).
+- `figures.py`: the training staircase in Fig. 2 and Fig. S1 is drawn with level y_k ending at its corner x_(k+1)
+  (`where="pre"`); the envelopes and all numbers are unchanged.
+- `make_supp_tables.py`, `make_springer_refs.py`: Table S7 confidence limits to four decimals, Table S3 column "Sum",
+  Springer basic reference style (no final period, no "?." , dated online document).
+- `results/E3fresh_pc_overlap/`: the PC copies of the seven splits computed on both machines (the cloud copies in
+  `results/E3fresh` are used; comparison in `results/E3fresh_provenance.csv`).

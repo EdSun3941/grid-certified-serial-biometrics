@@ -120,7 +120,9 @@ def main():
     def evaluate(row, rec, thr, Btrain, Gtrain):
         s_tr = rec["smap"](Btrain); s_te = rec["smap"](Bte)
         fa, fr, sg, si = simulate(s_tr, Gtrain, thr); row.update(feasible=True, far_train=fa, frr_train=fr)
-        fa, fr, sg, si = simulate(s_te, Gte, thr); row.update(far_test=fa, frr_test=fr, stages_gen=sg, stages_imp=si, thr=jthr(thr))
+        fa, fr, sg, si = simulate(s_te, Gte, thr)
+        if rec["kind"] == "parallel": sg = si = float(len(M))          # parallel fusion acquires every modality (fixed in v05)
+        row.update(far_test=fa, frr_test=fr, stages_gen=sg, stages_imp=si, thr=jthr(thr))
     # (a) paper calibration on the whole training half
     des, fi = design_all(Btr, Gtr, subj_r[r_tr], subj_c[c_tr], M, alphas, seed, a.B, a.conf, 1000 + seed)
     for rec in des:
