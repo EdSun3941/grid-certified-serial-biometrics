@@ -14,6 +14,7 @@ authors:
     given-names: Chiu-Han
 license: MIT
 version: "1.0.0"
+doi: 10.5281/zenodo.23072674
 date-released: "2026-10-01"
 abstract: "Code, per-split results, tables, figures and run logs for the design of serial (sequential) multibiometric verification thresholds by geometric programming with corner-dominating posynomial FAR-FRR envelopes fitted by exact-dual Lagrangian-relaxation branch-and-bound, evaluated on NIST BSSR1 and a chimeric LFW + BSSR1 subset."
 keywords:

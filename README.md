@@ -1,5 +1,7 @@
 # Grid-certified posynomial FAR–FRR envelopes for serial multibiometric threshold design
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23072674.svg)](https://doi.org/10.5281/zenodo.23072674)
+
 Code and per-split results for the article
 
 > C.-H. Su, F. Y.-S. Lin, T.-L. Sun, C.-C. Yeh, C.-H. Hsiao, "Grid-Certified Posynomial FAR–FRR Envelopes for Serial
@@ -75,7 +77,8 @@ fold A with seed 3000 + split and fold B with seed 4000 + split. Further seeds a
 
 ## Citation
 
-See `CITATION.cff`. Please cite the article once it is published.
+See `CITATION.cff`. Version 1.0.0 of this repository, the version used for the article, is archived at Zenodo:
+https://doi.org/10.5281/zenodo.23072674. Please cite the article once it is published.
 
 ## License
 
