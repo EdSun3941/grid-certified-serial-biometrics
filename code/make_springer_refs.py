@@ -132,6 +132,8 @@ def entry(key, typ, f):
         mon = {"Sep": "September", "Oct": "October"}.get(m.group(1), m.group(1)) if m else ""
         ad = f", {f['addendum']}" if "addendum" in f else ""          # v08: page dates and data description (review, minor 4)
         return f"{a}: {t}{ad}. \\url{{{url}}} ({y}). Accessed {m.group(2)} {mon} {m.group(3)}"   # online document (Springer example)
+    if typ == "misc" and f.get("publisher") == "GitHub":                 # v08: software release (Zenodo DOI of v1.1.0 to be added)
+        return f"{a}: {t}, {f['version']}. GitHub release ({y}). \\url{{{f['url']}}}"
     if typ == "misc" and f.get("publisher") == "Zenodo":                 # software / data archive with a DOI
         return f"{a}: {t}, {f['version']}. Zenodo ({y}).{doi(f)}"
     raise ValueError(f"unhandled entry {key} ({typ})")

@@ -1,7 +1,7 @@
-# Code package: grid-certified posynomial FAR–FRR envelopes for serial multibiometric threshold design
+# Code package: grid-certified corner-dominating FAR–FRR envelopes for serial multibiometric threshold design
 
-Reproduces every number, table and figure of the manuscript "Grid-Certified Posynomial FAR–FRR Envelopes for Serial
-Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound" (Springer version for the International
+Reproduces every number, table and figure of the manuscript "Grid-Certified Corner-Dominating FAR–FRR Envelopes for Serial
+Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound" (titled "Grid-Certified Posynomial …" up to v1.1.0) (Springer version for the International
 Journal of Information Security, `../paper_ijis`, main text `main.tex`, Online Resource 1 `ESM_1.tex`) and of its
 supplementary material, and of an earlier IEEE-format draft of the same work (`../paper`). All reported values come from CSV files written by these scripts; every table CSV carries a
 `source` column naming its inputs, and `verify_numbers.py` recomputes the numbers quoted in the text.
@@ -180,3 +180,25 @@ simulation; Online Resource 1 Sect. S4 describes the simulation and Sect. S5 the
 are feasible there (identical to recomputing them; checked on D1 split 0) and recomputes the others. The simulation ran on
 the 24-core PC (Windows, Python 3.12.5), the sensitivity analysis on the 2-vCPU Linux machine, so that its paper variant
 reproduces `results/E3b` exactly. `dev/calib_sensitivity.py` is an earlier version restricted to the selected orders.
+
+## IJIS v09: additional analyses (release v1.2.0)
+Table and section numbers follow the v09 manuscript (Online Resource 1 Tables S23 and S24 are new).
+
+| Analysis | Script | Output | Paper |
+|---|---|---|---|
+| Fold-A-only control of the held-out calibration: the fold-A designs of `run_fresh.py` (same fold split and seeds) deployed with their fold-A calibration, fold B unused; checks that every fold-A design reproduces the xfit arm of `results/E3fresh`, and compares the bootstrap, fold-A-only and held-out calibrations | `run_foldA.py` (`jobs_foldA.txt`; on a multi-core PC `run_local_foldA.py`), `analyze_foldA.py` | `results/E3foldA`, `E3foldA_provenance.csv`, `T_foldA_repro.csv`, `T_foldA_selected.csv`, `T_foldA_system.csv`, `T_foldA_paired.csv`, `T_foldA_methods.csv` | Sects. 5.2, 6.4, 7, Table S23 |
+| Presentation-attack sensitivity: attack strength (score interpolation), scores shifted above the genuine distribution, PAD at every trait acquisition (APCER 0.2 / 0.05, BPCER 0.01), FRR with PAD and trait acquisitions per claim; lambda = 1 reproduces Table 8 | `spoof_sens.py` | `spoof_sens_raw_*.csv`, `T_spoof_sens.csv` | Sect. 6.6, Table S24 |
+
+The control arm ran D1 and D4 on the 2-vCPU Linux machine and D2 and D3 on the 24-core PC; split 12 of D2 was run on
+both machines and gave identical rates (`results/E3foldA_cloud_overlap`). Two of the 15,050 feasible fold-A designs (D1,
+splits 17 and 27) differ from the original xfit runs by one genuine comparison of fold A; in the one setting where this
+changes the tied best orders, `analyze_foldA.py` deploys the orders fixed in the xfit arm.
+
+D4 spoof analyses (Table 8 D4 row, Table S24 D4 rows): the thresholds of D4 splits 2-9 were computed on the 24-core PC.
+The SPRT re-estimates its log-likelihood ratios when a design is evaluated, and their last bits differ between the PC
+and the Linux machine, which flipped a few test scores lying exactly at an SPRT threshold in splits 4 and 7 (SPRT test
+FRR 0.0016 instead of 0.0011 on D4 at alpha = 1e-3). `spoof_trait.py lfw_x_fing` and `spoof_sens.py lfw_x_fing` were
+therefore also run on the PC; `merge_d4_spoof.py` keeps the PC rows of splits 2-9 (all other rows are identical on the
+two machines), keeps the local files as `*_local.csv`, writes `results/D4_spoof_provenance.csv`, and re-aggregates
+`T_rev_spoof_trait.csv` and `T_spoof_sens.csv`. This corrects the D4 SPRT entry of Table 8 (0.956 / 0.587 in v08,
+now 0.981 / 0.596); the evaluated test FRR now equals that of `results/E3fresh` for every method and split.

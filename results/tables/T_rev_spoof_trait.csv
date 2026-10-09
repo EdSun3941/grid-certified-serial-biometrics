@@ -29,5 +29,5 @@ lfw_x_fing,P1-LLR,0.9754927918724106,0.8341626463855307,10,results/E3fresh thres
 lfw_x_fing,P2-LogReg,0.9790968556671775,0.6712547060938002,10,results/E3fresh thresholds (calib boot) + test scores; spoof_trait.py (per-trait perfect spoof)
 lfw_x_fing,S1-Marcialis,0.899440187676183,0.748726398584861,10,results/E3fresh thresholds (calib boot) + test scores; spoof_trait.py (per-trait perfect spoof)
 lfw_x_fing,S2-Symmetric,0.899440187676183,0.748726398584861,10,results/E3fresh thresholds (calib boot) + test scores; spoof_trait.py (per-trait perfect spoof)
-lfw_x_fing,S3-SPRT,0.9555887110505704,0.587249587724111,10,results/E3fresh thresholds (calib boot) + test scores; spoof_trait.py (per-trait perfect spoof)
+lfw_x_fing,S3-SPRT,0.9808720699245134,0.5957239540962723,10,results/E3fresh thresholds (calib boot) + test scores; spoof_trait.py (per-trait perfect spoof)
 lfw_x_fing,S4-Direct,0.9597359361106381,0.6564703303252171,10,results/E3fresh thresholds (calib boot) + test scores; spoof_trait.py (per-trait perfect spoof)

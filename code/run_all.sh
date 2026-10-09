@@ -41,7 +41,6 @@ fi
 python3 figures.py all           # ../results/figures/*.pdf
 [ -d ../paper/figures ] && cp ../results/figures/F2_*.pdf ../results/figures/*_rev.pdf ../paper/figures/
 [ -f ../paper/main.tex ] && python3 verify_numbers.py   # recomputes every number quoted in the manuscript; exit code 1 on any mismatch
-[ -f ../paper_ijis/main.tex ] || PAPER=../paper_ijis python3 verify_numbers.py --numbers-only   # without the manuscript: every number against the checklist in the script
 # ---- IJIS (Springer) version, v02 additions
 ./launch.sh jobs_miqp.txt 1 miqp                                # E2miqp: MIQP reference by outer approximation (N = 2, 3); E2v2 N = 3
 python3 matched_far.py           # T_rev_matchedfar*: final threshold re-set on the test half to test FAR <= alpha (oracle)
@@ -64,8 +63,14 @@ python3 analyze_d4_subsets.py    # T_d4_subsets (Table S20): D4 face only, face 
 python3 analyze_sens.py          # T_sens_* (Table S21; Proposition 1 at all deployed GP stage thresholds)
 ./launch.sh jobs_sim.txt "$NP" sim                              # E9sim: controlled simulation (or python run_local_sim.py [workers])
 python3 analyze_sim.py           # T_sim (Table S22)
+# ---- IJIS v09: fold-A-only control of the held-out calibration (review M1) and presentation-attack sensitivity (review M8)
+./launch.sh jobs_foldA.txt "$NP" foldA                          # E3foldA: fold A only, same seeds as E3fresh (or python run_local_foldA.py [workers])
+python3 analyze_foldA.py         # T_foldA_* (Table S23); checks that the fold-A designs reproduce those of E3fresh
 # ---- IJIS (Springer) version: per-trait spoof analysis, Springer tables/figures/references, checks
 python3 spoof_trait.py fing_x_face fing_x_fing face_x_face lfw_x_fing   # T_rev_spoof_trait, T_rev_cost_spoof_trait
+python3 spoof_sens.py            # T_spoof_sens (Table S24): attack strength, score shift, PAD; lambda = 1 reproduces Table 8
+#   (D4 splits 2-9 were designed on the 24-core PC; for the article, spoof_trait.py and spoof_sens.py were also run for D4 on that PC
+#    and merged with python3 merge_d4_spoof.py <folder with the PC raw files>; see code/README.md, IJIS v09)
 if [ -d ../paper_ijis ]; then
   PAPER=../paper_ijis python3 make_main_tables.py
   PAPER=../paper_ijis python3 make_supp_tables.py
@@ -77,4 +82,5 @@ if [ -d ../paper_ijis ]; then
   (cd ../paper_ijis && for i in 1 2; do pdflatex -interaction=nonstopmode main.tex >/dev/null; pdflatex -interaction=nonstopmode ESM_1.tex >/dev/null; done)
   PAPER=../paper_ijis python3 verify_numbers.py
 fi
+[ -f ../paper_ijis/main.tex ] || PAPER=../paper_ijis python3 verify_numbers.py --numbers-only   # without the manuscript: every number against the checklist in the script
 echo "done: see ../results/tables, ../results/figures and ../paper/tables"

@@ -401,6 +401,58 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_sim.csv"):
                             r"replicates with a deployed design and compliance among them), and share of the calibrated two-stage designs whose step-(iii) "
                             r"prediction is at least the population FRR and at least the joint training FRR; $\rho$, genuine-score correlation (impostor $\rho/3$); "
                             r"200 ($N=500$) and 100 ($N=1500$) replicates")
+# ---- IJIS v09: fold-A-only control (review M1) and presentation-attack sensitivity (review M8) (Springer version only)
+_cnt = lambda v: f"{v:.1f}"[:-2] if f"{v:.1f}".endswith(".0") else f"{v:.1f}"     # tie-averaged counts, one decimal as in Table S17
+if "ijis" in _PAPER and os.path.exists(f"{T}/T_foldA_system.csv"):
+    fs_ = pd.read_csv(f"{T}/T_foldA_system.csv"); fs_ = fs_[fs_.method == "LR-P1-N2"]; fp_ = pd.read_csv(f"{T}/T_foldA_paired.csv")
+    out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-folda}\scriptsize\setlength{\tabcolsep}{2.6pt}"
+               r"\begin{tabular}{@{}llcccccccccccccc@{}}\toprule & & \multicolumn{3}{c}{Bootstrap, training half} & \multicolumn{3}{c}{Fold A only} & \multicolumn{4}{c}{Held-out (fold B)} & \multicolumn{2}{c}{Held-out deployed} & \multicolumn{2}{c}{No held-out design} \\"
+               r"\cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-12}\cmidrule(lr){13-14}\cmidrule(lr){15-16}"
+               r"Set & $\alpha$ & Met & FAR$/\alpha$ & FRR & Met & FAR$/\alpha$ & FRR & Deployed & Met & FAR$/\alpha$ & FRR & Splits & Met (B / A / H) & Splits & Met (A) \\\midrule")
+    for ds in ["fing_x_face", "fing_x_fing", "face_x_face", "lfw_x_fing"]:
+        als = sorted(fs_[fs_.dataset == ds].alpha.unique(), reverse=True)
+        for k, a in enumerate(als):
+            g_ = lambda c: fs_[(fs_.dataset == ds) & np.isclose(fs_.alpha, a) & (fs_.calib == c)].iloc[0]
+            b_, f_, x_ = g_("boot"), g_("foldA"), g_("xfit"); p_ = fp_[(fp_.dataset == ds) & np.isclose(fp_.alpha, a)].iloc[0]
+            n_ = int(b_.n_splits)
+            out.append(f"{_DS4[ds] if k == 0 else ''} & {_AL[a]} & {_cnt(b_.n_met)}/{n_} & {b_.far_over_alpha:.2f} & {b_.frr_test:.4f} & "
+                       f"{_cnt(f_.n_met)}/{n_} & {f_.far_over_alpha:.2f} & {f_.frr_test:.4f} & {_cnt(x_.n_deployed)}/{n_} & {_cnt(x_.n_met)} & "
+                       f"{x_.far_over_alpha:.2f} & {x_.frr_test:.4f} & {int(p_.n_xfit)} & {_cnt(p_.met_boot_full)} / {_cnt(p_.met_foldA_full)} / {_cnt(p_.met_xfit_full)} & "
+                       f"{int(p_.n_none)} & {_cnt(p_.met_foldA_none) if p_.n_none else '--'} \\\\")
+        out.append(r"\midrule")
+    out[-1] = r"\bottomrule\end{tabular}\end{table*}"
+    NEW_CAP["tab:s-folda"] = (r"Fold-A-only control (proposed design; 20 new splits of D1--D3 and ten splits of D4): splits whose deployed design met $\alpha$ "
+                              r"on the test half (tie-averaged), mean test FAR$/\alpha$, and mean test FRR of the deployed designs under the bootstrap calibration "
+                              r"on the whole training half (as in the paper), under the fold-A-only calibration (design, order selection, and bootstrap "
+                              r"calibration on fold~A; fold~B unused), and under the held-out calibration (order fixed on fold~A, final threshold re-set on "
+                              r"fold~B; splits with a deployed design). Last four columns: splits in which the held-out calibration deployed every tied "
+                              r"fold-A order, with the splits that met $\alpha$ under the bootstrap (B), fold-A-only (A), and held-out (H) calibrations, and "
+                              r"splits in which it deployed none, with those that met $\alpha$ under the fold-A-only calibration")
+if "ijis" in _PAPER and os.path.exists(f"{T}/T_spoof_sens.csv"):
+    sp_ = pd.read_csv(f"{T}/T_spoof_sens.csv")
+    _MS = [("LR-P1-N2", "Proposed"), ("S1-Marcialis", "Marcialis"), ("S2-Symmetric", "Symmetric"), ("S4-Direct", "Direct"),
+           ("S3-SPRT", "SPRT"), ("P0-Parallel", "Sum"), ("P1-LLR", "LLR"), ("P2-LogReg", "LogReg")]
+    out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-attack}\scriptsize\setlength{\tabcolsep}{3.2pt}"
+               r"\begin{tabular}{@{}llccccccccccc@{}}\toprule & & \multicolumn{5}{c}{Attack strength $\lambda$} & \multicolumn{2}{c}{Shift above genuine} & \multicolumn{2}{c}{PAD (APCER)} & & \\"
+               r"\cmidrule(lr){3-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}"
+               r"Set & Method & 0$^{\mathrm{a}}$ & 0.25 & 0.5 & 0.75 & 1 & $+0.5\sigma_{\mathrm{g}}$ & $+1\sigma_{\mathrm{g}}$ & 0.20 & 0.05 & FRR / with PAD & Traits (gen / imp) \\\midrule")
+    for ds in ["fing_x_face", "fing_x_fing", "face_x_face", "lfw_x_fing"]:
+        for j, (m, lab) in enumerate(_MS):
+            r = sp_[(sp_.dataset == ds) & (sp_.method == m)].iloc[0]
+            cells = [f"{r['strength_0_worst'] / 1e-3:.2f}"] + [f"{r[f'strength_{l:g}_worst']:.3f}" for l in [0.25, 0.5, 0.75, 1.0]] + [f"{r[f'shift_{d:g}_worst']:.3f}" for d in [0.5, 1.0]]
+            cells += [f"{r[f'pad_{a:g}_worst']:.3f}" for a in [0.2, 0.05]] + [f"{r.frr_test:.4f} / {r.frr_test_pad:.4f}", f"{r.acq_gen:.2f} / {r.acq_imp:.2f}"]
+            out.append(f"{_DS4[ds] if j == 0 else ''} & {lab} & " + " & ".join(cells) + r" \\")
+        out.append(r"\midrule")
+    out[-1] = (r"\bottomrule\end{tabular}\par\smallskip\parbox{\textwidth}{\footnotesize $^{\mathrm{a}}$Zero-effort impostors: largest test FAR "
+               r"over the traits, in units of $\alpha=10^{-3}$}\end{table*}")
+    NEW_CAP["tab:s-attack"] = (r"Sensitivity of the single-trait presentation-attack stress test of Table~8 of the paper (same selected designs at "
+                               r"$\alpha=10^{-3}$, splits, and spoofed comparisons): acceptance rate of the trait most favorable to the attacker, averaged "
+                               r"over ten splits, when the spoofed scores are $(1-\lambda)s_{\mathrm{imp}}+\lambda s_{\mathrm{gen}}$ ($\lambda=0$: zero-effort "
+                               r"FAR; $\lambda=1$: Table~8), when they are the genuine scores shifted up by 0.5 or 1 standard deviation $\sigma_{\mathrm{g}}$ of the "
+                               r"matcher's genuine training scores, and for $\lambda=1$ with a presentation-attack detector (PAD) at every trait acquisition "
+                               r"that passes an artifact with probability APCER and rejects a bona fide presentation with probability BPCER $=0.01$, "
+                               r"independently of the scores; test FRR without and with the PAD, and mean number of traits acquired per genuine and per "
+                               r"impostor claim (both face matchers of D1 and D3 use one face image)")
 text = "\n".join(out) + "\n"
 PAPER = os.environ.get("PAPER", "../paper")
 if "ijis" in PAPER:

@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this code or these results, please cite the article below."
-title: "Grid-certified posynomial FAR-FRR envelopes for serial multibiometric threshold design: code and per-split results"
+title: "Grid-certified corner-dominating FAR-FRR envelopes for serial multibiometric threshold design: code and per-split results"
 authors:
   - family-names: Su
     given-names: Chuan-Hsiang
@@ -13,7 +13,7 @@ authors:
   - family-names: Hsiao
     given-names: Chiu-Han
 license: MIT
-version: "1.1.0"
+version: "1.2.0"
 date-released: "2026-10-10"
 abstract: "Code, per-split results, tables, figures and run logs for the design of serial (sequential) multibiometric verification thresholds by geometric programming with corner-dominating posynomial FAR-FRR envelopes fitted by exact-dual Lagrangian-relaxation branch-and-bound, evaluated on NIST BSSR1 and a chimeric LFW + BSSR1 subset."
 keywords:
@@ -26,7 +26,7 @@ keywords:
 repository-code: "https://github.com/EdSun3941/grid-certified-serial-biometrics"
 preferred-citation:
   type: article
-  title: "Grid-Certified Posynomial FAR-FRR Envelopes for Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound"
+  title: "Grid-Certified Corner-Dominating FAR-FRR Envelopes for Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound"
   authors:
     - family-names: Su
       given-names: Chuan-Hsiang

@@ -1,11 +1,11 @@
-# Grid-certified posynomial FAR–FRR envelopes for serial multibiometric threshold design
+# Grid-certified corner-dominating FAR–FRR envelopes for serial multibiometric threshold design
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23072674.svg)](https://doi.org/10.5281/zenodo.23072674)
 
 Code and per-split results for the article
 
-> C.-H. Su, F. Y.-S. Lin, T.-L. Sun, C.-C. Yeh, C.-H. Hsiao, "Grid-Certified Posynomial FAR–FRR Envelopes for Serial
-> Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound", submitted to the
+> C.-H. Su, F. Y.-S. Lin, T.-L. Sun, C.-C. Yeh, C.-H. Hsiao, "Grid-Certified Corner-Dominating FAR–FRR Envelopes for
+> Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound", submitted to the
 > *International Journal of Information Security*.
 
 The package designs the thresholds of a serial (sequential) multibiometric verification system by geometric
@@ -80,6 +80,14 @@ fold A with seed 3000 + split and fold B with seed 4000 + split. Further seeds a
 
 ## Version history
 
+- **v1.2.0** (October 2026, revision after review): new title of the article ("Grid-Certified Corner-Dominating
+  FAR–FRR Envelopes ..."). New: a fold-A-only control of the held-out calibration (`run_foldA.py`, `analyze_foldA.py`,
+  `results/E3foldA`; the fold-A designs reproduce those of `results/E3fresh`), and a sensitivity analysis of the
+  presentation-attack stress test to attack strength, score shift and presentation-attack detection (`spoof_sens.py`).
+  Correction: the D4 spoof analyses of splits 2–9 are now evaluated on the PC that computed their thresholds
+  (`merge_d4_spoof.py`), which changes the D4 SPRT entry of the per-trait spoof table (`T_rev_spoof_trait.csv`) from
+  0.956 / 0.587 to 0.981 / 0.596. `verify_numbers.py --numbers-only` now also runs without the processed data (the
+  checks that read them are skipped). All other results are unchanged. See `code/README.md`, section "IJIS v09".
 - **v1.1.0** (October 2026, revision after review): the held-out calibration now fixes the order of every method on
   fold A before fold B is used, and a split whose fold-A design cannot be calibrated on fold B has no deployed design
   (`analyze_fresh.py`; previously, orders that failed on fold B were dropped before the selection). The runs are
@@ -92,7 +100,7 @@ fold A with seed 3000 + split and fold B with seed 4000 + split. Further seeds a
 ## Citation
 
 See `CITATION.cff`. Every release is archived at Zenodo; version 1.0.0 (first submission) is
-https://doi.org/10.5281/zenodo.23072674, and version 1.1.0 (revision) is the version used for the revised article.
+https://doi.org/10.5281/zenodo.23072674, and version 1.2.0 (revision) is the version used for the revised article.
 Please cite the article once it is published.
 
 ## License

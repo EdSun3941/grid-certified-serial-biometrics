@@ -86,7 +86,7 @@ try:
     check_true("no failure scores in D3 face G / D2", not (D3["S_face_G"] == -1).any())
     del D1, D3
 except FileNotFoundError as e:
-    print("SKIP failure-score checks (processed BSSR1 data not available):", e)
+    print("SKIP failure-score checks (processed BSSR1 data not available):", e); n_skip += 1
 check_true("D1 test genuine about 260 (258 or 259)", abs(517 / 2 - 260) < 2, "about 260 genuine")
 check("D1 training genuine", 517 // 2, "258", "hold only 258 genuine comparisons")
 check("D1 test impostors 6.7e4", (517 / 2) * (517 / 2 - 1) / 1e4, "6.7", "$6.7\\times10^{4}$ impostor comparisons")
@@ -441,7 +441,10 @@ if SPRINGER:
     # ------------------------------------------------------------------ IJIS v02 (retitled revision): new analyses
     print("=" * 30, "IJIS v02 claims (title, MIQP, matched FAR, new splits, cross-fitting, D4)")
     mt_ = ptext("main.tex")
-    check_true("v03: title", TXT(lambda: "Grid-Certified Posynomial FAR--FRR Envelopes for Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound" in mt_))
+    check_true("v08: running title and ESM title follow the title", TXT(lambda: "\\titlerunning{Grid-certified corner-dominating FAR--FRR envelopes for serial multibiometrics}" in mt_
+               and "Grid-Certified Corner-Dominating FAR--FRR Envelopes" in SRC["ESM_1.tex"] and "grid-certified posynomial" not in ALL.lower()
+               and "\\titlerunning{Online Resource 1: grid-certified corner-dominating FAR--FRR envelopes}" in SRC["ESM_1.tex"]))
+    check_true("v03: title", TXT(lambda: "Grid-Certified Corner-Dominating FAR--FRR Envelopes for Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound" in mt_))
     refq = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2ref/ref_*.csv")], ignore_index=True); refq = refq[refq.obj == "P1"]
     mq2 = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2miqp/miqp_*_N2.csv")], ignore_index=True)
     mq2 = mq2.merge(refq[["dataset", "seed", "matcher", "value"]].rename(columns={"value": "opt"}), on=["dataset", "seed", "matcher"])
@@ -587,7 +590,7 @@ if SPRINGER:
     sl4 = fsy[(fsy.dataset == D4) & (fsy.calib == "boot") & fsy.method.isin(["S3-SPRT", "P1-LLR"])].frr_test
     sig4 = fst[(fst.dataset == D4) & (fst.calib == "boot") & (fst.p_holm < 0.05)].method.unique().tolist()
     check_true(f"v08: abstract - D4 only sum fusion differs significantly from the proposed design ({sig4})", sig4 == ["P0-Parallel"],
-               "On a chimeric subset with a contemporary face matcher, only sum fusion differed significantly from them.")
+               "On a chimeric subset with a contemporary face matcher, only sum fusion differed significantly from the proposed designs.")
     check_true("v02: conclusion - proposed higher mean FRR than most serial rules on D4",
                sum(fv("D4", a, m) < fv("D4", a, "LR-P1-N2") for m in ["S1-Marcialis", "S2-Symmetric", "S4-Direct", "S3-SPRT"] for a in (1e-2, 1e-3, 1e-4)) > 6,
                "although the proposed design had a higher mean FRR than most of them")
@@ -624,19 +627,19 @@ if SPRINGER:
     check_true(f"v08: abstract compliance 70-95 (boot, new splits and D4: {100 * ball.min():.1f}-{100 * ball.max():.1f}); held-out deployed 55-100, compliant 91-100",
                round(100 * ball.min()) == 70 and round(100 * ball.max()) == 95 and round(100 * xf.dep_share.min()) == 55 and xf.dep_share.max() == 1
                and round(100 * xa.min()) == 91 and xa.max() == 1,
-               "met the FAR requirement in 70\\%--95\\% of new test halves; with held-out calibration of an order fixed beforehand, a design could be deployed in 55\\%--100\\% of the splits and then met it in 91\\%--100\\%")
+               "met the FAR requirement in 70\\%--95\\% of new test halves; with held-out calibration of a fixed order, a design could be deployed in 55\\%--100\\% of splits and then met it in 91\\%--100\\%")
     check_true("v02: boot below 88% on D1, D3 and D4 at 1e-3 only", (bD1.far_ok < 0.8776).all() and (bD3.far_ok < 0.8776).all() and (bD2.far_ok > 0.8776).all()
                and sorted(bD4[bD4.far_ok < 0.8776].alpha.round(6)) == [0.001], "below the 88\\% benchmark on D1 and D3 and at $\\alpha=10^{-3}$ on D4")
     fb = fco[(fco.split_set != "original 0-9")].groupby("calib").far_over_alpha.agg(["min", "max"])
     check("v02: held-out FAR/alpha min", fb.loc["xfit", "min"], "0.43", "(mean test FAR of the deployed designs 0.43$\\alpha$--0.85$\\alpha$, against 0.73$\\alpha$--0.92$\\alpha$)")
     check("v02: held-out FAR/alpha max", fb.loc["xfit", "max"], "0.85"); check("v02: boot FAR/alpha min", fb.loc["boot", "min"], "0.73"); check("v02: boot FAR/alpha max", fb.loc["boot", "max"], "0.92")
     bl = fsy[fsy.method.isin(["S3-SPRT", "P0-Parallel", "P1-LLR", "P2-LogReg"])].groupby("calib").far_ok.agg(["min", "max"])
-    check("v02: SPRT/fusion compliance boot min %", bl.loc["boot", "min"], "60", "met $\\alpha$ in 60\\%--100\\% of the test halves with the bootstrap and in 70\\%--100\\% of their deployed test halves with the held-out calibration", scale=100)
-    check("v02: SPRT/fusion compliance held-out min %", bl.loc["xfit", "min"], "70", scale=100)
+    check("v02: SPRT/fusion compliance boot min %", bl.loc["boot", "min"], "60", "The SPRT and parallel fusion met $\\alpha$ in 60\\%--100\\% of the test halves with the bootstrap and in 70\\%--100\\% of their deployed test halves with the held-out calibration", scale=100)
+    check("v02: SPRT/fusion compliance held-out min %", bl.loc["xfit", "min"], "70", "(the SPRT and parallel fusion in 70\\%--100\\%)", scale=100)
     check_true("v02: SPRT/fusion compliance max 100% under both", (bl["max"] == 1).all())
-    check_true("v08: parallel fusion always deployed under held-out calibration",
+    check_true("v09: parallel fusion always deployed under held-out calibration",
                (fsy[(fsy.calib == "xfit") & fsy.method.isin(["P0-Parallel", "P1-LLR", "P2-LogReg"])].n_deployed == fsy[(fsy.calib == "xfit") & fsy.method.isin(["P0-Parallel", "P1-LLR", "P2-LogReg"])].n_splits).all(),
-               "parallel fusion, which makes no early decision, could always be calibrated")
+               "For parallel fusion, which the held-out calibration always deploys")
     # FRR cost of the held-out calibration, paired over the splits in which it deployed a design (T_fresh_selected)
     sl8 = tab("T_fresh_selected"); sl8 = sl8[sl8.method == "LR-P1-N2"]
     pr8 = sl8[sl8.calib == "boot"][["dataset", "seed", "alpha", "frr_test"]].merge(sl8[sl8.calib == "xfit"][["dataset", "seed", "alpha", "frr_test", "p_deploy"]],
@@ -657,10 +660,14 @@ if SPRINGER:
     check("v02: D4 face spoof others min", oth.min(), "0.90", "and in 0.90--0.98 by every other method except sum fusion"); check("v02: D4 face spoof others max", oth.max(), "0.98")
     check("v02: D4 sum fusion right-index spoof", r4.loc["P0-Parallel", "spoof_right_index"], "0.82", "sum fusion instead accepted 0.82 of the perfect right-index artifacts")
     check_true("v02: D4 sum fusion face spoof low", r4.loc["P0-Parallel", "spoof_face"] < 0.5)
-    Dz = np.load("../data/lfw_x_fing.npz"); Gz = Dz["genuine"]
-    zmed = {m: float(np.median((Dz["S_" + m][Gz] - Dz["S_" + m][~Gz].mean()) / Dz["S_" + m][~Gz].std())) for m in ["face_S", "li_V", "ri_V"]}
-    check("v02: D4 face genuine z median", zmed["face_S"], "6.6", "with a median genuine score of 18--22 impostor standard deviations against 6.6 for the face")
-    check("v02: D4 finger z min", min(zmed["li_V"], zmed["ri_V"]), "18"); check("v02: D4 finger z max", max(zmed["li_V"], zmed["ri_V"]), "22")
+    try:                     # v09: needs the processed D4 data (not redistributed); skipped when it is absent
+        from data import data_file as _dfz
+        Dz = np.load(_dfz("lfw_x_fing")); Gz = Dz["genuine"]
+        zmed = {m: float(np.median((Dz["S_" + m][Gz] - Dz["S_" + m][~Gz].mean()) / Dz["S_" + m][~Gz].std())) for m in ["face_S", "li_V", "ri_V"]}
+        check("v02: D4 face genuine z median", zmed["face_S"], "6.6", "with a median genuine score of 18--22 impostor standard deviations against 6.6 for the face")
+        check("v02: D4 finger z min", min(zmed["li_V"], zmed["ri_V"]), "18"); check("v02: D4 finger z max", max(zmed["li_V"], zmed["ri_V"]), "22")
+    except FileNotFoundError as e:
+        print("SKIP D4 score-scale checks (processed D4 data not available):", e); n_skip += 1
     # two machines (Sect. 5.4, Online Resource 1, Sect. S4)
     pv_ = pd.read_csv(f"{R}/E3fresh_provenance.csv"); both = pv_[pv_.checked_against_pc.notna()]
     check("v02: splits computed on both machines", len(both), "7", "Seven splits were computed on both machines (seed 10 of D1, seeds 10 and 11 of D2 and D3, and seeds 0 and 1 of D4)")
@@ -804,9 +811,12 @@ if SPRINGER:
                and "\\section*{Supplementary Information}" in SRC["main.tex"]))
     check_true("v05: US spelling", TXT(lambda: not re.search(r"analys(ed|e\b)|favour|colour|behaviour|modelling", ALL)))
     doi5 = "10.5281/zenodo.23072674"
-    check_true("v05: Zenodo DOI of the code release in Code availability (reference), ESM S4 and the reference list",
-               TXT(lambda: "the version used for this article is archived at Zenodo~\\cite{su2026code}" in SRC["main.tex"] and doi5 in SRC["ESM_1.tex"]
-               and f"\\url{{https://doi.org/{doi5}}}" in open(f"{P}/references.tex").read()))
+    rel8 = "https://github.com/EdSun3941/grid-certified-serial-biometrics/releases/tag/v1.2.0"
+    check_true("v09: release v1.2.0 cited in Code availability, ESM S5 and the reference list; v1.0.0 Zenodo DOI kept for the first submission",
+               TXT(lambda: "the version used for this article is release v1.2.0~\\cite{su2026code}" in SRC["main.tex"] and doi5 in SRC["main.tex"]
+                   and rel8 in SRC["ESM_1.tex"] and doi5 in SRC["ESM_1.tex"] and rel8 in refs5 and "v1.2.0. GitHub release (2026)" in refs5
+                   and "Grid-certified corner-dominating FAR--FRR envelopes for serial multibiometric threshold design: code and per-split results" in refs5
+                   and "v1.1.0" not in ALL))
     check_true("v05: logarithmic change of variables (no z overload); tolerance of the certificate stated",
                TXT(lambda: "$z=\\log" not in ALL), "within a relative tolerance of $10^{-4}$")
     print("=" * 30, "IJIS v06: reference audit of 2026-10-09")
@@ -839,7 +849,7 @@ if SPRINGER:
         check(f"v08: D4 face-only FRR at {a_:g}", g4(a_, "face only").frr_test, v_, "reached a test FRR of 0.0069, 0.0132, and 0.0271 at $\\alpha=10^{-2}$, $10^{-3}$, and $10^{-4}$ and met $\\alpha$ in 7 of 10 test halves at each $\\alpha$")
     check_true("v08: D4 face-only met alpha in 7 of 10 at each alpha", (d4s[d4s.design == "face only"].n_met == 7).all())
     f1 = d4s[d4s.design == "face and one finger"].frr_test
-    check("v08: D4 face + one finger FRR min", f1.min(), "0.0020", "with one finger after the face the FRR fell to 0.0020--0.0058"); check("v08: ... max", f1.max(), "0.0058")
+    check("v08: D4 face + one finger FRR min", f1.min(), "0.0020", "with the face and one finger (in either order) the FRR fell to 0.0020--0.0058"); check("v08: ... max", f1.max(), "0.0058")
     ap4 = d4s[d4s.design == "all orders (paper)"].set_index("alpha")
     check_true(f"v08: D4 selected designs lower than face-only in all ten splits, significant (unadjusted) at alpha <= 1e-3 only ({ap4.p.round(4).tolist()})",
                (ap4.n_lower == 10).all() and (ap4.loc[[1e-3, 1e-4], "p"] < 0.05).all() and ap4.loc[1e-2, "p"] >= 0.05,
@@ -873,6 +883,150 @@ if SPRINGER:
     from scipy.stats import norm as _n8
     check("v08: sim - population FRR of matcher 1 at FAR 1e-3", _n8.cdf(_n8.isf(1e-3) - 4.0), "0.18", "two Gaussian matchers (FRR 0.18 and 0.08 at $\\far=10^{-3}$)")
     check("v08: sim - population FRR of matcher 2 at FAR 1e-3", _n8.cdf(_n8.isf(1e-3) - 4.5), "0.08")
+    # M4/M5: calibration sensitivity (Sect. 6.4, Table S21)
+    ss8 = tab("T_sens_summary").set_index("variant"); mc = ss8.loc[["B1000", "seed7000", "seed8000"]]
+    check_true("v08: sensitivity paper variant reproduces E3b and the published Holm decisions exactly",
+               ss8.loc["paper", "reproduces_E3b_feasibility"] == 1 and ss8.loc["paper", "reproduces_E3b_test"] == 1 and ss8.loc["paper", "paper_equals_published_decisions"] == 1)
+    check("v08: sens - feasible designs (paper)", ss8.loc["paper", "feasible"], "6665", "The final threshold changed in 54\\%--61\\% of the 6665 feasible designs")
+    check("v08: sens - threshold changed min %", mc.thr_changed_share.min(), "54", scale=100); check("v08: sens - threshold changed max %", mc.thr_changed_share.max(), "61", scale=100)
+    check("v08: sens - mean |dFAR| min", mc.dfar_train_mean_alpha.min(), "0.012", "their training FAR changed by only 0.012$\\alpha$--0.019$\\alpha$ on average (at most 0.28$\\alpha$)")
+    check("v08: sens - mean |dFAR| max", mc.dfar_train_mean_alpha.max(), "0.019"); check("v08: sens - max |dFAR|", mc.dfar_train_max_alpha.max(), "0.28")
+    check("v08: sens - feasibility changed min", mc.feasibility_changed.min(), "48", "48--102 of the 8560 designs changed feasibility"); check("v08: sens - feasibility changed max", mc.feasibility_changed.max(), "102")
+    check("v08: sens - designs", ss8.loc["paper", "designs"], "8560")
+    check("v08: sens - proposed met alpha min (of 80)", mc.proposed_n_met.min(), "67.6", "met $\\alpha$ in 66.6--68.7 of the 80 combinations of split and requirement (66.6 in Table~\\ref{tab:system})")
+    check("v08: sens - proposed met alpha max", mc.proposed_n_met.max(), "68.7"); check("v08: sens - proposed met alpha paper", ss8.loc["paper", "proposed_n_met"], "66.6")
+    check("v08: sens - Holm decisions kept min", mc.decisions_kept.min(), "56", "and 56--59 of the 59 Holm decisions of the primary comparisons were unchanged"); check("v08: sens - Holm kept max", mc.decisions_kept.max(), "59")
+    st8 = tab("T_sens_stats"); pp8 = st8[st8.variant == "paper"][["dataset", "alpha", "method", "decision"]]
+    ch8 = st8[st8.variant.isin(["B1000", "seed7000", "seed8000"])].merge(pp8, on=["dataset", "alpha", "method"], suffixes=("", "_p"))
+    ch8 = ch8[ch8.decision.fillna("n/a") != ch8.decision_p.fillna("n/a")]          # "n/a" reads back as NaN
+    check_true(f"v08: sens - changed decisions on D3 with Holm p 0.045-0.064 ({sorted(ch8.p_holm.round(3).tolist())})",
+               (ch8.dataset == DS["D3"]).all() and round(ch8.p_holm.min(), 3) == 0.045 and round(ch8.p_holm.max(), 3) == 0.064,
+               "the changed decisions were on D3, with Holm-adjusted $p$-values between 0.045 and 0.064")
+    check("v08: sens - floor binds, all feasible proposed designs %", ss8.loc["paper", "cp_binds_all_gp"], "25", "The floor bound in 25\\% of the feasible proposed designs and in 21\\% of the selected ones", scale=100)
+    check("v08: sens - floor binds, selected %", ss8.loc["paper", "cp_binds_selected"], "21", scale=100)
+    sy8 = tab("T_sens_system"); pr_ = sy8[sy8.method == "LR-P1-N2"].pivot_table(index=["dataset", "alpha"], columns="variant", values=["frr_test", "cp_binds"])
+    cpb = pr_["cp_binds"]["paper"]
+    check_true(f"v08: sens - floor most often on D2 at 1e-2 and D1, never on D3 ({cpb.round(3).to_dict()})",
+               cpb.idxmax() == (DS["D2"], 0.01) and (cpb.loc[DS["D3"]] == 0).all() and cpb.loc[DS["D1"]].min() > cpb.drop(DS["D1"]).drop((DS["D2"], 0.01)).max(),
+               "most often on D2 at $\\alpha=10^{-2}$ and on D1 and never on D3")
+    dfl = (pr_["frr_test"]["paper"] - pr_["frr_test"]["nofloor"])
+    check("v08: sens - no floor: largest FRR reduction", dfl.max(), "0.0012", "the selected proposed designs had a test FRR lower by at most 0.0012 (D2, $\\alpha=10^{-2}$)")
+    check_true("v08: sens - no floor: largest reduction on D2 1e-2 and FRR never higher", dfl.idxmax() == (DS["D2"], 0.01) and (dfl >= -1e-12).all())
+    check("v08: sens - no floor: met alpha", ss8.loc["nofloor", "proposed_n_met"], "66.6", "met $\\alpha$ in the same 66.6 of 80 combinations, and 58 of the 59 Holm decisions were unchanged")
+    check("v08: sens - no floor: Holm kept", ss8.loc["nofloor", "decisions_kept"], "58")
+    lm8 = tab("T_sens_lemma").iloc[0]
+    check("v08: Lemma - stage thresholds checked", lm8.n, "5485", "Proposition~\\ref{prop:corner} held at all 5485 stage thresholds of the calibrated GP designs (training data), 28 of which had zero training FAR")
+    check_true("v08: Lemma held at all of them", lm8.holds == lm8.n and lm8.zero_far_holds == lm8.zero_far); check("v08: Lemma - zero-FAR thresholds", lm8.zero_far, "28")
+    # ------------------------------------------------------------------ IJIS v09: fold-A-only control (M1) and attack sensitivity (M8)
+    print("=" * 30, "IJIS v09: fold-A-only control and presentation-attack sensitivity")
+    rp9 = tab("T_foldA_repro").iloc[0]
+    check("v09: control - designs compared", rp9.designs, "19550", "the same feasibility in all 19{,}550 designs and the same fold-A FAR and FRR in all but 2 of the 15{,}050 feasible ones, which differed by one genuine comparison of D1")
+    check_true("v09: control - feasibility identical in every design, thresholds before the final stage identical", rp9.feasibility_equal == rp9.designs and rp9.pre_thresholds_equal == rp9.pre_thresholds_compared)
+    check("v09: control - feasible designs", rp9.feasible_foldA, "15050"); check("v09: control - rates differing", rp9.feasible_foldA - rp9.rates_equal, "2")
+    fA9 = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(f"{R}/E3foldA/foldA_*.csv"))]); xF9 = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(f"{R}/E3fresh/fresh_*.csv"))])
+    xF9 = xF9[xF9.calib == "xfit"]; m9 = fA9.merge(xF9, on=["dataset", "seed", "alpha", "order", "method"], suffixes=("", "_x"))
+    m9 = m9[(m9.feasible == True) & m9.frr_foldA_x.notna()]
+    d9 = m9[~(np.isclose(m9.frr_foldA, m9.frr_foldA_x, rtol=0, atol=1e-12) & np.isclose(m9.far_foldA, m9.far_foldA_x, rtol=0, atol=1e-12))]
+    def _ngA(seed):          # genuine comparisons of fold A of D1: the FRR values of its designs lie on a grid of step 1/n
+        v = np.unique(np.round(fA9[(fA9.dataset == DS["D1"]) & (fA9.seed == seed)].frr_foldA.dropna().values, 12)); return int(round(1 / np.diff(v).min()))
+    check_true(f"v09: control - the 2 differing designs are on D1 and differ by one genuine comparison ({[(int(r.seed), _ngA(int(r.seed)), round(abs(r.frr_foldA - r.frr_foldA_x) * _ngA(int(r.seed)), 6)) for _, r in d9.iterrows()]})",
+               len(d9) == 2 and (d9.dataset == DS["D1"]).all() and all(np.isclose(abs(r.frr_foldA - r.frr_foldA_x) * _ngA(int(r.seed)), 1) for _, r in d9.iterrows()))
+    fs9 = tab("T_foldA_system"); fs9 = fs9[fs9.method == "LR-P1-N2"]; fa9 = fs9[fs9.calib == "foldA"]
+    check("v09: control - fold-A-only FAR/alpha min", fa9.far_over_alpha.min(), "0.56", "kept a larger margin than with the whole training half (mean test FAR 0.56$\\alpha$--0.89$\\alpha$)")
+    check("v09: control - fold-A-only FAR/alpha max", fa9.far_over_alpha.max(), "0.89")
+    g9 = lambda d: fa9[fa9.dataset == DS[d]].n_met if d != "D4" else fa9[fa9.dataset == "lfw_x_fing"].n_met
+    check("v09: control - D1 met min", g9("D1").min(), "17.1", "met $\\alpha$ in 17.1 and 17.2 of 20 test halves on D1, 16 to 18 on D3, 19 or 20 on D2, and 8.3 to 9.2 of 10 on D4")
+    check("v09: control - D1 met max", g9("D1").max(), "17.2"); check("v09: control - D3 met min", g9("D3").min(), "16"); check("v09: control - D3 met max", g9("D3").max(), "18")
+    check("v09: control - D2 met min", g9("D2").min(), "19"); check("v09: control - D2 met max", g9("D2").max(), "20")
+    check("v09: control - D4 met min", g9("D4").min(), "8.3"); check("v09: control - D4 met max", g9("D4").max(), "9.2")
+    check_true("v09: control - D1/D3 below the 91% benchmark at every alpha", (fa9[fa9.dataset.isin([DS["D1"], DS["D3"]])].far_ok < _ndist.cdf(1.645 * np.sqrt(2 / 3))).all(),
+               "the fold-A-only calibration also stayed below the 91\\% benchmark on D1 and D3")
+    pp9 = tab("T_foldA_paired"); sm9 = pp9[["n_xfit", "met_boot_full", "met_foldA_full", "met_xfit_full", "n_none", "met_foldA_none"]].sum()
+    check("v09: control - combinations with every tied order deployed", sm9.n_xfit, "147", "In the 147 combinations in which the held-out calibration deployed every tied fold-A order, the fold-A-only designs met $\\alpha$ almost as often as the held-out designs (140.3 against 144.2 times; 129.1 with the bootstrap on the whole training half)")
+    check("v09: control - met fold A only there", sm9.met_foldA_full, "140.3"); check("v09: control - met held-out there", sm9.met_xfit_full, "144.2"); check("v09: control - met bootstrap there", sm9.met_boot_full, "129.1")
+    mt9 = tab("T_foldA_methods").set_index(["method", "calib"]); par9 = ["P0-Parallel", "P1-LLR", "P2-LogReg"]
+    check("v09: control - added by re-setting on fold B where all deployed", sm9.met_xfit_full - sm9.met_foldA_full, "3.9",
+          "re-setting the threshold of the deployed designs on new subjects added 3.9 compliant cases in 147, and none for parallel fusion")
+    check_true("v09: control - parallel fusion: held-out never more compliant than fold A only",
+               all(mt9.loc[(m_, "xfit"), "met_share"] <= mt9.loc[(m_, "foldA"), "met_share"] + 1e-12 for m_ in par9))
+    for c_, v_ in [("foldA", "90"), ("boot", "86"), ("xfit", "83")]:
+        check(f"v09: control - compliant design over all 190 combinations ({c_}) %", mt9.loc[("LR-P1-N2", c_), "met_share"], v_,
+              "over all 190 combinations of subset, split, and requirement, they yielded a compliant design in 90\\%, against 86\\% with the bootstrap and 83\\% with the held-out calibration", scale=100)
+    check("v09: control - combinations of the proposed design", mt9.loc[("LR-P1-N2", "foldA"), "n_splits"], "190")
+    check("v09: control - selections compared", rp9.selected_compared, "1710", "changed the tied best orders in one of 1710 selections, where the orders of the held-out calibration were kept")
+    check("v09: control - selections differing", rp9.selected_compared - rp9.selected_orders_equal, "1")
+    f13 = fa9[fa9.dataset.isin([DS["D1"], DS["D3"]])].far_ok
+    check("v09: control - fold A only D1/D3 compliance min %", f13.min(), "80", "stayed below the 91\\% benchmark on D1 and D3 (80\\%--90\\%)", scale=100)
+    check("v09: control - ... max %", f13.max(), "90", scale=100)
+    check("v09: control - combinations with no held-out design", sm9.n_none, "12", "and in the 12 in which it deployed none, they met it only 6.4 times (never in the four on D3)")
+    check("v09: control - met fold A only there", sm9.met_foldA_none, "6.4")
+    d3n = pp9[pp9.dataset == DS["D3"]]; check_true("v09: control - D3: four combinations without held-out design, none met", d3n.n_none.sum() == 4 and d3n.met_foldA_none.sum() == 0)
+    mt9 = tab("T_foldA_methods").set_index(["method", "calib"]); par9 = ["P0-Parallel", "P1-LLR", "P2-LogReg"]
+    xs9 = mt9.loc[[(m_, "xfit") for m_ in par9]].met_share; as9 = mt9.loc[[(m_, "foldA") for m_ in par9]].met_share
+    check("v09: control - parallel fusion held-out pooled min %", xs9.min(), "86", "(86\\%--91\\% of the test halves, pooled over subsets and requirements, against 90\\%--91\\% with the fold-A threshold)", scale=100)
+    check("v09: control - ... held-out max %", xs9.max(), "91", scale=100); check("v09: control - ... fold A min %", as9.min(), "90", scale=100); check("v09: control - ... fold A max %", as9.max(), "91", scale=100)
+    check("v09: control - FRR fold A vs bootstrap, D2/D3 min %", pp9[pp9.dataset.isin([DS["D2"], DS["D3"]])].foldA_rel_boot.min(), "1",
+          "the fold-A-only designs had a test FRR 1\\%--2\\% higher than the bootstrap designs on D2 and D3 and 48\\%--78\\% higher on D1 and D4", scale=100)
+    check("v09: control - ... D2/D3 max %", pp9[pp9.dataset.isin([DS["D2"], DS["D3"]])].foldA_rel_boot.max(), "2", scale=100)
+    check("v09: control - ... D1/D4 min %", pp9[pp9.dataset.isin([DS["D1"], "lfw_x_fing"])].foldA_rel_boot.min(), "48", scale=100)
+    check("v09: control - ... D1/D4 max %", pp9[pp9.dataset.isin([DS["D1"], "lfw_x_fing"])].foldA_rel_boot.max(), "78", scale=100)
+    check("v09: control - held-out vs fold A where all deployed min %", pp9.xfit_rel_foldA.min(), "-4", "and the held-out designs differed from them by $-4\\%$ to $+2\\%$ where every tied order was deployed", scale=100)
+    check("v09: control - ... max %", pp9.xfit_rel_foldA.max(), "2", scale=100)
+    check_true("v09: control - arm described in Sect. 5.2 (specified after the results were known; deploys whenever fold A yields a design)",
+               TXT(lambda: "A control arm, specified after the results of both calibrations were known, repeats the held-out calibration up to fold~A" in SRC["s5_setup.tex"]
+                   and "and therefore deploys a design in every split in which fold~A yields one" in SRC["s5_setup.tex"]))
+    check_true("v09: control - fold A yields a proposed design in every combination", (fa9.n_deployed == fa9.n_splits).all())
+    # attack sensitivity (Table S24)
+    sp9 = tab("T_spoof_sens"); t89 = tab("T_rev_spoof_trait").merge(sp9, on=["dataset", "method"])
+    check_true("v09: attack - lambda = 1 reproduces Table 8 exactly", np.allclose(t89.spoof_trait_max, t89.strength_1_worst, rtol=0, atol=0) and np.allclose(t89.spoof_trait_mean, t89.strength_1_mean, rtol=0, atol=0))
+    check_true("v09: attack - lambda = 0 gives a zero-effort FAR <= alpha-level", (sp9.strength_0_worst <= 0.0015).all())
+    rs9 = tab("T_rev_selected"); rs9 = rs9[np.isclose(rs9.alpha, 1e-3)].groupby(["dataset", "method"]).frr_test.mean()
+    sp9i = sp9.set_index(["dataset", "method"])
+    kk = [k_ for k_ in sp9i.index if k_[0] != "lfw_x_fing"]
+    fz9 = tab("T_fresh_selected"); fz9 = fz9[(fz9.dataset == "lfw_x_fing") & (fz9.calib == "boot") & np.isclose(fz9.alpha, 1e-3)].groupby("method").frr_test.mean()
+    check_true("v09: attack - FRR without PAD equals the test FRR of the selected designs (D1-D3: E3b; D4: E3fresh, splits 2-9 evaluated on the PC)",
+               np.allclose(sp9i.loc[kk].frr_test.values, rs9.loc[kk].values, rtol=0, atol=1e-12)
+               and np.allclose(sp9i.loc["lfw_x_fing"].frr_test.values, fz9.loc[sp9i.loc["lfw_x_fing"].index].values, rtol=0, atol=1e-12))
+    pv9 = pd.read_csv(f"{R}/D4_spoof_provenance.csv")
+    check_true("v09: D4 spoof files - PC rows used for splits 2-9; only the SPRT of splits 4 and 7 differed between the machines",
+               set(pv9[pv9.used == "PC"].seed) == set(range(2, 10)) and sorted(set(pv9[pv9.methods_differing.notna()].seed)) == [4, 7]
+               and set(pv9.methods_differing.dropna()) == {"S3-SPRT"})
+    d1 = sp9i.loc[DS["D1"]]; oth = d1.drop("LR-P1-N2")
+    check("v09: attack - D1 proposed at lambda 0.25", d1.loc["LR-P1-N2", "strength_0.25_worst"], "0.385", "by the widest margin for weak artifacts (0.385 at $\\lambda=0.25$, against 0.148--0.244)")
+    check("v09: attack - D1 others at 0.25 min", oth["strength_0.25_worst"].min(), "0.148"); check("v09: attack - D1 others at 0.25 max", oth["strength_0.25_worst"].max(), "0.244")
+    lam9 = ["strength_0.25_worst", "strength_0.5_worst", "strength_0.75_worst", "strength_1_worst"]
+    mg9 = [d1.loc["LR-P1-N2", c] - oth[c].max() for c in lam9]
+    check_true(f"v09: attack - D1 proposed most exposed at every lambda > 0, margin decreasing ({np.round(mg9, 3).tolist()})", all(v > 0 for v in mg9) and all(np.diff(mg9) < 0),
+               "on D1, the proposed designs were the most exposed at every $\\lambda>0$")
+    d4 = sp9i.loc["lfw_x_fing"]; o4 = d4.drop("LR-P1-N2")
+    check("v09: attack - D4 proposed at 0.75", d4.loc["LR-P1-N2", "strength_0.75_worst"], "0.924", "and on D4 at $\\lambda=0.75$ (0.924 against 0.751--0.917)")
+    check("v09: attack - D4 others at 0.75 min", o4["strength_0.75_worst"].min(), "0.751"); check("v09: attack - D4 others at 0.75 max", o4["strength_0.75_worst"].max(), "0.917")
+    ok9 = all(sp9i.loc[(DS[d], r_), c] >= sp9i.loc[(DS[d], "LR-P1-N2"), c] for d in ["D2", "D3"] for r_ in ["S1-Marcialis", "S2-Symmetric"] for c in lam9[:3])
+    d2 = sp9i.loc[DS["D2"]]
+    ok9b = all(d2.loc[par9, c].max() < d2.drop(par9)[c].min() for c in lam9[:3])
+    check_true("v09: attack - D2/D3 Marcialis and symmetric at least as exposed as proposed; D2 parallel least exposed (lambda < 1)", ok9 and ok9b,
+               "whereas for partial artifacts on D2 and D3 the Marcialis and symmetric rules were at least as exposed as the proposed designs and on D2 parallel fusion was the least exposed")
+    check("v09: attack - shift 0.5 sd min", sp9["shift_0.5_worst"].min(), "0.87", "were accepted in 0.87--1.00 of the attempts by every method when shifted up by half a standard deviation of the genuine scores")
+    check("v09: attack - shift 0.5 sd max", sp9["shift_0.5_worst"].max(), "1.00")
+    check("v09: conclusion - at least 87% of the shifted artifacts on D1, D2, D4", sp9[sp9.dataset != DS["D3"]]["shift_0.5_worst"].min(), "87",
+          "and at least 87\\% of those scoring above genuine users", scale=100)
+    ser9 = ["LR-P1-N2", "S1-Marcialis", "S2-Symmetric", "S3-SPRT", "S4-Direct"]; inc9 = sp9.assign(inc=sp9.frr_test_pad - sp9.frr_test).set_index(["dataset", "method"]).inc
+    check_true("v09: attack - PAD costs every serial design less FRR than every parallel fusion on D1, D2 and D4",
+               all(inc9.loc[d_][ser9].max() < inc9.loc[d_][par9].min() for d_ in [DS["D1"], DS["D2"], "lfw_x_fing"]),
+               "cost the serial designs less FRR than parallel fusion, which acquires every trait, on D1, D2, and D4")
+    rat9 = sp9["pad_0.2_worst"] / sp9.strength_1_worst
+    check_true(f"v09: attack - PAD reduces in proportion to APCER (ratio {rat9.min():.4f}-{rat9.max():.4f} at APCER 0.2)", rat9.min() > 0.195 and rat9.max() <= 0.2 + 1e-12,
+               "reduced the worst-case acceptance in proportion to its attack presentation classification error rate (APCER), to 0.15--0.19 at an APCER of 0.2")
+    check("v09: attack - PAD 0.2 min", sp9["pad_0.2_worst"].min(), "0.15"); check("v09: attack - PAD 0.2 max", sp9["pad_0.2_worst"].max(), "0.19")
+    for (d_, m_, a_, b_) in [("D1", "LR-P1-N2", "0.0117", "0.0230"), ("D4", "LR-P1-N2", "0.0024", "0.0127"), ("D1", "P1-LLR", "0.0023", "0.0319"), ("D4", "P1-LLR", "0.0007", "0.0304")]:
+        r_ = sp9i.loc[(DS.get(d_, "lfw_x_fing"), m_)]
+        check(f"v09: attack - {d_} {m_} FRR without PAD", r_.frr_test, a_, "the test FRR of the proposed design rose from 0.0117 to 0.0230 on D1 and from 0.0024 to 0.0127 on D4, that of LLR fusion from 0.0023 to 0.0319 and from 0.0007 to 0.0304")
+        check(f"v09: attack - {d_} {m_} FRR with PAD", r_.frr_test_pad, b_)
+    pa9 = sp9[sp9.method == "LR-P1-N2"].set_index("dataset")
+    check("v09: acquisitions - proposed genuine min (D1, D2, D4)", pa9.drop(DS["D3"]).acq_gen.min(), "1.03", "acquired 1.03--1.17 traits per genuine claim and 1.98--2.47 per impostor claim on D1, D2, and D4")
+    check("v09: acquisitions - ... genuine max", pa9.drop(DS["D3"]).acq_gen.max(), "1.17"); check("v09: acquisitions - ... impostor min", pa9.drop(DS["D3"]).acq_imp.min(), "1.98")
+    check("v09: acquisitions - ... impostor max", pa9.drop(DS["D3"]).acq_imp.max(), "2.47")
+    check_true("v09: attack - D3 single trait: one acquisition per claim for every method", (sp9[sp9.dataset == DS["D3"]][["acq_gen", "acq_imp"]] == 1).all().all())
     print("=" * 30, "IJIS format checks")
     if NUMBERS_ONLY:
         print("SKIP IJIS format checks (abstract, keywords, cross-references; need the manuscript source)"); n_skip += 1
@@ -901,6 +1055,9 @@ if SPRINGER:
             check_true("v08: new ESM tables S20-S22", esm.get("tab:s-dfour") == "S20" and esm.get("tab:s-sens") == "S21" and esm.get("tab:s-sim") == "S22",
                        "(Online Resource~1, Sect.~S4 and Table~S22)")
             check_true("v04: MLP table is S19 in ESM_1", esm.get("tab:s-mlp") == "S19", "(Online Resource~1, Table~S19)")
+            check_true("v09: new ESM tables S23 (fold-A control) and S24 (attack sensitivity)", esm.get("tab:s-folda") == "S23" and esm.get("tab:s-attack") == "S24",
+                       "(Online Resource~1, Table~S23)")
+            check_true("v09: main text cites Table S24 and lists Tables S1-S24", TXT(lambda: "Online Resource~1, Table~S24 varies it" in SRC["s6_results.tex"] and "Tables~S1--S24" in SRC["main.tex"]))
         else:
             check_true("IJIS: main.aux and ESM_1.aux present (compile first)", False)
 
