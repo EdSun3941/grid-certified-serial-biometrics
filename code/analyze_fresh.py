@@ -1,6 +1,7 @@
 """Analysis of the fresh-seed replication and of subset D4 (results/E3fresh, run_fresh.py).
 Selection per (dataset, seed, alpha, method, calibration): smallest design-data FRR (training half for `boot`, fold A for
-`xfit`), ties averaged, exactly as in analyze_rev.py.  Paired differences to the proposed design: corrected resampled
+`xfit`), ties averaged, exactly as in analyze_rev.py.  v08: for `xfit` the order is fixed on fold A before fold B is used;
+a fold-B calibration failure leaves the split without a deployed design (see select()).  Paired differences to the proposed design: corrected resampled
 t-test (Nadeau-Bengio, K = number of splits, n_test/n_train = 1) and Holm within each (dataset, alpha, calibration).
 Outputs results/tables/T_fresh_selected.csv, T_fresh_system.csv, T_fresh_stats.csv, T_fresh_compliance.csv."""
 import glob, numpy as np, pandas as pd
@@ -11,14 +12,31 @@ PRIMARY = ["HYP", "S1-Marcialis", "S2-Symmetric", "S4-Direct", "S3-SPRT", "P0-Pa
 
 
 def select(df):
+    """boot: smallest training-half FRR among the feasible (calibrated) designs, ties averaged.
+    xfit (v08, corrected protocol): the order is fixed on fold A alone -- smallest fold-A FRR among the designs that
+    are feasible on fold A (frr_foldA present), ties averaged as a uniform random tie-break fixed before fold B is
+    used.  The fold-B recalibration of the final threshold is then applied to that design only; if it fails, no
+    design is deployed for that split (no reselection).  p_deploy is the share of tied fold-A designs that could be
+    deployed; the test rates are means over the deployed ones (conditional on deployment)."""
     rows = []
-    f = df[df.feasible == True]
-    for key, g in f.groupby(["dataset", "seed", "alpha", "method", "calib"]):
-        crit = "frr_train" if key[4] == "boot" else "frr_foldA"
-        mn = g[crit].min(); t = g[np.isclose(g[crit], mn, rtol=0, atol=1e-12)]; a = key[2]
-        rows.append(dict(zip(["dataset", "seed", "alpha", "method", "calib"], key), n_tied=len(t), frr_test=t.frr_test.mean(),
-                         far_test=t.far_test.mean(), far_ok=float((t.far_test <= a).mean()), stages_gen=t.stages_gen.mean(),
-                         stages_imp=t.stages_imp.mean(), orders="|".join(t.order.astype(str))))
+    keys = ["dataset", "seed", "alpha", "method", "calib"]
+    for key, g in df.groupby(keys):
+        a = key[2]
+        if key[4] == "boot":
+            f = g[g.feasible == True]
+            if len(f) == 0: continue
+            mn = f.frr_train.min(); t = f[np.isclose(f.frr_train, mn, rtol=0, atol=1e-12)]; dep = t
+        else:
+            f = g[g.frr_foldA.notna()]
+            if len(f) == 0:
+                rows.append(dict(zip(keys, key), n_tied=0, n_deployed=0, p_deploy=0.0, design_foldA=False)); continue
+            mn = f.frr_foldA.min(); t = f[np.isclose(f.frr_foldA, mn, rtol=0, atol=1e-12)]; dep = t[t.feasible == True]
+        row = dict(zip(keys, key), n_tied=len(t), n_deployed=len(dep), p_deploy=len(dep) / len(t), design_foldA=True,
+                   orders="|".join(t.order.astype(str)), orders_deployed="|".join(dep.order.astype(str)))
+        if len(dep):
+            row.update(frr_test=dep.frr_test.mean(), far_test=dep.far_test.mean(), far_ok=float((dep.far_test <= a).mean()),
+                       stages_gen=dep.stages_gen.mean(), stages_imp=dep.stages_imp.mean())
+        rows.append(row)
     return pd.DataFrame(rows)
 
 
@@ -27,16 +45,22 @@ def main():
     # files written before the v05 fix of run_fresh.py record one stage for parallel fusion, which acquires every modality
     par = df.kind == "parallel"; df.loc[par, "stages_gen"] = df.loc[par, "n_stages"].astype(float); df.loc[par, "stages_imp"] = df.loc[par, "n_stages"].astype(float)
     src = f"results/E3fresh/fresh_*.csv ({len(fs)} files)"
-    sel = select(df); sel["source"] = src; sel.to_csv(f"{OUT}/T_fresh_selected.csv", index=False)
+    sel = select(df); sel["source"] = src; sel.to_csv(f"{OUT}/T_fresh_selected.csv", index=False); sel = sel.drop(columns="source")
     nseeds = sel.groupby(["dataset", "calib"]).seed.nunique()
-    agg = sel.groupby(["dataset", "alpha", "calib", "method"]).agg(n_seeds=("seed", "size"), frr_test=("frr_test", "mean"),
+    sel["met"] = sel.p_deploy * sel.far_ok.fillna(0)            # deployed and test FAR <= alpha (tie-averaged)
+    dep_ = sel.groupby(["dataset", "alpha", "calib", "method"]).agg(n_splits=("seed", "size"), n_deployed=("p_deploy", "sum"),
+                                                                     n_met=("met", "sum")).reset_index()
+    agg = sel[sel.p_deploy > 0].groupby(["dataset", "alpha", "calib", "method"]).agg(n_seeds=("seed", "size"), frr_test=("frr_test", "mean"),
                                                                     frr_test_sd=("frr_test", "std"), far_test=("far_test", "mean"),
-                                                                    far_ok=("far_ok", "mean"), stages_gen=("stages_gen", "mean"),
+                                                                    stages_gen=("stages_gen", "mean"),
                                                                     stages_imp=("stages_imp", "mean")).reset_index()
+    agg = dep_.merge(agg, on=["dataset", "alpha", "calib", "method"], how="left")
+    agg["far_ok"] = np.where(agg.n_deployed > 0, agg.n_met / agg.n_deployed.where(agg.n_deployed > 0), np.nan)   # v08: share of deployed designs
     agg["far_over_alpha"] = agg.far_test / agg.alpha; agg["source"] = src
     agg.to_csv(f"{OUT}/T_fresh_system.csv", index=False)
     st = []
     for (ds, a, cal), g in sel.groupby(["dataset", "alpha", "calib"]):
+        g = g[g.p_deploy > 0]                       # paired over the splits in which both designs were deployed
         mv = g[g.method == MAIN].set_index("seed").frr_test
         for m in PRIMARY:
             o = g[g.method == m].set_index("seed").frr_test; c = mv.index.intersection(o.index)
@@ -53,12 +77,15 @@ def main():
     st["source"] = src; st.to_csv(f"{OUT}/T_fresh_stats.csv", index=False)
     # compliance of the deployed (selected) proposed designs: original ten splits (E3b) + fresh splits
     old = pd.read_csv(f"{OUT}/T_rev_selected.csv"); old = old[old.method == MAIN].assign(calib="boot", split_set="original 0-9")
+    old = old.assign(p_deploy=1.0)
     new = sel[sel.method == MAIN].assign(split_set=lambda x: np.where(x.dataset == "lfw_x_fing", "D4 0-9", "fresh"))
-    comp = pd.concat([old[["dataset", "seed", "alpha", "calib", "far_ok", "far_test", "frr_test", "split_set"]],
-                      new[["dataset", "seed", "alpha", "calib", "far_ok", "far_test", "frr_test", "split_set"]]], ignore_index=True)
-    cagg = comp.groupby(["dataset", "alpha", "calib", "split_set"]).agg(n=("seed", "size"), far_ok=("far_ok", "mean"),
-                                                                        far_over_alpha=("far_test", "mean"), frr_test=("frr_test", "mean")).reset_index()
-    cagg["far_over_alpha"] = cagg.far_over_alpha / cagg.alpha; cagg["source"] = f"T_rev_selected.csv + {src}"
+    cols = ["dataset", "seed", "alpha", "calib", "p_deploy", "far_ok", "far_test", "frr_test", "split_set"]
+    comp = pd.concat([old[cols], new[cols]], ignore_index=True)
+    comp["met"] = comp.p_deploy * comp.far_ok.fillna(0)          # deployed and test FAR <= alpha (tie-averaged)
+    cagg = comp.groupby(["dataset", "alpha", "calib", "split_set"]).agg(n=("seed", "size"), n_deployed=("p_deploy", "sum"), n_met=("met", "sum"),
+                                                                        far_test=("far_test", "mean"), frr_test=("frr_test", "mean")).reset_index()
+    cagg["far_ok"] = cagg.n_met / cagg.n_deployed                 # share of deployed designs with test FAR <= alpha
+    cagg["far_over_alpha"] = cagg.far_test / cagg.alpha; cagg["source"] = f"T_rev_selected.csv + {src}"
     cagg.to_csv(f"{OUT}/T_fresh_compliance.csv", index=False)
     print(nseeds.to_string())
     print(agg[agg.calib == "boot"].pivot_table(index=["dataset", "alpha"], columns="method", values="frr_test").round(4).to_string())

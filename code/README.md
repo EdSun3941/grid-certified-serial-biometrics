@@ -44,20 +44,20 @@ Wall-clock on the hardware above: roughly one day in total (E3b and the 600-s-li
 ## Experiments and where they appear (numbering of the IJIS manuscript and Online Resource 1)
 | Experiment | Script | Output | Paper |
 |---|---|---|---|
-| E1 envelope fitting, E3 uncalibrated designs | `run_main.py` | `results/E1`, `results/E3` | Sect. 6.1, Table 5, Tables S3, S8 |
+| E1 envelope fitting, E3 uncalibrated designs | `run_main.py` | `results/E1`, `results/E3` | Sect. 6.1, Table 7, Tables S3, S8 |
 | E3-cal pair-level Clopper–Pearson calibration | `run_cal.py` | `results/E3cal` | Fig. 5, Table S4 |
-| E3b subject-bootstrap calibration, all baselines | `run_cal2.py` | `results/E3b` | Table 3, Figs. 4–5, Sects. 6.3–6.5 |
-| E2 solver comparison (subgradient LR, enumeration, DE) | `run_e2.py` | `results/E2` | Table 2 |
-| E2v2 exact-dual LR-BB and MILP on the same fitting sets | `run_e2v2.py` | `results/E2v2` | Table 2, Sect. 6.2, Table S1 |
+| E3b subject-bootstrap calibration, all baselines | `run_cal2.py` | `results/E3b` | Table 5, Figs. 4–5, Sects. 6.3–6.6 |
+| E2 solver comparison (subgradient LR, enumeration, DE) | `run_e2.py` | `results/E2` | Table 4 |
+| E2v2 exact-dual LR-BB and MILP on the same fitting sets | `run_e2v2.py` | `results/E2v2` | Table 4, Sect. 6.2, Table S1 |
 | E7 scalability (subgradient LR-BB, enumeration) | `run_e7.py` | `results/E7` | Fig. 3, Table S9 |
 | E7v2 scalability (exact-dual LR-BB, MILP) | `run_e7v2.py` | `results/E7v2` | Fig. 3, Sect. 6.2 |
-| Ablations, sensitivity, SPRT (preliminary implementation) | `run_main.py` options, `run_sprt.py` | `results/E3`, `results/S3` | Sect. 6.6, Table S11 |
-| Independent exact reference (all exponent pairs, N = 2) | `reference_exact.py` | `results/E2ref` | Table 2, Sect. 6.2 |
+| Ablations, sensitivity, SPRT (preliminary implementation) | `run_main.py` options, `run_sprt.py` | `results/E3`, `results/S3` | Sect. 6.7, Table S11 |
+| Independent exact reference (all exponent pairs, N = 2) | `reference_exact.py` | `results/E2ref` | Table 4, Sect. 6.2 |
 | Refit of the system envelopes by the exact-dual LR-BB | `refit_check.py` | `results/E1xd` | Sect. 5.3, Table S14 |
-| E3b LR-BB rows with the refitted envelopes | `run_cal2_xd.py` | `results/E3b` (earlier rows kept in `results/E3b_round1`) | Table 3, Figs. 4–5 |
-| E8 stage-budget designs (GP vs. SPRT) | `run_cost.py` | `results/E8` | Sect. 6.5, Table 7 |
-| Spoof analysis per matcher | `spoof_rev.py` | `T_rev_spoof.csv` | Sect. 6.5 (per-algorithm values) |
-| Spoof analysis per trait | `spoof_trait.py` | `T_rev_spoof_trait.csv`, `T_rev_cost_spoof_trait.csv` | Tables 6 and 7 |
+| E3b LR-BB rows with the refitted envelopes | `run_cal2_xd.py` | `results/E3b` (earlier rows kept in `results/E3b_round1`) | Table 5, Figs. 4–5 |
+| E8 stage-budget designs (GP vs. SPRT) | `run_cost.py` | `results/E8` | Sect. 6.6, Table 9 |
+| Spoof analysis per matcher | `spoof_rev.py` | `T_rev_spoof.csv` | Sect. 6.6 (per-algorithm values) |
+| Spoof analysis per trait | `spoof_trait.py` | `T_rev_spoof_trait.csv`, `T_rev_cost_spoof_trait.csv` | Tables 8 and 9 |
 | Calibration diagnostic | `calib_diag.py` | `T_rev_calib_diag.csv` | Sect. 6.4, Table S2 |
 | Continuous monomial / convexified support | `check_monoc_weights.py` | `T_rev_monoc.csv` | Sect. 6.2 |
 
@@ -99,10 +99,10 @@ sources `../paper` and `../paper_ijis` are not part of the public repository).
 ## Springer (IJIS) version
 The IJIS manuscript uses the same experiments. Additional or format-specific steps (all in `run_all.sh`):
 - `spoof_trait.py`: presentation-attack exposure per trait (a face artifact replaces both face scores, because face
-  matchers C and G compare the same image); writes `T_rev_spoof_trait.csv` (Table 6) and `T_rev_cost_spoof_trait.csv`
-  (spoof column of Table 7).
+  matchers C and G compare the same image); writes `T_rev_spoof_trait.csv` (Table 8) and `T_rev_cost_spoof_trait.csv`
+  (spoof column of Table 9).
 - `PAPER=../paper_ijis python3 make_main_tables.py` / `make_supp_tables.py`: table bodies with superscript-letter
-  footnotes, the spoof and stage-cap tables in the main text, and Online Resource tables numbered S1-S18 in citation order.
+  footnotes, the spoof and stage-cap tables in the main text, and Online Resource tables numbered S1-S22 in citation order.
 - `FIGSTYLE=springer python3 figures.py all`: figures at 84 mm / 174 mm width with sans-serif lettering, copied to
   `../paper_ijis/figures/Fig1-Fig5` (Fig. 1 is `../paper_ijis/figsrc/Fig1_pipeline.tex`, compiled with pdflatex);
   EPS versions are produced with `pdftops -eps -level3`.
@@ -114,12 +114,12 @@ The IJIS manuscript uses the same experiments. Additional or format-specific ste
 ## IJIS v02 (retitled revision): additional analyses
 | Analysis | Script | Output | Paper |
 |---|---|---|---|
-| MIQP reference for P1 by outer approximation (HiGHS), N = 2 and 3; exact-dual LR-BB with N = 3 | `miqp_oa.py`, `run_e2v2.py` (`jobs_miqp.txt`) | `results/E2miqp`, `results/E2v2/*_N3.csv` | Table 2, Sect. 6.2 |
+| MIQP reference for P1 by outer approximation (HiGHS), N = 2 and 3; exact-dual LR-BB with N = 3 | `miqp_oa.py`, `run_e2v2.py` (`jobs_miqp.txt`) | `results/E2miqp`, `results/E2v2/*_N3.csv` | Table 4, Sect. 6.2 |
 | Matched-FAR comparison (final threshold re-set on the test half; oracle) | `matched_far.py` | `T_rev_matchedfar*.csv` | Sect. 6.3, Table S15 |
 | Matched FAR on the new splits and D4 (each split on the machine that computed it) | `matched_far.py --fresh --part cloud/local/combine` (`--part all` on one machine) | `T_fresh_matchedfar*.csv` | Sect. 6.3, Table S18 |
-| D4: LFW faces (YuNet + SFace, OpenCV 4.13) paired with BSSR1 D2 fingers (chimeric, 1680 subjects) | `build_lfw_chimeric.py` | `data/lfw_x_fing.npz`, `data/lfw_x_fing_build.json` | Sect. 5.1, Table 1 |
-| New splits 10–29 of D1–D3 and splits 0–9 of D4, bootstrap and held-out calibration (`calib` = `boot` / `xfit`) | `run_fresh.py` (`jobs_fresh.txt`, `jobs_d4.txt`) | `results/E3fresh` | Sects. 6.3–6.4, Tables 3–4, S16–S17, Fig. 4(d) |
-| Analysis of the new splits and D4 | `analyze_fresh.py` | `T_fresh_selected/system/stats/compliance.csv` | Tables 3–4, S16–S17 |
+| D4: LFW faces (YuNet + SFace, OpenCV 4.13) paired with BSSR1 D2 fingers (chimeric, 1680 subjects) | `build_lfw_chimeric.py` | `data/lfw_x_fing.npz`, `data/lfw_x_fing_build.json` | Sect. 5.1, Table 3 |
+| New splits 10–29 of D1–D3 and splits 0–9 of D4, bootstrap and held-out calibration (`calib` = `boot` / `xfit`) | `run_fresh.py` (`jobs_fresh.txt`, `jobs_d4.txt`) | `results/E3fresh` | Sects. 6.3–6.4, Tables 5–6, S16–S17, Fig. 4(d) |
+| Analysis of the new splits and D4 | `analyze_fresh.py` | `T_fresh_selected/system/stats/compliance.csv` | Tables 5–6, S16–S17 |
 | Hyperbola constants of the D4 matchers | `d4_hyp_constants.py` | `T_d4_hyp_constants.csv` | Sect. 6.3 |
 | Runs on a second machine; comparison of overlapping splits | `run_local2.py`, `merge_local.py`, `compare_runs.py` | `results/E3fresh_provenance.csv` | Sect. 5.4 |
 
@@ -163,3 +163,20 @@ All 100 MLP jobs ran on the 24-core PC.
   Springer basic reference style (no final period, no "?." , dated online document).
 - `results/E3fresh_pc_overlap/`: the PC copies of the seven splits computed on both machines (the cloud copies in
   `results/E3fresh` are used; comparison in `results/E3fresh_provenance.csv`).
+
+## IJIS v08: changes after the review of 2026-10-09 (release v1.1.0)
+Table and section numbers in this file follow the v08 manuscript (new Tables 1 and 2; Sect. 6.5 is the controlled
+simulation; Online Resource 1 Sect. S4 describes the simulation and Sect. S5 the reproducibility details).
+
+| Change or analysis | Script | Output | Paper |
+|---|---|---|---|
+| Held-out calibration: the order of every method is now fixed on fold A (smallest fold-A FRR after the fold-A calibration, ties averaged) before fold B is used; if fold B cannot calibrate that design, no design is deployed in the split and no other order is tried. Previously, orders that failed on fold B were dropped before the selection. The runs are unchanged; only the analysis changed | `analyze_fresh.py` (`select`), `make_main_tables.py`, `make_supp_tables.py`, `analyze_mlp.py` | `T_fresh_selected.csv` (columns `n_tied`, `n_deployed`, `p_deploy`), `T_fresh_system.csv`, `T_fresh_stats.csv` (paired over splits in which both designs were deployed), `T_fresh_compliance.csv` (`n_deployed`, `n_met`) | Sects. 5.2, 6.3–6.4, Table 6, Tables S17, S19 |
+| D4 candidate sets: face only, face + one finger, three matchers, all orders | `analyze_d4_subsets.py` | `T_d4_subsets.csv` | Sect. 6.3, Table S20 |
+| Calibration sensitivity with order re-selection: B = 1000, bootstrap seeds 7000 + split and 8000 + split, and no step-(i) Clopper–Pearson floor for the GP designs; Proposition 1 checked at every deployed stage threshold | `calib_sensitivity_all.py` (`jobs_sensall.txt`), `analyze_sens.py` | `results/E3sensall`, `T_sens_system.csv`, `T_sens_stats.csv`, `T_sens_summary.csv`, `T_sens_lemma.csv` | Sects. 3.5, 6.4, Table S21 |
+| Controlled simulation with known population error rates (bootstrap and held-out calibration; correlation 0–0.8) | `sim_controlled.py` (`jobs_sim.txt`; on a multi-core PC `run_local_sim.py`), `analyze_sim.py` | `results/E9sim`, `T_sim.csv` | Sect. 6.5, Online Resource 1 Sect. S4, Table S22 |
+| `verify_numbers.py --numbers-only` | `verify_numbers.py` | -- | recomputes every number of the article and compares it with the value written into the script (the checklist), without the manuscript source |
+
+`calib_sensitivity_all.py` reuses the stage thresholds of the decision-level rules from `results/E3b` for the designs that
+are feasible there (identical to recomputing them; checked on D1 split 0) and recomputes the others. The simulation ran on
+the 24-core PC (Windows, Python 3.12.5), the sensitivity analysis on the 2-vCPU Linux machine, so that its paper variant
+reproduces `results/E3b` exactly. `dev/calib_sensitivity.py` is an earlier version restricted to the selected orders.

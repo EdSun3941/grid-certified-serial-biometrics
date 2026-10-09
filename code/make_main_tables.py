@@ -165,7 +165,10 @@ if FRESH and os.path.exists(f"{T}/T_fresh_compliance.csv"):
     def ccell(ds, a, calib, ss, k=3):
         r = comp[(comp.dataset == ds) & np.isclose(comp.alpha, a) & (comp.calib == calib) & (comp.split_set == ss)]
         if len(r) == 0: return ["--"] * k
-        r = r.iloc[0]; n = int(r.n); cnt = f"{r.far_ok * n:.2f}".rstrip("0").rstrip(".")
+        r = r.iloc[0]; n = int(r.n); fmt = lambda v: f"{v:.2f}".rstrip("0").rstrip(".")
+        if calib == "xfit":   # v08: deployed designs (order fixed on fold A), test FAR <= alpha among them, FAR/alpha, FRR
+            return [f"{fmt(r.n_deployed)}/{n}", fmt(r.n_met), f"{r.far_over_alpha:.2f}", f"{r.frr_test:.4f}"]
+        cnt = fmt(r.far_ok * n)
         return [f"{cnt}/{n}", f"{r.far_over_alpha:.2f}", f"{r.frr_test:.4f}"][:k]
     for ds, lab in [("fing_x_face", "D1"), ("fing_x_fing", "D2"), ("face_x_face", "D3"), ("lfw_x_fing", "D4")]:
         als = sorted(comp[comp.dataset == ds].alpha.unique(), reverse=True)

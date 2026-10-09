@@ -41,6 +41,7 @@ fi
 python3 figures.py all           # ../results/figures/*.pdf
 [ -d ../paper/figures ] && cp ../results/figures/F2_*.pdf ../results/figures/*_rev.pdf ../paper/figures/
 [ -f ../paper/main.tex ] && python3 verify_numbers.py   # recomputes every number quoted in the manuscript; exit code 1 on any mismatch
+[ -f ../paper_ijis/main.tex ] || PAPER=../paper_ijis python3 verify_numbers.py --numbers-only   # without the manuscript: every number against the checklist in the script
 # ---- IJIS (Springer) version, v02 additions
 ./launch.sh jobs_miqp.txt 1 miqp                                # E2miqp: MIQP reference by outer approximation (N = 2, 3); E2v2 N = 3
 python3 matched_far.py           # T_rev_matchedfar*: final threshold re-set on the test half to test FAR <= alpha (oracle)
@@ -57,6 +58,12 @@ python3 matched_far.py --fresh --part all   # T_fresh_matchedfar* (Table S18); w
 ./launch.sh jobs_mlp.txt "$NP" mlp                              # E3mlp: D1-D3 splits 0-29, D4 splits 0-9 (boot; xfit for new splits and D4)
 #   (or on a multi-core PC: python run_local_mlp.py [workers] in code/, then copy results/E3mlp here)
 python3 analyze_mlp.py           # T_mlp_system, T_mlp_stats (Table S19)
+# ---- IJIS v08: review of 2026-10-09 (held-out protocol fixed in analyze_fresh.py; sensitivity, simulation, D4 subsets)
+python3 analyze_d4_subsets.py    # T_d4_subsets (Table S20): D4 face only, face + one finger, three matchers
+./launch.sh jobs_sensall.txt "$NP" sensall                      # E3sensall: B = 1000, other seeds, no step-(i) floor, all orders
+python3 analyze_sens.py          # T_sens_* (Table S21; Proposition 1 at all deployed GP stage thresholds)
+./launch.sh jobs_sim.txt "$NP" sim                              # E9sim: controlled simulation (or python run_local_sim.py [workers])
+python3 analyze_sim.py           # T_sim (Table S22)
 # ---- IJIS (Springer) version: per-trait spoof analysis, Springer tables/figures/references, checks
 python3 spoof_trait.py fing_x_face fing_x_fing face_x_face lfw_x_fing   # T_rev_spoof_trait, T_rev_cost_spoof_trait
 if [ -d ../paper_ijis ]; then

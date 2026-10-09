@@ -130,7 +130,8 @@ def entry(key, typ, f):
         acc = f.get("note", "").replace("Accessed: ", "")
         m = re.match(r"(\w+)\. (\d+), (\d+)", acc)
         mon = {"Sep": "September", "Oct": "October"}.get(m.group(1), m.group(1)) if m else ""
-        return f"{a}: {t}. \\url{{{url}}} ({y}). Accessed {m.group(2)} {mon} {m.group(3)}"   # online document (Springer example)
+        ad = f", {f['addendum']}" if "addendum" in f else ""          # v08: page dates and data description (review, minor 4)
+        return f"{a}: {t}{ad}. \\url{{{url}}} ({y}). Accessed {m.group(2)} {mon} {m.group(3)}"   # online document (Springer example)
     if typ == "misc" and f.get("publisher") == "Zenodo":                 # software / data archive with a DOI
         return f"{a}: {t}, {f['version']}. Zenodo ({y}).{doi(f)}"
     raise ValueError(f"unhandled entry {key} ({typ})")

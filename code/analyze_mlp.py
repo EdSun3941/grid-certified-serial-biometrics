@@ -27,7 +27,7 @@ def main():
     old = pd.read_csv(f"{OUT}/T_rev_selected.csv").assign(calib="boot")
     new = pd.read_csv(f"{OUT}/T_fresh_selected.csv")
     ref = pd.concat([old[["dataset", "seed", "alpha", "method", "calib", "frr_test"]], new[["dataset", "seed", "alpha", "method", "calib", "frr_test"]]],
-                    ignore_index=True)
+                    ignore_index=True).dropna(subset=["frr_test"])     # v08: held-out splits without a deployed design are excluded
     rows = []
     for (ds, ss, cal, a), g in m[m.feasible == True].groupby(["dataset", "split_set", "calib", "alpha"]):
         mv = g.set_index("seed").frr_test

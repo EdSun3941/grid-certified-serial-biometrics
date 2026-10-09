@@ -2,16 +2,29 @@
 result files and compared at the printed precision; each check also confirms that the printed phrase occurs in
 the LaTeX source, so the checks stay tied to the current text.  The main-paper table bodies are regenerated and
 compared with the files in ../paper/tables.
-Usage: python verify_numbers.py      (exit code 1 if any check fails)"""
+Usage: python verify_numbers.py      (exit code 1 if any check fails)
+       python verify_numbers.py --numbers-only
+           recomputes every number from the result files and compares it with the value printed in the paper, which is
+           written into each check below (the checklist); the checks that need the LaTeX source of the manuscript (phrase
+           occurrence, reference list, labels, regenerated table files) are reported as SKIP.  This mode is used
+           automatically when the manuscript source is not present (e.g., in the released code archive)."""
 import glob, hashlib, os, re, subprocess, sys
 import numpy as np, pandas as pd
 
 R = "../results"; T = f"{R}/tables"; P = os.environ.get("PAPER", "../paper")   # PAPER=../paper_ijis checks the IJIS version
 SPRINGER = "ijis" in P; SUPP = f"{P}/ESM_1.tex" if SPRINGER else f"{P}/supplementary.tex"
 tab = lambda n: pd.read_csv(f"{T}/{n}.csv")
-SRC = {os.path.basename(f): open(f).read() for f in glob.glob(f"{P}/sections/*.tex") + [SUPP] + ([f"{P}/main.tex"] if SPRINGER else [])}
+NUMBERS_ONLY = "--numbers-only" in sys.argv or not os.path.exists(SUPP)
+SRC = ({} if NUMBERS_ONLY else
+       {os.path.basename(f): open(f).read() for f in glob.glob(f"{P}/sections/*.tex") + [SUPP] + ([f"{P}/main.tex"] if SPRINGER else [])})
 ALL = "\n".join(SRC.values())
-fails = []; n_ok = 0
+fails = []; n_ok = 0; n_skip = 0
+SKIP = object()
+def TXT(fn):
+    """A condition that needs the manuscript source: evaluated lazily, SKIP in --numbers-only mode."""
+    return SKIP if NUMBERS_ONLY else fn()
+def ptext(name):
+    return "" if NUMBERS_ONLY else open(f"{P}/{name}").read()
 IJ = lambda tifs, ijis: ijis if SPRINGER else tifs    # phrase of the TIFS or of the IJIS text
 
 def _norm(s): return re.sub(r"\s+", " ", s)
@@ -21,14 +34,16 @@ def check(label, value, printed, phrase=None, scale=1.0, tol=None):
     dec = len(printed.split(".")[1]) if "." in printed else 0
     v = round(float(value) * scale, dec); p = float(printed)
     ok = (abs(float(value) * scale - p) <= tol) if tol is not None else (abs(v - p) <= 1e-12 or v == p)
-    txt_ok = True if phrase is None else _norm(phrase) in _norm(ALL)
+    txt_ok = True if (phrase is None or NUMBERS_ONLY) else _norm(phrase) in _norm(ALL)
     status = "OK  " if (ok and txt_ok) else "FAIL"
     print(f"{status} {label}: computed {float(value) * scale:.6g} -> {v} vs printed {printed}" + ("" if txt_ok else f"   [phrase not found: {phrase!r}]"))
     if ok and txt_ok: n_ok += 1
     else: fails.append(label)
 def check_true(label, cond, phrase=None):
-    global n_ok
-    txt_ok = True if phrase is None else _norm(phrase) in _norm(ALL)
+    global n_ok, n_skip
+    if cond is SKIP:
+        print(f"SKIP {label} (needs the manuscript source)"); n_skip += 1; return
+    txt_ok = True if (phrase is None or NUMBERS_ONLY) else _norm(phrase) in _norm(ALL)
     ok = bool(cond) and txt_ok
     print(f"{'OK  ' if ok else 'FAIL'} {label}" + ("" if txt_ok else f"   [phrase not found: {phrase!r}]"))
     if ok: n_ok += 1
@@ -105,7 +120,7 @@ v2["excess"] = (v2.value - v2.opt) / v2.opt; v2["short"] = (v2.opt - v2.root_lb)
 sg = e2[e2.method == "LR-root (no OBBT)"]
 check("subgradient root bound shortfall P1 mean %", sg[sg.obj == "P1"].short.mean(), "61", "on average 61\\% (P1) and 71\\% (P2) below the optimum", scale=100)
 check("subgradient root bound shortfall P2 mean %", sg[sg.obj == "P2"].short.mean(), "71", scale=100)
-check("abstract: subgradient 61%-71%", sg[sg.obj == "P1"].short.mean(), "61", IJ("left the root bound on average 61\\%--71\\% below the optimum", "(earlier subgradient bound: 61\\% below on average)"), scale=100)
+check("abstract: subgradient 61%-71%", sg[sg.obj == "P1"].short.mean(), "61", IJ("left the root bound on average 61\\%--71\\% below the optimum", "it left the root bound on average 61\\% (P1) and 71\\% (P2) below the optimum"), scale=100)
 check("Sec. IV: subgradient 61% / 71%", sg[sg.obj == "P2"].short.mean(), "71", "left the root bound on average 61\\% (P1) and 71\\% (P2) below the optimum on the BSSR1 fitting sets", scale=100)
 check_true("subgradient root bound often zero", (sg.short >= 1 - 1e-9).sum() >= 10, "often at zero")
 check("subgradient primal worst %", sg.excess.max(), "28.3", "up to 28.3\\% worse than the optimum", scale=100)
@@ -118,7 +133,7 @@ ex = v2[v2.method == "LR-BB exact dual"]; p1 = ex[ex.obj == "P1"]; p2 = ex[ex.ob
 check("P1 root bound = optimum", int((p1.short <= 1e-4).sum()), "39", "the root bound of P1 equaled the optimum in 39 of the 40 instances")
 check("P1 root shortfall other %", p1.short.max(), "0.26", "fell short by 0.26\\% in the other, which LR-BB closed after 41 nodes", scale=100)
 check("P1 nodes of that instance", p1.loc[p1.short.idxmax()].nodes, "41")
-check("abstract: root gap 39 of 40", int((p1.short <= 1e-4).sum()), "39", IJ("least-squares problem in 39 of 40 instances, whereas", "the exact dual closed the least-squares root gap in 39 of 40 instances (earlier"))
+check("abstract: root gap 39 of 40", int((p1.short <= 1e-4).sum()), "39", IJ("least-squares problem in 39 of 40 instances, whereas", "closed the P1 root gap in 39 of 40 instances and left 0.26\\% in the other"))
 check("intro: root gap 39 of 40", int((p1.short <= 1e-4).sum()), "39", IJ("closed the root gap in 39 of 40 instances and left 0.26\\% in the other", "closed the P1 root gap in 39 of 40 instances and left 0.26\\% in the other"))
 check("conclusion: root gap 39 of 40", int((p1.short <= 1e-4).sum()), "39", IJ("in 39 of 40 BSSR1 instances, left 0.26\\% in the other", "in 39 of 40 BSSR1 instances, mostly because two adjacent grid exponents can emulate an intermediate one, left 0.26\\% in the other"))
 check("P2 root bound = optimum", int((p2.short <= 1e-4).sum()), "37", "For P2 the root bound equaled the optimum in 37 instances (at most 1.86\\% below)")
@@ -249,7 +264,7 @@ check("MAXMONO CI lo", mm.ci_lo, "-0.030"); check("MAXMONO CI hi", mm.ci_hi, "-0
 print("=" * 30, "Conservativeness (Section VI-D, discussion)")
 rc = tab("T_rev_conservativeness"); oc = tab("T_conservativeness"); oc = oc[oc.method == "LR-P1-N2"]
 al = rc[rc.chain == "all"]; seln = rc[rc.chain == "selected"]
-check_true("all calibrated designs meet alpha on training", (al.far_ok_train == 1).all(), "every calibrated design met $\\alpha$ on its training half")
+check_true("all calibrated designs meet alpha on training", (al.far_ok_train == 1).all(), IJ("every calibrated design met $\\alpha$ on its training half", "Every calibrated design met $\\alpha$ on its training half"))
 b1 = al[al.dataset == DS["D1"]].far_ok_test
 check("bootstrap D1 compliance min %", b1.min(), "93", "93\\%--94\\% on D1 and 100\\% on D2", scale=100); check("bootstrap D1 compliance max %", b1.max(), "94", scale=100)
 check("bootstrap D2 compliance %", al[al.dataset == DS["D2"]].far_ok_test.min(), "100", scale=100)
@@ -264,7 +279,7 @@ check("bootstrap D3 min %", b3.far_ok_test.min(), "65", "reached only 65\\%--70\
 check("CP D3 min %", c3.min(), "35", scale=100); check("CP D3 max %", c3.max(), "55", scale=100)
 check("D3 median FAR/alpha min", b3.far_ratio_median.min(), "0.90", "median test FAR of 0.90--0.95"); check("D3 median FAR/alpha max", b3.far_ratio_median.max(), "0.95")
 from scipy.stats import norm
-check("benchmark compliance of a correct 95% bound %", norm.cdf(norm.ppf(0.95) / np.sqrt(2)), "88", "A correct 95\\% bound yields only about 88\\% compliance", scale=100)
+check("benchmark compliance of a correct 95% bound %", norm.cdf(norm.ppf(0.95) / np.sqrt(2)), "88", IJ("A correct 95\\% bound yields only about 88\\% compliance", "the test FAR would meet $\\alpha$ with probability $\\Phi(1.645/\\sqrt2)\\approx0.88$"), scale=100)
 cdg = tab("T_rev_calib_diag"); c3 = cdg[cdg.dataset == DS["D3"]]; c3p = c3[c3.method == "LR-P1-N2"]
 check("D3 bootstrap SD min", c3p.boot_sd_mean.min(), "0.05", "bootstrap standard deviation of the training FAR (0.05$\\alpha$--0.13$\\alpha$)"); check("D3 bootstrap SD max", c3p.boot_sd_mean.max(), "0.13")
 check_true("bootstrap SD matches split-to-split spread (within 0.02 alpha)", (abs(c3p.boot_sd_mean - c3p.shift_sd_over_sqrt2) <= 0.02).all(), IJ("matched the split-to-split spread", "matched the split-to-split spread of the difference between test and training FAR, so there is no evidence that the variance was underestimated"))
@@ -314,10 +329,10 @@ else:   # IJIS: per-trait perfect spoof (spoof_trait.py); a face artifact replac
     spm = tab("T_rev_spoof"); par3 = spm[(spm.dataset == DS["D3"]) & spm.method.str.startswith("P")].spoof_max
     check("per-algorithm spoof, parallel fusion D3 min", par3.min(), "0.30", "Parallel fusion accepted only 0.30--0.60 of the attempts on D3 when a single face algorithm was deceived")
     check("per-algorithm spoof, parallel fusion D3 max", par3.max(), "0.60")
-    check_true("trait spoof: on D1 and D2 every method accepts most attempts of its worst trait", (spt[spt.dataset.isin([DS["D1"], DS["D2"]])].spoof_trait_max > 0.5).all(), "Every design combining two traits or fingers accepted most perfect spoofs of one of them")
+    check_true("trait spoof: on D1 and D2 every method accepts most attempts of its worst trait", (spt[spt.dataset.isin([DS["D1"], DS["D2"]])].spoof_trait_max > 0.5).all(), "Every design combining two traits or fingers accepted most simulated perfect spoofs of one of them")
     check_true("trait spoof: on D1, D2 and D4 every method accepts most attempts of its worst trait (conclusion)",
                (spt[spt.dataset.isin([DS["D1"], DS["D2"], "lfw_x_fing"])].spoof_trait_max > 0.5).all() and (spt.dataset == "lfw_x_fing").sum() == 8,
-               "On the subsets that combine two traits or two fingers, every serial and parallel design accepted most perfect artifacts of its most vulnerable trait")
+               "On the subsets that combine two traits or two fingers, every serial and parallel design accepted most simulated perfect artifacts of the trait most favorable to the attacker")
     rj_ = tab("T_reject_far"); r3_ = rj_[np.isclose(rj_.alpha, 1e-3) & rj_.dataset.isin([DS["D2"], DS["D3"]])].a_rej_median
     check_true("reject median stage FAR above 0.99 on D2 and D3 at 1e-3", (r3_ > 0.99).all(), "above 0.99 on D2 and D3")
 rj = tab("T_reject_far"); acc = rj[np.isclose(rj.alpha, 1e-3)].a_acc_median
@@ -425,8 +440,8 @@ if SPRINGER:
     check_true("IJIS: D3 bootstrap p95 about 1.00", ((p95[DS["D3"]] > 0.99) & (p95[DS["D3"]] <= 1.0)).all())
     # ------------------------------------------------------------------ IJIS v02 (retitled revision): new analyses
     print("=" * 30, "IJIS v02 claims (title, MIQP, matched FAR, new splits, cross-fitting, D4)")
-    mt_ = open(f"{P}/main.tex").read()
-    check_true("v03: title", "Grid-Certified Posynomial FAR--FRR Envelopes for Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound" in mt_)
+    mt_ = ptext("main.tex")
+    check_true("v03: title", TXT(lambda: "Grid-Certified Posynomial FAR--FRR Envelopes for Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound" in mt_))
     refq = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2ref/ref_*.csv")], ignore_index=True); refq = refq[refq.obj == "P1"]
     mq2 = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2miqp/miqp_*_N2.csv")], ignore_index=True)
     mq2 = mq2.merge(refq[["dataset", "seed", "matcher", "value"]].rename(columns={"value": "opt"}), on=["dataset", "seed", "matcher"])
@@ -518,8 +533,8 @@ if SPRINGER:
     xm_ = fst[(fst.calib == "xfit") & (fst.method == "S1-Marcialis") & fst.dataset.isin([DS["D2"], DS["D3"]])]
     check("v02: Marcialis significant with held-out calibration", int(((xm_.p_holm < 0.05) & (xm_.mean_diff < 0)).sum()), "4", "and with the held-out calibration in four of six")
     xs_ = fst[(fst.calib == "xfit") & fst.dataset.isin([DS["D2"], DS["D3"]]) & (fst.alpha <= 1e-3) & fst.method.isin(["S3-SPRT", "P0-Parallel", "P1-LLR", "P2-LogReg"])]
-    check("v02: held-out SPRT/parallel significant of 16", int(((xs_.p_holm < 0.05) & (xs_.mean_diff > 0)).sum()), "12",
-          "with the held-out calibration, the SPRT and parallel fusion remained significantly better in 12 of the 16 comparisons at $\\alpha\\le10^{-3}$")
+    check("v08: held-out SPRT/parallel significant of 16", int(((xs_.p_holm < 0.05) & (xs_.mean_diff > 0)).sum()), "13",
+          "with the held-out calibration, the SPRT and parallel fusion remained significantly better in 13 of the 16 comparisons at $\\alpha\\le10^{-3}$")
     check_true("v02: ... of 16", len(xs_) == 16)
     gh = pr[pr.p_corr_t.notna()].copy(); pv_g = gh.p_corr_t.values; og = np.argsort(pv_g); mg = len(pv_g); ag = np.empty(mg); rn = 0
     for r_, i_ in enumerate(og): rn = max(rn, (mg - r_) * pv_g[i_]); ag[i_] = min(1, rn)
@@ -570,10 +585,9 @@ if SPRINGER:
     check("v02: D4 HYP 1e-3 FRR", fv("D4", 1e-3, "HYP"), "0.0074", "the hyperbolic model was feasible at $\\alpha=10^{-3}$ on D4, with a test FRR of 0.0074")
     ab4 = fsy[(fsy.dataset == D4) & (fsy.calib == "boot") & fsy.method.isin(["LR-P1-N2", "S1-Marcialis", "S2-Symmetric", "S4-Direct", "S3-SPRT"])].frr_test
     sl4 = fsy[(fsy.dataset == D4) & (fsy.calib == "boot") & fsy.method.isin(["S3-SPRT", "P1-LLR"])].frr_test
-    check_true(f"v02: abstract - D4 SPRT/LLR about 0.001 ({sl4.min():.4f}-{sl4.max():.4f}), proposed 0.002-0.004, not significant",
-               round(sl4.min(), 3) == 0.001 and round(sl4.max(), 3) == 0.001 and round(sg4.frr_test.min(), 3) == 0.002 and round(sg4.frr_test.max(), 3) == 0.004
-               and (fst[(fst.dataset == D4) & (fst.calib == "boot") & fst.method.isin(["S3-SPRT", "P1-LLR"])].p_holm >= 0.05).all(),
-               "sequential testing and likelihood-ratio fusion reached lower FRRs than the proposed design (0.001 against 0.002--0.004), though not significantly")
+    sig4 = fst[(fst.dataset == D4) & (fst.calib == "boot") & (fst.p_holm < 0.05)].method.unique().tolist()
+    check_true(f"v08: abstract - D4 only sum fusion differs significantly from the proposed design ({sig4})", sig4 == ["P0-Parallel"],
+               "On a chimeric subset with a contemporary face matcher, only sum fusion differed significantly from them.")
     check_true("v02: conclusion - proposed higher mean FRR than most serial rules on D4",
                sum(fv("D4", a, m) < fv("D4", a, "LR-P1-N2") for m in ["S1-Marcialis", "S2-Symmetric", "S4-Direct", "S3-SPRT"] for a in (1e-2, 1e-3, 1e-4)) > 6,
                "although the proposed design had a higher mean FRR than most of them")
@@ -585,39 +599,57 @@ if SPRINGER:
     bD1 = cc("D1", "boot", "fresh"); check_true(f"v02: boot D1 about 16 of 20 ({(bD1.far_ok * 20).round(2).tolist()})", (np.round(bD1.far_ok * 20) == 16).all(), "only in about 16 of 20 on D1")
     bD3 = cc("D3", "boot", "fresh"); check_true("v02: boot D3 14 to 17 of 20", sorted(np.round(bD3.far_ok * 20).astype(int)) == [14, 17, 17], "in 14 to 17 of 20 on D3")
     bD4 = cc("D4", "boot", "D4 0-9"); check("v02: boot D4 min of 10", (bD4.far_ok * 10).min(), "8.1", "and in 8.1 to 9.1 of 10 on D4"); check("v02: boot D4 max of 10", (bD4.far_ok * 10).max(), "9.1")
-    xx = fco[(fco.calib == "xfit") & (fco.dataset != D4)]
-    check_true(f"v02: xfit D1-D3 18 to 20 of 20 ({sorted((xx.far_ok * 20).round(2))})", np.round((xx.far_ok * 20).min()) == 18 and (xx.far_ok * 20).max() == 20, "they met $\\alpha$ in 18 to 20 of 20 test halves on D1--D3 and in all ten on D4")
-    check_true("v02: xfit D4 all ten", (cc("D4", "xfit", "D4 0-9").far_ok == 1).all())
+    # v08: held-out calibration with the order fixed on fold A (no reselection); compliance among the deployed designs
+    xf = fco[fco.calib == "xfit"].copy(); xf["dep_share"] = xf.n_deployed / xf.n; xf["all_share"] = xf.n_met / xf.n
+    xd_ = lambda d: xf[xf.dataset == DS.get(d, D4)].set_index("alpha")
+    check_true(f"v08: xfit deployed D2 all splits, D3 17-20 of 20 ({sorted(xd_('D3').n_deployed.round(2))}), D1 11.1 and 12.7 of 20, D4 5.5-9.2 of 10",
+               (xd_("D2").n_deployed == 20).all() and sorted(xd_("D3").n_deployed.round(2)) == [17, 19, 20]
+               and round(xd_("D1").loc[1e-3, "n_deployed"], 1) == 11.1 and round(xd_("D1").loc[1e-2, "n_deployed"], 1) == 12.7
+               and round(xd_("D4").n_deployed.min(), 1) == 5.5 and round(xd_("D4").n_deployed.max(), 1) == 9.2,
+               "the fold-A design could be calibrated on fold~B in every split of D2, in 17 to 20 of the 20 splits of D3, in 11.1 and 12.7 of 20 on D1 ($\\alpha=10^{-3}$ and $10^{-2}$; tie-averaged), and in 5.5 to 9.2 of 10 on D4")
+    check("v08: xfit compliance among deployed D1 min %", xd_("D1").far_ok.min(), "91", "The deployed designs met $\\alpha$ in 91\\%--94\\% of their test halves on D1, 94\\%--100\\% on D3, and in all of them on D2 and D4", scale=100)
+    check("v08: ... D1 max %", xd_("D1").far_ok.max(), "94", scale=100); check("v08: ... D3 min %", xd_("D3").far_ok.min(), "94", scale=100)
+    check_true("v08: ... D3 max 100%, D2 and D4 all", xd_("D3").far_ok.max() == 1 and (xd_("D2").far_ok == 1).all() and (xd_("D4").far_ok == 1).all())
+    check("v08: compliant design over all splits D1 min %", xd_("D1").all_share.min(), "51", "a compliant design was obtained in 51\\%--60\\% of the D1 splits, 80\\%--100\\% on D3, 55\\%--92\\% on D4, and every D2 split", scale=100)
+    check("v08: ... D1 max %", xd_("D1").all_share.max(), "60", scale=100); check("v08: ... D3 min %", xd_("D3").all_share.min(), "80", scale=100)
+    check("v08: ... D4 min %", xd_("D4").all_share.min(), "55", scale=100); check("v08: ... D4 max %", xd_("D4").all_share.max(), "92", scale=100)
+    check_true("v08: ... D3 max and D2 all 100%", xd_("D3").all_share.max() == 1 and (xd_("D2").all_share == 1).all())
     from scipy.stats import norm as _ndist
-    check("v02: expected compliance bootstrap %", _ndist.cdf(1.645 / np.sqrt(2)), "88", "below the 88\\% expected for a correct bound", scale=100)
-    check("v02: expected compliance cross-fitted %", _ndist.cdf(1.645 * np.sqrt(2 / 3)), "91", "in line with the 91\\% expected under the same approximation", scale=100)
-    b13 = pd.concat([bD1, bD3]).far_ok; xa = fco[fco.calib == "xfit"].far_ok
-    check("v02: boot D1/D3 compliance min %", b13.min(), "70", "it met $\\alpha$ in 70\\%--85\\% of the test halves on D1 and D3, below the 88\\% expected", scale=100)
+    check("v02: expected compliance bootstrap %", _ndist.cdf(1.645 / np.sqrt(2)), "0.88", "the test FAR would meet $\\alpha$ with probability $\\Phi(1.645/\\sqrt2)\\approx0.88$")
+    check("v02: expected compliance cross-fitted %", _ndist.cdf(1.645 * np.sqrt(2 / 3)), "0.91", "($\\Phi(1.645\\sqrt{2/3})\\approx0.91$ when the calibration data hold half as many subjects as the test half)")
+    b13 = pd.concat([bD1, bD3]).far_ok; xa = xf.far_ok
+    check("v02: boot D1/D3 compliance min %", b13.min(), "70", "it met $\\alpha$ in 70\\%--85\\% of the test halves on D1 and D3, below the 88\\% benchmark", scale=100)
     check("v02: boot D1/D3 compliance max %", b13.max(), "85", scale=100)
     ball = fco[(fco.calib == "boot") & (fco.split_set != "original 0-9")].far_ok
-    check_true(f"v02: abstract compliance 70-95 (boot, new splits and D4: {100 * ball.min():.1f}-{100 * ball.max():.1f}) / 90-100 held-out",
-               round(100 * ball.min()) == 70 and round(100 * ball.max()) == 95 and round(100 * xa.min()) == 90 and xa.max() == 1,
-               "The deployed proposed designs met the FAR requirement in 70\\%--95\\% of new test halves (88\\% expected) and in 90\\%--100\\% with held-out calibration")
+    check_true(f"v08: abstract compliance 70-95 (boot, new splits and D4: {100 * ball.min():.1f}-{100 * ball.max():.1f}); held-out deployed 55-100, compliant 91-100",
+               round(100 * ball.min()) == 70 and round(100 * ball.max()) == 95 and round(100 * xf.dep_share.min()) == 55 and xf.dep_share.max() == 1
+               and round(100 * xa.min()) == 91 and xa.max() == 1,
+               "met the FAR requirement in 70\\%--95\\% of new test halves; with held-out calibration of an order fixed beforehand, a design could be deployed in 55\\%--100\\% of the splits and then met it in 91\\%--100\\%")
     check_true("v02: boot below 88% on D1, D3 and D4 at 1e-3 only", (bD1.far_ok < 0.8776).all() and (bD3.far_ok < 0.8776).all() and (bD2.far_ok > 0.8776).all()
-               and sorted(bD4[bD4.far_ok < 0.8776].alpha.round(6)) == [0.001], "below the 88\\% expected for a correct bound on D1 and D3 and at $\\alpha=10^{-3}$ on D4")
-    check_true("v02: held-out 90-100 on D1-D3, all ten D4", round(100 * xa.min()) == 90 and fco[fco.calib == "xfit"].dataset.nunique() == 4,
-               "whereas the held-out calibration met it in 90\\%--100\\% of the test halves of D1--D3 and in all ten D4 splits")
+               and sorted(bD4[bD4.far_ok < 0.8776].alpha.round(6)) == [0.001], "below the 88\\% benchmark on D1 and D3 and at $\\alpha=10^{-3}$ on D4")
     fb = fco[(fco.split_set != "original 0-9")].groupby("calib").far_over_alpha.agg(["min", "max"])
-    check("v02: held-out FAR/alpha min", fb.loc["xfit", "min"], "0.42", "(mean test FAR 0.42$\\alpha$--0.85$\\alpha$, against 0.73$\\alpha$--0.92$\\alpha$)")
+    check("v02: held-out FAR/alpha min", fb.loc["xfit", "min"], "0.43", "(mean test FAR of the deployed designs 0.43$\\alpha$--0.85$\\alpha$, against 0.73$\\alpha$--0.92$\\alpha$)")
     check("v02: held-out FAR/alpha max", fb.loc["xfit", "max"], "0.85"); check("v02: boot FAR/alpha min", fb.loc["boot", "min"], "0.73"); check("v02: boot FAR/alpha max", fb.loc["boot", "max"], "0.92")
     bl = fsy[fsy.method.isin(["S3-SPRT", "P0-Parallel", "P1-LLR", "P2-LogReg"])].groupby("calib").far_ok.agg(["min", "max"])
-    check("v02: SPRT/fusion compliance boot min %", bl.loc["boot", "min"], "60", "met $\\alpha$ in 60\\%--100\\% of the test halves with the bootstrap and in 70\\%--100\\% with the held-out calibration", scale=100)
+    check("v02: SPRT/fusion compliance boot min %", bl.loc["boot", "min"], "60", "met $\\alpha$ in 60\\%--100\\% of the test halves with the bootstrap and in 70\\%--100\\% of their deployed test halves with the held-out calibration", scale=100)
     check("v02: SPRT/fusion compliance held-out min %", bl.loc["xfit", "min"], "70", scale=100)
     check_true("v02: SPRT/fusion compliance max 100% under both", (bl["max"] == 1).all())
-    check_true("v02: conclusion - SPRT/fusion 70-100 with held-out", round(100 * bl.loc["xfit", "min"]) == 70, "(the SPRT and parallel fusion in 70\\%--100\\%)")
-    xb = fco[fco.split_set != "original 0-9"].pivot_table(index=["dataset", "alpha"], columns="calib", values="frr_test"); xb["rel"] = xb.xfit / xb.boot - 1; xb["abs"] = xb.xfit - xb.boot
-    rr = lambda d: xb.loc[DS.get(d, D4)]
-    check("v02: xfit cost D2 min %", rr("D2").rel.min(), "1", "it raised the FRR of the proposed designs by 1\\%--2\\% on D2 and 3\\%--5\\% on D3", scale=100); check("v02: xfit cost D2 max %", rr("D2").rel.max(), "2", scale=100)
-    check("v02: xfit cost D3 min %", rr("D3").rel.min(), "3", scale=100); check("v02: xfit cost D3 max %", rr("D3").rel.max(), "5", scale=100)
-    check("v02: xfit cost D1 min %", rr("D1").rel.min(), "58", "but by 58\\%--96\\% on D1 (0.006--0.007)", scale=100); check("v02: xfit cost D1 max %", rr("D1").rel.max(), "96", scale=100)
-    check("v02: xfit cost D1 abs min", rr("D1")["abs"].min(), "0.006"); check("v02: xfit cost D1 abs max", rr("D1")["abs"].max(), "0.007")
-    check("v02: xfit cost D4 min %", rr("D4").rel.min(), "65", "and 65\\%--84\\% on D4 (at most 0.0035)", scale=100); check("v02: xfit cost D4 max %", rr("D4").rel.max(), "84", scale=100)
-    check("v02: xfit cost D4 max abs", rr("D4")["abs"].max(), "0.0035")
+    check_true("v08: parallel fusion always deployed under held-out calibration",
+               (fsy[(fsy.calib == "xfit") & fsy.method.isin(["P0-Parallel", "P1-LLR", "P2-LogReg"])].n_deployed == fsy[(fsy.calib == "xfit") & fsy.method.isin(["P0-Parallel", "P1-LLR", "P2-LogReg"])].n_splits).all(),
+               "parallel fusion, which makes no early decision, could always be calibrated")
+    # FRR cost of the held-out calibration, paired over the splits in which it deployed a design (T_fresh_selected)
+    sl8 = tab("T_fresh_selected"); sl8 = sl8[sl8.method == "LR-P1-N2"]
+    pr8 = sl8[sl8.calib == "boot"][["dataset", "seed", "alpha", "frr_test"]].merge(sl8[sl8.calib == "xfit"][["dataset", "seed", "alpha", "frr_test", "p_deploy"]],
+                                                                                 on=["dataset", "seed", "alpha"], suffixes=("_b", "_x"))
+    pr8 = pr8[pr8.p_deploy > 0].groupby(["dataset", "alpha"])[["frr_test_b", "frr_test_x"]].mean()
+    pr8["rel"] = pr8.frr_test_x / pr8.frr_test_b - 1; pr8["abs"] = pr8.frr_test_x - pr8.frr_test_b
+    rr = lambda d: pr8.loc[DS.get(d, D4)]
+    check("v08: xfit cost D2 min %", rr("D2").rel.min(), "1", "it raised the FRR of the proposed designs by 1\\%--2\\% on D2 and 3\\%--4\\% on D3", scale=100); check("v08: xfit cost D2 max %", rr("D2").rel.max(), "2", scale=100)
+    check("v08: xfit cost D3 min %", rr("D3").rel.min(), "3", scale=100); check("v08: xfit cost D3 max %", rr("D3").rel.max(), "4", scale=100)
+    check("v08: xfit cost D1 min %", rr("D1").rel.min(), "53", "but by 53\\%--97\\% on D1 (0.006) and 61\\%--84\\% on D4 (at most 0.0029)", scale=100); check("v08: xfit cost D1 max %", rr("D1").rel.max(), "97", scale=100)
+    check("v08: xfit cost D1 abs min", rr("D1")["abs"].min(), "0.006"); check("v08: xfit cost D1 abs max", rr("D1")["abs"].max(), "0.006")
+    check("v08: xfit cost D4 min %", rr("D4").rel.min(), "61", scale=100); check("v08: xfit cost D4 max %", rr("D4").rel.max(), "84", scale=100)
+    check("v08: xfit cost D4 max abs", rr("D4")["abs"].max(), "0.0029")
     # D4 presentation attacks (Sect. 6.5)
     r4 = pd.read_csv(f"{T}/spoof_trait_raw_lfw_x_fing.csv").groupby("method")[["spoof_face", "spoof_right_index"]].mean()
     check("v02: D4 face spoof proposed", r4.loc["LR-P1-N2", "spoof_face"], "0.96", "a perfect face artifact was accepted in 0.96 of the attempts by the proposed designs")
@@ -647,24 +679,24 @@ if SPRINGER:
     check("v04: exact-dual LR-BB time min (MIQP rationale)", txd.min(), "0.51", "(0.60--1.93~s against 0.51--1.46~s for the exact-dual LR-BB")
     check("v04: exact-dual LR-BB time max", txd.max(), "1.46")
     check_true("v04: MIQP rationale names the solver and the slack cardinality constraint",
-               "solved by outer approximation with the general-purpose solver HiGHS" in _norm(SRC["s6_results.tex"]),
+               TXT(lambda: "solved by outer approximation with the general-purpose solver HiGHS" in _norm(SRC["s6_results.tex"])),
                "the cardinality constraint was slack in 38 of the 40 instances, so additional terms barely improved the fit")
     check_true("v04: framework positioning in intro, contribution 2 and conclusion",
-               "whose envelopes are safe by construction for every recovered threshold on the training data, whose envelope fit is certifiably optimal over an exponent grid, and which is open to further posynomial constraints" in _norm(SRC["s1_intro.tex"])
+               TXT(lambda: "whose envelopes are safe by construction on the training staircase, whose envelope fit carries a numerical optimality certificate over an exponent grid, and which is open to further posynomial constraints" in _norm(SRC["s1_intro.tex"])
                and "the value of the exact dual lies in the analysis it enables" in _norm(SRC["s1_intro.tex"])
-               and "the FAR requirement itself rests on the calibration" in _norm(SRC["s7_discussion.tex"]),
+               and "the FAR requirement itself rests on the calibration" in _norm(SRC["s7_discussion.tex"])),
                "the value of the framework lies in these properties rather than in a lower FRR")
-    check_true("v04: first-person plural for the authors' own earlier work", "authors' group" not in ALL and "preliminary study" not in ALL
-               and r"In earlier work~\cite{lin2026}, we formulated" in ALL and r"In an earlier study~\cite{yeh2023}, we fitted" in ALL,
+    check_true("v04: first-person plural for the authors' own earlier work", TXT(lambda: "authors' group" not in ALL and "preliminary study" not in ALL
+               and r"In earlier work~\cite{lin2026}, we formulated" in ALL and r"In an earlier study~\cite{yeh2023}, we fitted" in ALL),
                r"We have applied LR to security resource allocation~\cite{chen2025}")
-    mt4 = _norm(SRC["main.tex"]); esm4 = _norm(SRC["ESM_1.tex"]); url4 = "https://github.com/EdSun3941/grid-certified-serial-biometrics"
+    mt4 = _norm(SRC.get("main.tex", "")); esm4 = _norm(SRC.get("ESM_1.tex", "")); url4 = "https://github.com/EdSun3941/grid-certified-serial-biometrics"
     check_true("v04: declarations filled (funding, competing interests, code URL, contributions)",
-               "No funding was received for conducting this study." in mt4
+               TXT(lambda: "No funding was received for conducting this study." in mt4
                and "The authors have no competing interests to declare that are relevant to the content of this article." in mt4
-               and url4 in mt4 and url4 in esm4 and "To be completed" not in ALL and "to be inserted" not in ALL and "[repository" not in ALL,
+               and url4 in mt4 and url4 in esm4 and "To be completed" not in ALL and "to be inserted" not in ALL and "[repository" not in ALL),
                r"The first draft of the manuscript was prepared by Chuan-Hsiang Su and Tzu-Lung Sun in the human--AI collaboration described in Sect.~\ref{sec:stats}")
     check_true("v04: AI use stated in one sentence in Sect. 5.4 (label sec:stats), separate subsection removed",
-               "Use of generative AI" not in ALL and "sec:ai" not in ALL and "large language model (Claude, Anthropic)" in _norm(SRC["s5_setup.tex"]).split("Statistics and implementation")[1],
+               TXT(lambda: "Use of generative AI" not in ALL and "sec:ai" not in ALL and "large language model (Claude, Anthropic)" in _norm(SRC["s5_setup.tex"]).split("Statistics and implementation")[1]),
                "The work was carried out in human--AI collaboration: the authors designed the study and directed and checked each step, and a large language model (Claude, Anthropic) wrote and ran the experiment code and drafted the text; the authors verified the code, the results, and the text and take full responsibility for the content.")
     import run_mlp as _rm
     from data import MATCHERS as _MA
@@ -707,10 +739,11 @@ if SPRINGER:
     check_true("v04: no significant MLP difference on D1 and D4", (ms[ms.dataset.isin(["fing_x_face", "lfw_x_fing"])].p_unadj >= 0.05).all(),
                "no difference involving the MLP was significant on either subset")
     d3x = ms[(ms.dataset == "face_x_face") & (ms.calib == "xfit")]
-    check_true("v04: D3 held-out: no significant difference from proposed or LLR; MLP lower than proposed in 19 of 20 splits at every alpha",
-               (d3x[d3x.other.isin(["LR-P1-N2", "P1-LLR"])].p_unadj >= 0.05).all() and (d3x[d3x.other == "LR-P1-N2"].n_mlp_lower == 19).all()
-               and (d3x[d3x.other == "LR-P1-N2"].n == 20).all(),
-               "no held-out difference on D3 from the proposed design or from LLR fusion was significant, although the MLP had lower FRR than the proposed design in 19 of the 20 splits at every $\\alpha$")
+    d3p = d3x[d3x.other == "LR-P1-N2"].set_index("alpha")
+    check_true(f"v08: D3 held-out: no significant difference from proposed or LLR; MLP lower in 16/17, 18/19, 19/20 ({d3p[['n_mlp_lower', 'n']].values.tolist()})",
+               (d3x[d3x.other.isin(["LR-P1-N2", "P1-LLR"])].p_unadj >= 0.05).all()
+               and [tuple(d3p.loc[a, ["n_mlp_lower", "n"]].astype(int)) for a in (1e-4, 1e-3, 1e-2)] == [(16, 17), (18, 19), (19, 20)],
+               "although the MLP had lower FRR than the proposed design in 16 of 17, 18 of 19, and 19 of 20 of the splits in which both were deployed")
     mm = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E3mlp/mlp_face_x_face_s*.csv")], ignore_index=True)
     fs_ = tab("T_fresh_selected")
     fx = {a: mm[(mm.calib == "xfit") & np.isclose(mm.alpha, a)].set_index("seed").frr_test for a in (1e-3, 1e-4)}
@@ -725,7 +758,7 @@ if SPRINGER:
                all(1.9 <= r <= 2.3 for r in rat) and fx[1e-3].idxmax() == worst and fx[1e-4].drop(worst).max() < 0.30)
     check("v04: MLP FAR compliance min %", my.far_ok.min(), "70", "The MLP met $\\alpha$ in 70\\%--100\\% of the test halves", scale=100)
     check("v04: MLP FAR compliance max %", my.far_ok.max(), "100", scale=100)
-    check_true("v04: MLP positioned in intro and discussion", "including a small neural-network fusion" in ALL,
+    check_true("v04: MLP positioned in intro and discussion", TXT(lambda: "including a small neural-network fusion" in ALL),
                "on D2 and D3 a small neural fusion reached about the FRR of likelihood-ratio fusion, so additional model capacity did not enlarge the advantage of parallel fusion")
     print("=" * 30, "IJIS v05: mathematical review, data review, journal compliance")
     from data import staircase_points as _sp
@@ -733,16 +766,18 @@ if SPRINGER:
     check_true(f"v05: corner set includes (x_1, y_0) and (x_(K+1), y_K) as in Sect. 3.3 (code corners {list(np.round(xs_, 3))})",
                np.isclose(xs_.min(), 1/6) and np.isclose(ys_.max(), 1.0) and np.isclose(xs_.max(), 5/6) and np.isclose(ys_.min(), 0.2),
                "The \\emph{corner points} are $(x_{k+1},y_k)$, $k=0,\\dots,K$, and $[\\underline{x}_s,\\overline{x}_s]=[x_1,x_{K+1}]$.")
-    check_true("v05: Prop. 1 stated on (0, x_(K+1)] for k = 0..K",
-               "if and only if $g(x_{k+1})\\ge y_k$ for $k=0,\\dots,K$" in _norm(SRC["s3_model.tex"]),
-               "when step (ii) raises the final threshold, it lies at an accepted impostor score rather than at the most permissive score with the same FAR, so the recomputed value is a prediction rather than a bound at the final stage")
+    check_true("v05/v08: Prop. 1 stated on (0, x_(K+1)] for k = 0..K, with the bound for every threshold of positive FAR; step (iii) is a bound",
+               TXT(lambda: "if and only if $g(x_{k+1})\\ge y_k$ for $k=0,\\dots,K$" in _norm(SRC["s3_model.tex"])
+                   and "every threshold $t$ satisfies $\\frr_s(t)\\le g(\\far_s(t))$ if $0<\\far_s(t)\\le x_{K+1}$" in _norm(SRC["s3_model.tex"])
+                   and "prediction rather than a bound" not in ALL),
+               "by the argument of Proposition~\\ref{prop:system} the prediction bounds the training FRR of the deployed design under the product of the per-matcher training distributions")
     src_es = open("envelope_solvers.py").read()
     check_true("v05: Prop. 5 early-stop bound (1 - eps) U in text and code",
                "U if not heap else U * (1 - eps)" in src_es and "U if not (heap or open_leaves) else U * (1 - eps)" in src_es,
                "the minimum of $(1-\\epsilon)U$ and the bounds of the open nodes and leaves is a valid lower bound")
     check_true("v05: P2 dual reference, node description, d_mu, midpoint q, J splits",
-               "\\ref{eq:zd}) is again evaluated" not in ALL and "g_\\mu" not in ALL and "midpoint $m$" not in ALL and "$K=10$ splits" not in ALL
-               and "0\\le\\sigma\\le\\bar\\sigma" in _norm(SRC["ESM_1.tex"]),
+               TXT(lambda: "\\ref{eq:zd}) is again evaluated" not in ALL and "g_\\mu" not in ALL and "midpoint $m$" not in ALL and "$K=10$ splits" not in ALL
+               and "0\\le\\sigma\\le\\bar\\sigma" in _norm(SRC["ESM_1.tex"])),
                "holds the ordered tuples $\\beta_1\\le\\dots\\le\\beta_N$ in these intervals")
     check_true("v05: staircase drawn with where='pre' (corners close each level)", 'ax.step(x, y, where="pre"' in open("figures.py").read())
     rs_ = tab("T_rev_selected"); fs5 = tab("T_fresh_selected"); fs5 = fs5[(fs5.dataset == "lfw_x_fing") & (fs5.calib == "boot")]
@@ -758,54 +793,116 @@ if SPRINGER:
                "(on D1, one of three orders that were each selected in three splits)")
     st5 = tab("T_rev_stats"); rr = st5[(st5.dataset == "face_x_face") & np.isclose(st5.alpha, 1e-4) & (st5.method == "LR-P1-N2-rel")].iloc[0]
     check("v05: relative-error variant D3 1e-4 CI low", rr.ci_lo, "0.0002"); check("v05: ... CI high", rr.ci_hi, "0.0130")
-    refs5 = open(f"{P}/references.tex").read()
+    refs5 = ptext("references.tex")
     check_true("v05: reference list in Springer basic style (no '?.', no final period, full author list of chen2025, dated online document)",
-               "?." not in refs5 and not any(l.rstrip().endswith(".") for l in refs5.splitlines() if l.startswith("\\bibitem"))
+               TXT(lambda: "?." not in refs5 and not any(l.rstrip().endswith(".") for l in refs5.splitlines() if l.startswith("\\bibitem"))
                and "Tai, K.-Y., Hsiao, C.-H., Wang, W.-H., Tsai, M.-C., Sun, T.-L." in refs5
-               and "nist-biometric-scores-set-bssr1} (2017). Accessed 9 October 2026" in refs5)
+               and "nist-biometric-scores-set-bssr1} (2017). Accessed 9 October 2026" in refs5))
     check_true("v05: declarations (ethics, consent to participate, consent for publication, data URLs) and ESM description",
-               "\\paragraph{Consent to participate} Not applicable." in SRC["main.tex"] and "\\paragraph{Consent for publication}" in SRC["main.tex"]
+               TXT(lambda: "\\paragraph{Consent to participate} Not applicable." in SRC["main.tex"] and "\\paragraph{Consent for publication}" in SRC["main.tex"]
                and "\\url{http://vis-www.cs.umass.edu/lfw/}" in SRC["main.tex"] and "\\url{https://github.com/opencv/opencv_zoo}" in SRC["main.tex"]
-               and "\\section*{Supplementary Information}" in SRC["main.tex"])
-    check_true("v05: US spelling", not re.search(r"analys(ed|e\b)|favour|colour|behaviour|modelling", ALL))
+               and "\\section*{Supplementary Information}" in SRC["main.tex"]))
+    check_true("v05: US spelling", TXT(lambda: not re.search(r"analys(ed|e\b)|favour|colour|behaviour|modelling", ALL)))
     doi5 = "10.5281/zenodo.23072674"
     check_true("v05: Zenodo DOI of the code release in Code availability (reference), ESM S4 and the reference list",
-               "the version used for this article is archived at Zenodo~\\cite{su2026code}" in SRC["main.tex"] and doi5 in SRC["ESM_1.tex"]
-               and f"\\url{{https://doi.org/{doi5}}}" in open(f"{P}/references.tex").read())
+               TXT(lambda: "the version used for this article is archived at Zenodo~\\cite{su2026code}" in SRC["main.tex"] and doi5 in SRC["ESM_1.tex"]
+               and f"\\url{{https://doi.org/{doi5}}}" in open(f"{P}/references.tex").read()))
     check_true("v05: logarithmic change of variables (no z overload); tolerance of the certificate stated",
-               "$z=\\log" not in ALL, "within a relative tolerance of $10^{-4}$")
+               TXT(lambda: "$z=\\log" not in ALL), "within a relative tolerance of $10^{-4}$")
     print("=" * 30, "IJIS v06: reference audit of 2026-10-09")
     check_true("v06: [rastogi2026] cites the corrected version with its correction notice (DOI 10.3390/math14091428)",
-               "\\url{https://doi.org/10.3390/math14071178} (corrected version; correction published in Mathematics 14(9), 1428 (2026), \\url{https://doi.org/10.3390/math14091428})" in refs5)
+               TXT(lambda: "\\url{https://doi.org/10.3390/math14071178} (corrected version; correction published in Mathematics 14(9), 1428 (2026), \\url{https://doi.org/10.3390/math14091428})" in refs5))
     check_true("v06: [bssr1] uses the current NIST address (iad/btg) and no old image-group address remains",
-               "\\url{https://www.nist.gov/itl/iad/btg/nist-biometric-scores-set-bssr1}" in refs5 and "image-group" not in refs5 and "image-group" not in ALL)
+               TXT(lambda: "\\url{https://www.nist.gov/itl/iad/btg/nist-biometric-scores-set-bssr1}" in refs5 and "image-group" not in refs5 and "image-group" not in ALL))
     check_true("v07: [iso19795] cites the corrected version 2024-09 of ISO/IEC 19795-1:2021",
-               "Part 1: Principles and framework, 2nd edn., corrected version 2024-09. International Organization for Standardization, Geneva (2021)" in refs5)
+               TXT(lambda: "Part 1: Principles and framework, 2nd edn., corrected version 2024-09. International Organization for Standardization, Geneva (2021)" in refs5))
+    print("=" * 30, "IJIS v08: review of 2026-10-09 (M1-M8)")
+    # M1 disclosure: the earlier selection rule narrowed the tied best fold-A orders in 43 of 190 settings, replaced all in 12
+    xs8 = tab("T_fresh_selected"); xs8 = xs8[(xs8.calib == "xfit") & (xs8.method == "LR-P1-N2")]
+    check("v08: settings of the proposed design (subset x split x alpha)", len(xs8), "190", "in 43 of the 190 combinations of subset, split, and requirement")
+    check("v08: settings in which fold B narrowed the tied best fold-A orders", int((xs8.n_deployed < xs8.n_tied).sum()), "43")
+    check("v08: settings in which fold B excluded all best fold-A orders", int((xs8.n_deployed == 0).sum()), "12", "and replaced all of them by a worse fold-A order in 12")
+    # M7: realized FAR under the common cap
+    mf_o = tab("T_rev_matchedfar_system").far_matched_over_alpha; mf_n = tab("T_fresh_matchedfar_system").far_matched_over_alpha
+    check("v08: realized FAR at the cap, min over both analyses", min(mf_o.min(), mf_n.min()), "0.78", "(mean 0.78$\\alpha$--1.00$\\alpha$ per method and setting, lowest on the integer fingerprint scores of D2)")
+    check("v08: ... max", max(mf_o.max(), mf_n.max()), "1.00"); check("v08: ... original splits min (S15 caption)", mf_o.min(), "0.83")
+    check_true("v08: lowest realized FAR at the cap on D2", tab("T_fresh_matchedfar_system").sort_values("far_matched_over_alpha").dataset.iloc[0] == DS["D2"]
+               and tab("T_rev_matchedfar_system").sort_values("far_matched_over_alpha").dataset.iloc[0] == DS["D2"])
+    # minor 5: HiGHS version bundled with SciPy
+    import scipy as _sp_; from scipy.optimize._highspy import _core as _hc
+    check_true(f"v08: HiGHS {_hc.HIGHS_VERSION_MAJOR}.{_hc.HIGHS_VERSION_MINOR}.{_hc.HIGHS_VERSION_PATCH} bundled with SciPy {_sp_.__version__}",
+               (_hc.HIGHS_VERSION_MAJOR, _hc.HIGHS_VERSION_MINOR, _hc.HIGHS_VERSION_PATCH) == (1, 12, 0) and _sp_.__version__ == "1.17.1",
+               "(version 1.12.0, bundled with SciPy 1.17.1)")
+    # M6: D4 candidate sets (Table S20)
+    d4s = tab("T_d4_subsets"); g4 = lambda a, d: d4s[np.isclose(d4s.alpha, a) & (d4s.design == d)].iloc[0]
+    for a_, v_ in [(1e-2, "0.0069"), (1e-3, "0.0132"), (1e-4, "0.0271")]:
+        check(f"v08: D4 face-only FRR at {a_:g}", g4(a_, "face only").frr_test, v_, "reached a test FRR of 0.0069, 0.0132, and 0.0271 at $\\alpha=10^{-2}$, $10^{-3}$, and $10^{-4}$ and met $\\alpha$ in 7 of 10 test halves at each $\\alpha$")
+    check_true("v08: D4 face-only met alpha in 7 of 10 at each alpha", (d4s[d4s.design == "face only"].n_met == 7).all())
+    f1 = d4s[d4s.design == "face and one finger"].frr_test
+    check("v08: D4 face + one finger FRR min", f1.min(), "0.0020", "with one finger after the face the FRR fell to 0.0020--0.0058"); check("v08: ... max", f1.max(), "0.0058")
+    ap4 = d4s[d4s.design == "all orders (paper)"].set_index("alpha")
+    check_true(f"v08: D4 selected designs lower than face-only in all ten splits, significant (unadjusted) at alpha <= 1e-3 only ({ap4.p.round(4).tolist()})",
+               (ap4.n_lower == 10).all() and (ap4.loc[[1e-3, 1e-4], "p"] < 0.05).all() and ap4.loc[1e-2, "p"] >= 0.05,
+               "the selected designs had lower FRR than the face-only design in all ten splits at every $\\alpha$, significantly at $\\alpha\\le10^{-3}$ (unadjusted corrected $t$-test)")
+    check("v08: D4 selected designs stages per genuine claim min", ap4.stages_gen.min(), "1.02", "while using 1.02--1.05 modalities per genuine claim"); check("v08: ... max", ap4.stages_gen.max(), "1.05")
+    # M5/M6: controlled simulation (Sect. 6.5, Table S22)
+    sm8 = tab("T_sim")
+    check("v08: sim - designs checked for the Lemma", sm8.lemma_n.sum(), "11999", "in all 11{,}999 calibrated designs")
+    check_true("v08: sim - Lemma held in every design", np.isclose((sm8.lemma_all * sm8.lemma_n).sum(), sm8.lemma_n.sum()))
+    r0 = sm8[sm8.rho_g == 0]
+    check_true("v08: sim - prediction >= population FRR for every two-stage design under independence", (r0.pred_ge_pop_two_stage == 1).all(),
+               "Under independence ($\\rho=0$), it also bounded the population FRR of every two-stage design")
+    rr3 = r0[np.isclose(r0.alpha, 1e-3)].set_index("N").pred_over_pop_selected
+    check("v08: sim - conservativeness factor min (rho 0, alpha 1e-3)", rr3.min(), "6.3", "conservatively by a factor of 6.3--8.8 at $\\alpha=10^{-3}$"); check("v08: ... max", rr3.max(), "8.8")
+    r8 = sm8[(sm8.rho_g == 0.8) & np.isclose(sm8.alpha, 1e-3)].set_index("N").pred_ge_pop_two_stage
+    check("v08: sim - rho 0.8, N 500, bound held %", r8[500], "64", "it bounded it for only 64\\% of the two-stage designs at $N=500$ and 97.5\\% at $N=1500$", scale=100)
+    check("v08: sim - rho 0.8, N 1500, bound held %", r8[1500], "97.5", scale=100)
+    check("v08: sim - bootstrap population coverage min %", sm8.cov_selected.min(), "93.5", "met the requirement on the population in 93.5\\%--100\\% of the replicates", scale=100)
+    check("v08: sim - ... max %", sm8.cov_selected.max(), "100", scale=100)
+    check("v08: sim - coverage under independence min %", r0.cov_selected.min(), "98.5", "(98.5\\%--100\\% under independence and lowest, 93.5\\%--95\\%, with $N=1500$ and $\\rho\\ge0.6$", scale=100)
+    lo8 = sm8[(sm8.N == 1500) & (sm8.rho_g >= 0.6)].cov_selected
+    check_true(f"v08: sim - lowest coverage at N 1500, rho >= 0.6 ({sorted(lo8.round(3))})", round(100 * lo8.min(), 1) == 93.5 and round(100 * lo8.max(), 1) == 95.0
+               and lo8.max() <= sm8[~((sm8.N == 1500) & (sm8.rho_g >= 0.6))].cov_selected.min() + 1e-9)
+    check("v08: sim - mean population FAR/alpha min", sm8.far_pop_over_alpha.min(), "0.65", "mean population FAR 0.65$\\alpha$--0.92$\\alpha$"); check("v08: ... max", sm8.far_pop_over_alpha.max(), "0.92")
+    check("v08: sim - held-out deployed min %", sm8.xfit_deployed.min(), "95", "a design was deployed in 95\\%--100\\% of the replicates and met the requirement in 94\\%--100\\% of them", scale=100)
+    check("v08: sim - held-out deployed max %", sm8.xfit_deployed.max(), "100", scale=100)
+    check("v08: sim - held-out compliance min %", sm8.xfit_cov_deployed.min(), "94", scale=100); check("v08: sim - held-out compliance max %", sm8.xfit_cov_deployed.max(), "100", scale=100)
+    check_true("v08: sim - settings (N 500 with 200 replicates, N 1500 with 100; rho 0-0.8; impostor rho/3)",
+               set(sm8[sm8.N == 500].reps) == {200} and set(sm8[sm8.N == 1500].reps) == {100} and sorted(sm8.rho_g.unique()) == [0, 0.2, 0.4, 0.6, 0.8]
+               and np.allclose(sm8.rho_i, sm8.rho_g / 3), "with 200 replicates for $N=500$ and 100 for $N=1500$")
+    from scipy.stats import norm as _n8
+    check("v08: sim - population FRR of matcher 1 at FAR 1e-3", _n8.cdf(_n8.isf(1e-3) - 4.0), "0.18", "two Gaussian matchers (FRR 0.18 and 0.08 at $\\far=10^{-3}$)")
+    check("v08: sim - population FRR of matcher 2 at FAR 1e-3", _n8.cdf(_n8.isf(1e-3) - 4.5), "0.08")
     print("=" * 30, "IJIS format checks")
-    ab_ = open(f"{P}/sections/s0_abstract.tex").read(); ab_ = ab_.split("\\begin{abstract}")[1].split("\\keywords")[0]
-    nw = len(re.split(r"\s+|--", re.sub(r"\$[^$]*\$", "X", ab_).replace("~", " ").strip()))
-    check_true(f"IJIS: abstract has {nw} words (150-250)", 150 <= nw <= 250)
-    kw = open(f"{P}/sections/s0_abstract.tex").read().split("\\keywords{")[1].split("}")[0].count("\\and") + 1
-    check_true(f"IJIS: {kw} keywords (4-6)", 4 <= kw <= 6)
-    lab = lambda f: dict(re.findall(r"\\newlabel\{([^}]*)\}\{\{([^}]*)\}", open(f).read()))
-    if os.path.exists(f"{P}/ESM_1.aux") and os.path.exists(f"{P}/main.aux"):
-        esm, mn = lab(f"{P}/ESM_1.aux"), lab(f"{P}/main.aux")
-        for tlab, txt in [("tab:s-calib", "(Online Resource~1, Table~S2)"), ("tab:s-decomp", "(interquartile ranges in Online Resource~1, Table~S6)"),
-                          ("tab:s-abl", "(Online Resource~1, Table~S11)")]:
-            num = re.search(r"Table~(S\d+)", txt).group(1)
-            check_true(f"IJIS: {tlab} is {num} in ESM_1", esm.get(tlab) == num, txt)
-        check_true("IJIS: ESM cites main Tables 6 and 7 correctly", mn.get("tab:spoof") == "6" and mn.get("tab:cost") == "7",
-                   "the single-modality spoof analysis is Table~6 of the paper")
-        check_true("IJIS: ESM cites main Table 3 (system) correctly", mn.get("tab:system") == "3", "Table~3 of the paper")
-        check_true("IJIS: ESM cites main Sect. 3.5 / 6.4 and Fig. 3 correctly",
-                   mn.get("sec:calib") == "3.5" and mn.get("sec:cons") == "6.4" and mn.get("fig:scal") == "3",
-                   "(Sect.~3.5 of the paper)")
-        check_true("IJIS: Fig. 1 artwork refers to the GP as (3)", mn.get("eq:gp") == "3")
-        check_true("IJIS: ESM Sect. S1/S4 cited from main text exist", esm.get("sec:s-p2") == "S1" and esm.get("sec:s-repro") == "S4",
-                   "(Online Resource~1, Sect.~S4)")
-        check_true("v04: MLP table is S19 in ESM_1", esm.get("tab:s-mlp") == "S19", "(Online Resource~1, Table~S19)")
+    if NUMBERS_ONLY:
+        print("SKIP IJIS format checks (abstract, keywords, cross-references; need the manuscript source)"); n_skip += 1
     else:
-        check_true("IJIS: main.aux and ESM_1.aux present (compile first)", False)
+        ab_ = open(f"{P}/sections/s0_abstract.tex").read(); ab_ = ab_.split("\\begin{abstract}")[1].split("\\keywords")[0]
+        nw = len(re.split(r"\s+|--", re.sub(r"\$[^$]*\$", "X", ab_).replace("~", " ").strip()))
+        check_true(f"IJIS: abstract has {nw} words (150-250)", 150 <= nw <= 250)
+        kw = open(f"{P}/sections/s0_abstract.tex").read().split("\\keywords{")[1].split("}")[0].count("\\and") + 1
+        check_true(f"IJIS: {kw} keywords (4-6)", 4 <= kw <= 6)
+        lab = lambda f: dict(re.findall(r"\\newlabel\{([^}]*)\}\{\{([^}]*)\}", open(f).read()))
+        if os.path.exists(f"{P}/ESM_1.aux") and os.path.exists(f"{P}/main.aux"):
+            esm, mn = lab(f"{P}/ESM_1.aux"), lab(f"{P}/main.aux")
+            for tlab, txt in [("tab:s-calib", "(Online Resource~1, Table~S2)"), ("tab:s-decomp", "(interquartile ranges in Online Resource~1, Table~S6)"),
+                              ("tab:s-abl", "(Online Resource~1, Table~S11)")]:
+                num = re.search(r"Table~(S\d+)", txt).group(1)
+                check_true(f"IJIS: {tlab} is {num} in ESM_1", esm.get(tlab) == num, txt)
+            check_true("v08: ESM cites main Tables 8 and 9 correctly", mn.get("tab:spoof") == "8" and mn.get("tab:cost") == "9" and mn.get("tab:delta") == "1" and mn.get("tab:scope") == "2",
+                       "the single-modality spoof analysis is Table~8 of the paper")
+            check_true("v08: ESM cites main Table 5 (system) and Table 3 (data) correctly", mn.get("tab:system") == "5" and mn.get("tab:data") == "3", "Table~5 of the paper")
+            check_true("IJIS: ESM cites main Sect. 3.5 / 6.4 and Fig. 3 correctly",
+                       mn.get("sec:calib") == "3.5" and mn.get("sec:cons") == "6.4" and mn.get("fig:scal") == "3",
+                       "(Sect.~3.5 of the paper)")
+            check_true("IJIS: Fig. 1 artwork refers to the GP as (3)", mn.get("eq:gp") == "3")
+            check_true("v08: ESM Sect. S1/S4/S5 cited from main text exist", esm.get("sec:s-p2") == "S1" and esm.get("sec:s-sim") == "S4" and esm.get("sec:s-repro") == "S5"
+                       and mn.get("sec:sim") == "6.5", "(Online Resource~1, Sect.~S5)")
+            check_true("v08: new ESM tables S20-S22", esm.get("tab:s-dfour") == "S20" and esm.get("tab:s-sens") == "S21" and esm.get("tab:s-sim") == "S22",
+                       "(Online Resource~1, Sect.~S4 and Table~S22)")
+            check_true("v04: MLP table is S19 in ESM_1", esm.get("tab:s-mlp") == "S19", "(Online Resource~1, Table~S19)")
+        else:
+            check_true("IJIS: main.aux and ESM_1.aux present (compile first)", False)
 
 print("=" * 30, "Ablations (Section VI-F)")
 ab = tab("T_ablation_paired"); av = lambda v, a, c: ab[(ab.variant == v) & (ab.method == "LR-P1-N2") & np.isclose(ab.alpha, a)][c].iloc[0]
@@ -814,13 +911,17 @@ check("main FRR (uncalibrated)", av("abl_sample", 1e-3, "frr_test_main"), "0.009
 check("FAR-range restriction FRR", av("abl_region", 1e-3, "frr_test_variant"), "0.0432", "raised the FRR from 0.0093 to 0.0432")
 
 print("=" * 30, "Generated tables are current")
+if NUMBERS_ONLY:
+    print("SKIP regenerated table files (need the manuscript tables)"); n_skip += 1
+    print(f"\n{n_ok} checks passed, {len(fails)} failed, {n_skip} skipped (--numbers-only)" + (": " + "; ".join(fails) if fails else ""))
+    sys.exit(1 if fails else 0)
 before = {f: hashlib.md5(open(f, "rb").read()).hexdigest() for f in glob.glob(f"{P}/tables/*.tex")}
 subprocess.run([sys.executable, "make_main_tables.py"], capture_output=True, check=True, env={**os.environ, "PAPER": P})
 after = {f: hashlib.md5(open(f, "rb").read()).hexdigest() for f in glob.glob(f"{P}/tables/*.tex")}
 check_true("main-paper table bodies unchanged after regeneration", before == after)
 s_before = hashlib.md5(open(f"{P}/supp_tables.tex", "rb").read()).hexdigest()
 subprocess.run([sys.executable, "make_supp_tables.py"], capture_output=True, check=True, env={**os.environ, "PAPER": P})
-check_true("supplementary tables unchanged after regeneration", s_before == hashlib.md5(open(f"{P}/supp_tables.tex", "rb").read()).hexdigest())
+check_true("supplementary tables unchanged after regeneration", TXT(lambda: s_before == hashlib.md5(open(f"{P}/supp_tables.tex", "rb").read()).hexdigest()))
 
-print(f"\n{n_ok} checks passed, {len(fails)} failed" + (": " + "; ".join(fails) if fails else ""))
+print(f"\n{n_ok} checks passed, {len(fails)} failed" + (f", {n_skip} skipped (--numbers-only)" if n_skip else "") + (": " + "; ".join(fails) if fails else ""))
 sys.exit(1 if fails else 0)

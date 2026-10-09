@@ -248,7 +248,7 @@ _LO, _HI = "$^{\\mathrm{a}}$", "$^{\\mathrm{b}}$"
 _ML = [("LR-P1-N2", "Proposed"), ("HYP", "HYP"), ("S1-Marcialis", "Marcialis"), ("S2-Symmetric", "Symmetric"), ("S4-Direct", "Direct"),
        ("S3-SPRT", "SPRT"), ("P0-Parallel", "Sum"), ("P1-LLR", "LLR"), ("P2-LogReg", "LogReg")]
 _DS4 = {"fing_x_face": "D1", "fing_x_fing": "D2", "face_x_face": "D3", "lfw_x_fing": "D4"}
-def _grid(sysr, st, val, dss, count=True):
+def _grid(sysr, st, val, dss, count=True, xfit=False):
     rows = []
     for ds in dss:
         als = sorted(sysr[sysr.dataset == ds].alpha.unique(), reverse=True)
@@ -262,9 +262,13 @@ def _grid(sysr, st, val, dss, count=True):
                 if m != "LR-P1-N2" and len(s_) and pd.notna(s_.p_holm.iloc[0]) and s_.p_holm.iloc[0] < 0.05:
                     txt += _LO if s_.mean_diff.iloc[0] < 0 else _HI
                 n_ = int(r.get("n_seeds", r.get("n", 10)))
-                if count and "far_ok" in r and pd.notna(r.far_ok):
-                    txt += " (" + f"{r.far_ok * n_:.2f}".rstrip("0").rstrip(".") + ")"
-                if ("n_seeds" in sysr) and n_ < sysr[sysr.dataset == ds].n_seeds.max(): txt += "$^{\\mathrm{c}}$"   # per subset
+                fm_ = lambda v: f"{v:.2f}".rstrip("0").rstrip(".")
+                if xfit:          # v08: deployed designs meeting alpha / deployed designs (order fixed on fold A), one decimal
+                    f1 = lambda v: f"{v:.1f}".rstrip("0").rstrip(".")
+                    txt += f" ({f1(r.n_met)}/{f1(r.n_deployed)})"
+                elif count and "far_ok" in r and pd.notna(r.far_ok):
+                    txt += " (" + fm_(r.far_ok * n_) + ")"
+                if not xfit and ("n_seeds" in sysr) and n_ < sysr[sysr.dataset == ds].n_seeds.max(): txt += "$^{\\mathrm{c}}$"   # per subset
                 cells.append(txt)
             rows.append(" & ".join(cells) + r" \\")
         rows.append(r"\midrule")
@@ -277,18 +281,21 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_rev_matchedfar_system.csv"):
     out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-matched}\scriptsize\setlength{\tabcolsep}{3pt}" + _HDR)
     out += _grid(mf, mfs, "frr_matched", ["fing_x_face", "fing_x_fing", "face_x_face"], count=False)
     out.append(r"\bottomrule\end{tabular}" + _NOTE(" --, no design reaching the matched FAR.") + r"\end{table*}")
-    NEW_CAP["tab:s-matched"] = (r"Matched-FAR comparison (D1--D3, original splits): test FRR of the selected designs after the final threshold is re-set on the test half "
-                                r"to the most permissive value with test FAR $\le\alpha$ (earlier stage thresholds kept; oracle operating point), mean over ten splits")
+    NEW_CAP["tab:s-matched"] = (r"Oracle comparison under a common FAR cap (matched FAR; D1--D3, original splits): test FRR of the selected designs after the final threshold is re-set on the test half "
+                                r"to the most permissive value with test FAR $\le\alpha$ (earlier stage thresholds kept), mean over ten splits; the realized test FAR at the cap "
+                                r"was 0.83$\alpha$--1.00$\alpha$ (means per method and setting, lowest on D2), and comparisons are paired over the splits in which both designs reach the cap")
 if "ijis" in _PAPER and os.path.exists(f"{T}/T_fresh_system.csv"):
     fsy = pd.read_csv(f"{T}/T_fresh_system.csv"); fst = pd.read_csv(f"{T}/T_fresh_stats.csv")
     for cal, lab, dss, cap in [("boot", "tab:s-fresh", ["fing_x_face", "fing_x_fing", "face_x_face"],
                                 r"Replication on 20 further splits of D1--D3 (seeds 10--29; new halvings of the same subjects) with the calibration of the paper: test FRR of the selected designs (mean over the new splits) and, in parentheses, number of splits with test FAR $\le\alpha$ (tie-averaged)"),
                                ("xfit", "tab:s-xfit", ["fing_x_face", "fing_x_fing", "face_x_face", "lfw_x_fing"],
-                                r"Held-out calibration (20 new splits of D1--D3, ten splits of D4): design, stage thresholds and order selection on one half of the training subjects, final threshold by the subject bootstrap on the other half; test FRR (mean) and, in parentheses, number of splits with test FAR $\le\alpha$ (tie-averaged)")]:
+                                r"Held-out calibration (20 new splits of D1--D3, ten splits of D4): design, stage thresholds and order fixed on one half of the training subjects, final threshold by the subject bootstrap on the other half for that design only (no reselection if it fails); test FRR (mean over the deployed designs) and, in parentheses, deployed designs with test FAR $\le\alpha$ / deployed designs (tie-averaged, one decimal)")]:
         a_ = fsy[fsy.calib == cal]; b_ = fst[fst.calib == cal]
-        out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{" + lab + r"}\scriptsize\setlength{\tabcolsep}{2.5pt}" + _HDR)
-        out += _grid(a_, b_, "frr_test", dss)
-        out.append(r"\bottomrule\end{tabular}" + _NOTE(" $^{\mathrm{c}}$Mean over the splits with a feasible design only. --, no feasible design.") + r"\end{table*}")
+        out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{" + lab + r"}\scriptsize\setlength{\tabcolsep}{" + ("1.2pt" if cal == "xfit" else "2.5pt") + "}" + _HDR)
+        out += _grid(a_, b_, "frr_test", dss, xfit=(cal == "xfit"))
+        note_ = (" FRR averaged over the splits in which the fold-A design was deployed. --, no deployed design." if cal == "xfit"
+                 else " $^{\mathrm{c}}$Mean over the splits with a feasible design only. --, no feasible design.")
+        out.append(r"\bottomrule\end{tabular}" + _NOTE(note_) + r"\end{table*}")
         NEW_CAP[lab] = cap
 if "ijis" in _PAPER and os.path.exists(f"{T}/T_fresh_matchedfar_system.csv"):   # IJIS v02: matched FAR on the new splits and D4
     mfn = pd.read_csv(f"{T}/T_fresh_matchedfar_system.csv").assign(n_seeds=lambda d: d.n_feasible_all)
@@ -296,8 +303,9 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_fresh_matchedfar_system.csv"):   
     out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-matchednew}\scriptsize\setlength{\tabcolsep}{3pt}" + _HDR)
     out += _grid(mfn, mfns, "frr_matched", ["fing_x_face", "fing_x_fing", "face_x_face", "lfw_x_fing"], count=False)
     out.append(r"\bottomrule\end{tabular}" + _NOTE(" $^{\mathrm{c}}$Mean over the splits in which the matched FAR could be reached. --, no design reaching the matched FAR.") + r"\end{table*}")
-    NEW_CAP["tab:s-matchednew"] = (r"Matched-FAR comparison on the 20 new splits of D1--D3 and the ten splits of D4 (calibration of the paper): test FRR of the selected designs "
-                                   r"after the final threshold is re-set on the test half to the most permissive value with test FAR $\le\alpha$ (earlier stage thresholds kept; oracle operating point), mean over the splits")
+    NEW_CAP["tab:s-matchednew"] = (r"Oracle comparison under a common FAR cap (matched FAR) on the 20 new splits of D1--D3 and the ten splits of D4 (calibration of the paper): test FRR of the selected designs "
+                                   r"after the final threshold is re-set on the test half to the most permissive value with test FAR $\le\alpha$ (earlier stage thresholds kept), mean over the splits; "
+                                   r"the realized test FAR at the cap was 0.78$\alpha$--1.00$\alpha$ (means per method and setting, lowest on D2), and comparisons are paired over the splits in which both designs reach the cap")
 if "ijis" in _PAPER and os.path.exists(f"{T}/T_mlp_system.csv"):   # IJIS v04: MLP fusion baseline (secondary, unadjusted p)
     msy = pd.read_csv(f"{T}/T_mlp_system.csv"); mst = pd.read_csv(f"{T}/T_mlp_stats.csv")
     out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-mlp}\scriptsize\setlength{\tabcolsep}{4pt}"
@@ -326,6 +334,73 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_mlp_system.csv"):   # IJIS v04: M
     NEW_CAP["tab:s-mlp"] = (r"Parallel fusion by a multilayer perceptron (MLP; two hidden layers of 16 rectified linear units; secondary baseline): "
                             r"test FRR (mean over the splits) with, in parentheses, the number of splits with test FAR $\le\alpha$, and the test FRR of the "
                             r"selected proposed design (order selected by training FRR, ties averaged), LLR fusion, and logistic regression on the same splits and with the same calibration")
+# ---- IJIS v08: D4 candidate sets, calibration sensitivity, controlled simulation (Springer version only)
+_AL = {1e-2: "$10^{-2}$", 1e-3: "$10^{-3}$", 1e-4: "$10^{-4}$"}
+_f4 = lambda v: f"{v:.4f}"
+if "ijis" in _PAPER and os.path.exists(f"{T}/T_d4_subsets.csv"):
+    d4 = pd.read_csv(f"{T}/T_d4_subsets.csv")
+    out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-dfour}\footnotesize\setlength{\tabcolsep}{6pt}"
+               r"\begin{tabular}{@{}llcccc@{}}\toprule $\alpha$ & Design & FRR & FAR $\le\alpha$ & Stages & Difference [95\% CI] \\\midrule")
+    NAMES = [("face only", "Face only"), ("face and one finger", "Face and one finger"), ("three matchers", "Three matchers"),
+             ("all orders (paper)", "All orders (paper)"), ("S3-SPRT", "SPRT"), ("P1-LLR", "LLR fusion")]
+    for k, a in enumerate([1e-2, 1e-3, 1e-4]):
+        for j, (key, lab) in enumerate(NAMES):
+            r = d4[np.isclose(d4.alpha, a) & (d4.design == key)].iloc[0]
+            dif = "--" if key == "face only" else f"{r.diff_vs_face:+.4f} [{r.ci_lo:+.4f}, {r.ci_hi:+.4f}]".replace("+", "$+$").replace("-", "$-$")
+            nm = f"{r.n_met:.2f}".rstrip("0").rstrip(".")
+            out.append(f"{_AL[a] if j == 0 else ''} & {lab} & {_f4(r.frr_test)} & {nm}/10 & {r.stages_gen:.2f} & {dif} \\\\")
+        out.append(r"\midrule")
+    out[-1] = r"\bottomrule\end{tabular}\end{table*}"
+    NEW_CAP["tab:s-dfour"] = (r"D4 with the candidate orders of the proposed design restricted to the face matcher alone, to the face and one finger, "
+                              r"and to the three-stage chains, each with the subject-bootstrap calibration and selection by training FRR of the paper "
+                              r"(ten splits): mean test FRR, number of splits with test FAR $\le\alpha$, stages per genuine claim (parallel fusion acquires all three), "
+                              r"and mean FRR difference to the face-only design with its corrected resampled 95\% confidence interval")
+if "ijis" in _PAPER and os.path.exists(f"{T}/T_sens_summary.csv"):
+    ss = pd.read_csv(f"{T}/T_sens_summary.csv").set_index("variant"); sy = pd.read_csv(f"{T}/T_sens_system.csv")
+    VN = [("paper", "Paper ($B=300$, seed $1000+j$)"), ("B1000", "$B=1000$"), ("seed7000", "Seed $7000+j$"), ("seed8000", "Seed $8000+j$"),
+          ("nofloor", "No step-(i) floor")]
+    out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-sens}\footnotesize\setlength{\tabcolsep}{4pt}"
+               r"\begin{tabular}{@{}lccccc@{}}\toprule (a) & " + " & ".join(l for _, l in VN) + r" \\\midrule")
+    def _r(lab, fn): out.append(lab + " & " + " & ".join(fn(ss.loc[v]) for v, _ in VN) + r" \\")
+    _r("Designs with a changed final threshold", lambda r: "--" if r.name == "paper" else f"{100 * r.thr_changed_share:.0f}\\%")
+    _r(r"Mean / max change of training FAR ($\alpha$)", lambda r: "--" if r.name == "paper" else f"{r.dfar_train_mean_alpha:.3f} / {r.dfar_train_max_alpha:.2f}")
+    _r("Designs whose feasibility changed", lambda r: "--" if r.name == "paper" else f"{int(r.feasibility_changed)} of {int(r.designs)}")
+    _r("Holm decisions unchanged", lambda r: f"{int(r.decisions_kept)} of {int(r.decisions_compared)}")
+    out.append(r"\midrule (b) Proposed design & \multicolumn{5}{c}{Test FRR (splits with test FAR $\le\alpha$)} \\\midrule")
+    for ds in ["fing_x_face", "fing_x_fing", "face_x_face"]:
+        for a in sorted(sy[sy.dataset == ds].alpha.unique(), reverse=True):
+            cells = []
+            for v, _ in VN:
+                r = sy[(sy.variant == v) & (sy.dataset == ds) & np.isclose(sy.alpha, a) & (sy.method == "LR-P1-N2")].iloc[0]
+                cells.append(f"{r.frr_test:.4f} (" + f"{r.n_met:.2f}".rstrip("0").rstrip(".") + ")")
+            out.append(f"{_DS4[ds]}, $\\alpha=${_AL[a]} & " + " & ".join(cells) + r" \\")
+    out.append(r"\bottomrule\end{tabular}\end{table*}")
+    NEW_CAP["tab:s-sens"] = (r"Sensitivity of the subject-bootstrap calibration on the original splits of D1--D3: every order of every primary method was "
+                             r"recalibrated and the order re-selected by training FRR under each variant ($j$, split index). (a) Share of the feasible "
+                             r"designs whose final threshold changed relative to the paper variant, change of their training FAR, designs that became "
+                             r"feasible or infeasible, and Holm decisions of the primary comparisons (proposed design lower, higher, or not significantly "
+                             r"different) that are unchanged. (b) Selected proposed designs, mean over ten splits")
+if "ijis" in _PAPER and os.path.exists(f"{T}/T_sim.csv"):
+    sm = pd.read_csv(f"{T}/T_sim.csv")
+    out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-sim}\footnotesize\setlength{\tabcolsep}{3.5pt}"
+               r"\begin{tabular}{@{}cccccccccc@{}}\toprule & & & \multicolumn{2}{c}{Bootstrap calibration} & \multicolumn{3}{c}{Held-out calibration} & \multicolumn{2}{c}{Prediction (two-stage designs)} \\"
+               r"\cmidrule(lr){4-5}\cmidrule(lr){6-8}\cmidrule(lr){9-10}"
+               r"$N$ & $\rho$ & $\alpha$ & FAR $\le\alpha$ [95\% CI] & FAR$/\alpha$ & Deployed & FAR $\le\alpha$ & FAR$/\alpha$ & $\ge$ population FRR & $\ge$ joint training FRR \\\midrule")
+    pc = lambda v: f"{100 * v:.1f}\\%"
+    for N in sorted(sm.N.unique()):
+        for rho in sorted(sm.rho_g.unique()):
+            for a in [1e-2, 1e-3]:
+                r = sm[(sm.N == N) & np.isclose(sm.rho_g, rho) & np.isclose(sm.alpha, a)].iloc[0]
+                out.append(f"{N} & {rho:.1f} & {_AL[a]} & {pc(r.cov_selected)} [{100 * r.cov_lo:.1f}, {100 * r.cov_hi:.1f}] & {r.far_pop_over_alpha:.2f} & "
+                           f"{pc(r.xfit_deployed)} & {pc(r.xfit_cov_deployed)} & {r.xfit_far_pop_over_alpha:.2f} & {pc(r.pred_ge_pop_two_stage)} & {pc(r.pred_ge_joint_two_stage)} \\\\")
+        out.append(r"\midrule")
+    out[-1] = r"\bottomrule\end{tabular}\end{table*}"
+    NEW_CAP["tab:s-sim"] = (r"Controlled simulation (Sect.~\ref{sec:s-sim}): population FAR compliance of the deployed proposed design (share of replicates with "
+                            r"population FAR $\le\alpha$, Wilson 95\% interval, and mean population FAR$/\alpha$) with the bootstrap calibration on all $N$ "
+                            r"training subjects and with the held-out calibration (order fixed on $N/2$ subjects, final threshold on the other $N/2$; share of "
+                            r"replicates with a deployed design and compliance among them), and share of the calibrated two-stage designs whose step-(iii) "
+                            r"prediction is at least the population FRR and at least the joint training FRR; $\rho$, genuine-score correlation (impostor $\rho/3$); "
+                            r"200 ($N=500$) and 100 ($N=1500$) replicates")
 text = "\n".join(out) + "\n"
 PAPER = os.environ.get("PAPER", "../paper")
 if "ijis" in PAPER:

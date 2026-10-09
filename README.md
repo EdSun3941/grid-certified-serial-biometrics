@@ -10,9 +10,10 @@ Code and per-split results for the article
 
 The package designs the thresholds of a serial (sequential) multibiometric verification system by geometric
 programming under a system-level false acceptance rate (FAR) requirement. Each matcher's empirical FAR–FRR trade-off is
-replaced by a posynomial envelope that dominates the corner points of its operating staircase, which makes the design
-safe for every recovered threshold. The envelopes are fitted by a branch-and-bound search whose bounds come from the
-exact Lagrangian dual of the fitting problem, which certifies global optimality over the exponent grid. The evaluation
+replaced by a posynomial envelope that dominates the corner points of its operating staircase, which bounds the training
+FRR of every threshold with positive FAR. The envelopes are fitted by a branch-and-bound search whose bounds come from the
+exact Lagrangian dual of the fitting problem, which gives a numerical (double-precision) certificate of global optimality
+over the exponent grid. The evaluation
 compares the designs with decision-level serial rules, a sequential probability ratio test and parallel score fusion
 (including a small multilayer perceptron) on three subsets of NIST BSSR1 and a chimeric LFW + BSSR1 subset.
 
@@ -22,7 +23,7 @@ compares the designs with decision-level serial rules, a sequential probability 
 |---|---|
 | `code/` | all scripts (Python 3), job lists, the one-command driver `run_all.sh`, and `code/README.md` with a table mapping every experiment to its script, output and place in the article |
 | `code/dev/` | diagnostics used during development; not needed to reproduce the article |
-| `results/` | per-split CSV outputs of every experiment (`E1`, `E1xd`, `E2`, `E2ref`, `E2v2`, `E2miqp`, `E3`, `E3b`, `E3cal`, `E3fresh`, `E3mlp`, `E7`, `E7v2`, `E8`, `S3`), the table CSVs in `results/tables` (each with a `source` column naming its inputs), the figures, and the run logs |
+| `results/` | per-split CSV outputs of every experiment (`E1`, `E1xd`, `E2`, `E2ref`, `E2v2`, `E2miqp`, `E3`, `E3b`, `E3cal`, `E3fresh`, `E3mlp`, `E3sensall`, `E7`, `E7v2`, `E8`, `E9sim`, `S3`), the table CSVs in `results/tables` (each with a `source` column naming its inputs), the figures, and the run logs |
 | `results/E3b_round1` | E3b rows before the refit of the system envelopes by the exact-dual LR-BB (kept for comparison, see `code/README.md`) |
 | `results/E3fresh_provenance.csv` | which machine computed each file of `E3fresh` and the outcome of the cross-machine comparison |
 | `results/E3fresh_pc_overlap/` | the second machine's copies of the seven splits computed on both machines |
@@ -66,7 +67,9 @@ python analyze_rev.py && python analyze_fresh.py && python analyze_mlp.py
 ```
 
 `code/verify_numbers.py` recomputes every number quoted in the article from these CSV files and compares it with the
-manuscript source; the manuscript source is not part of this repository.
+manuscript source. The manuscript source is not part of this repository; without it, `python verify_numbers.py
+--numbers-only` (run with `PAPER=../paper_ijis`) compares every recomputed number with the printed value written into the
+script and skips only the checks that need the LaTeX source (phrases, reference list, labels, regenerated table files).
 
 ## Seeds
 
@@ -75,10 +78,22 @@ all procedures were fixed before these splits were run); D4 uses seeds 0–9. Th
 1000 + split (B = 300). The held-out calibration splits the training subjects with seed 5000 + split and bootstraps
 fold A with seed 3000 + split and fold B with seed 4000 + split. Further seeds are listed in `code/README.md`.
 
+## Version history
+
+- **v1.1.0** (October 2026, revision after review): the held-out calibration now fixes the order of every method on
+  fold A before fold B is used, and a split whose fold-A design cannot be calibrated on fold B has no deployed design
+  (`analyze_fresh.py`; previously, orders that failed on fold B were dropped before the selection). The runs are
+  unchanged; `T_fresh_*.csv` and `T_mlp_stats.csv` are recomputed. New: calibration sensitivity with order re-selection
+  (`calib_sensitivity_all.py`, `analyze_sens.py`, `results/E3sensall`), a controlled simulation with known population
+  error rates (`sim_controlled.py`, `analyze_sim.py`, `results/E9sim`), the D4 candidate-set analysis
+  (`analyze_d4_subsets.py`), and `verify_numbers.py --numbers-only`. See `code/README.md`, section "IJIS v08".
+- **v1.0.0** (October 2026): version of the first submission.
+
 ## Citation
 
-See `CITATION.cff`. Version 1.0.0 of this repository, the version used for the article, is archived at Zenodo:
-https://doi.org/10.5281/zenodo.23072674. Please cite the article once it is published.
+See `CITATION.cff`. Every release is archived at Zenodo; version 1.0.0 (first submission) is
+https://doi.org/10.5281/zenodo.23072674, and version 1.1.0 (revision) is the version used for the revised article.
+Please cite the article once it is published.
 
 ## License
 
