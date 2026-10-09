@@ -779,6 +779,8 @@ if SPRINGER:
                "\\url{https://doi.org/10.3390/math14071178} (corrected version; correction published in Mathematics 14(9), 1428 (2026), \\url{https://doi.org/10.3390/math14091428})" in refs5)
     check_true("v06: [bssr1] uses the current NIST address (iad/btg) and no old image-group address remains",
                "\\url{https://www.nist.gov/itl/iad/btg/nist-biometric-scores-set-bssr1}" in refs5 and "image-group" not in refs5 and "image-group" not in ALL)
+    check_true("v07: [iso19795] cites the corrected version 2024-09 of ISO/IEC 19795-1:2021",
+               "Part 1: Principles and framework, 2nd edn., corrected version 2024-09. International Organization for Standardization, Geneva (2021)" in refs5)
     print("=" * 30, "IJIS format checks")
     ab_ = open(f"{P}/sections/s0_abstract.tex").read(); ab_ = ab_.split("\\begin{abstract}")[1].split("\\keywords")[0]
     nw = len(re.split(r"\s+|--", re.sub(r"\$[^$]*\$", "X", ab_).replace("~", " ").strip()))

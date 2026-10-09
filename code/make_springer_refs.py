@@ -123,7 +123,8 @@ def entry(key, typ, f):
         return f"{a}: {t}. Master's thesis, Department of Information Management, National Taiwan University, Taipei, Taiwan ({y}).{doi(f)}"
     if typ == "misc" and f.get("howpublished", "").startswith("ISO/IEC"):
         std = f["howpublished"].split(",")[0]
-        return (f"{a}: {std} {t}, 2nd edn. International Organization for Standardization, Geneva ({y})")
+        edn = "2nd edn." if "addendum" not in f else f"2nd edn., {f['addendum']}."     # e.g. an ISO corrected version
+        return (f"{a}: {std} {t}, {edn} International Organization for Standardization, Geneva ({y})")
     if typ == "misc" and key == "bssr1":
         url = re.search(r"\\url\{([^}]*)\}", f["howpublished"]).group(1)
         acc = f.get("note", "").replace("Accessed: ", "")
