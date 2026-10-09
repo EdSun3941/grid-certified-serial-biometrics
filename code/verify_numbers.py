@@ -762,7 +762,7 @@ if SPRINGER:
     check_true("v05: reference list in Springer basic style (no '?.', no final period, full author list of chen2025, dated online document)",
                "?." not in refs5 and not any(l.rstrip().endswith(".") for l in refs5.splitlines() if l.startswith("\\bibitem"))
                and "Tai, K.-Y., Hsiao, C.-H., Wang, W.-H., Tsai, M.-C., Sun, T.-L." in refs5
-               and "nist-biometric-scores-set-bssr1} (2017). Accessed 29 September 2026" in refs5)
+               and "nist-biometric-scores-set-bssr1} (2017). Accessed 9 October 2026" in refs5)
     check_true("v05: declarations (ethics, consent to participate, consent for publication, data URLs) and ESM description",
                "\\paragraph{Consent to participate} Not applicable." in SRC["main.tex"] and "\\paragraph{Consent for publication}" in SRC["main.tex"]
                and "\\url{http://vis-www.cs.umass.edu/lfw/}" in SRC["main.tex"] and "\\url{https://github.com/opencv/opencv_zoo}" in SRC["main.tex"]
@@ -774,6 +774,11 @@ if SPRINGER:
                and f"\\url{{https://doi.org/{doi5}}}" in open(f"{P}/references.tex").read())
     check_true("v05: logarithmic change of variables (no z overload); tolerance of the certificate stated",
                "$z=\\log" not in ALL, "within a relative tolerance of $10^{-4}$")
+    print("=" * 30, "IJIS v06: reference audit of 2026-10-09")
+    check_true("v06: [rastogi2026] cites the corrected version with its correction notice (DOI 10.3390/math14091428)",
+               "\\url{https://doi.org/10.3390/math14071178} (corrected version; correction published in Mathematics 14(9), 1428 (2026), \\url{https://doi.org/10.3390/math14091428})" in refs5)
+    check_true("v06: [bssr1] uses the current NIST address (iad/btg) and no old image-group address remains",
+               "\\url{https://www.nist.gov/itl/iad/btg/nist-biometric-scores-set-bssr1}" in refs5 and "image-group" not in refs5 and "image-group" not in ALL)
     print("=" * 30, "IJIS format checks")
     ab_ = open(f"{P}/sections/s0_abstract.tex").read(); ab_ = ab_.split("\\begin{abstract}")[1].split("\\keywords")[0]
     nw = len(re.split(r"\s+|--", re.sub(r"\$[^$]*\$", "X", ab_).replace("~", " ").strip()))

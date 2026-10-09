@@ -107,7 +107,7 @@ def entry(key, typ, f):
         j = FULL[f["journal"]]
         vol = f.get("volume", ""); num = f"({f['number']})" if "number" in f else ""; pg = f.get("pages", "")
         src = j + (f" {vol}{num}" if vol else "") + (f", {pg}" if pg else "")
-        return f"{a}: {t}. {src} ({y}).{doi(f)}"
+        return f"{a}: {t}. {src} ({y}).{doi(f)}" + (f" ({f['addendum']})" if "addendum" in f else "")   # e.g. a published correction
     if typ == "inproceedings":
         return f"{a}: {t}. In: {BOOKTITLE[f['booktitle']]}, pp.~{f['pages']} ({y}).{doi(f)}"
     if typ == "incollection":
@@ -128,7 +128,7 @@ def entry(key, typ, f):
         url = re.search(r"\\url\{([^}]*)\}", f["howpublished"]).group(1)
         acc = f.get("note", "").replace("Accessed: ", "")
         m = re.match(r"(\w+)\. (\d+), (\d+)", acc)
-        mon = {"Sep": "September"}.get(m.group(1), m.group(1)) if m else ""
+        mon = {"Sep": "September", "Oct": "October"}.get(m.group(1), m.group(1)) if m else ""
         return f"{a}: {t}. \\url{{{url}}} ({y}). Accessed {m.group(2)} {mon} {m.group(3)}"   # online document (Springer example)
     if typ == "misc" and f.get("publisher") == "Zenodo":                 # software / data archive with a DOI
         return f"{a}: {t}, {f['version']}. Zenodo ({y}).{doi(f)}"

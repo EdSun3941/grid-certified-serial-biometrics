@@ -16,7 +16,7 @@ supplementary material, and of an earlier IEEE-format draft of the same work (`.
 
 ## Data
 NIST Biometric Scores Set Release 1 (BSSR1), free download from NIST
-(https://www.nist.gov/itl/iad/image-group/nist-biometric-scores-set-bssr1). The raw score files are not redistributed.
+(https://www.nist.gov/itl/iad/btg/nist-biometric-scores-set-bssr1). The raw score files are not redistributed.
 ```
 python prepare_bssr1.py <bssr1_root> ../data/processed chunk <subset> <matcher> <row_start> <row_stop>   # repeat per chunk
 python prepare_bssr1.py <bssr1_root> ../data/processed combine <subset>

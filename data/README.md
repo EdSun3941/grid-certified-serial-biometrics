@@ -6,7 +6,7 @@ variable `BSSR1_DIR`, else in `data/`, else in `data/processed/`.
 ## Subsets D1–D3: NIST BSSR1
 
 Download the NIST Biometric Scores Set Release 1 (BSSR1) from
-https://www.nist.gov/itl/iad/image-group/nist-biometric-scores-set-bssr1 and convert it:
+https://www.nist.gov/itl/iad/btg/nist-biometric-scores-set-bssr1 and convert it:
 
 ```
 cd code
