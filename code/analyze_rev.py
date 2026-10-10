@@ -27,6 +27,20 @@ def corrected_t(d):
     t = m / se; p = 2 * stats.t.sf(abs(t), K - 1); h = stats.t.ppf(0.975, K - 1) * se
     return m, (m - h, m + h), p
 
+def corrected_t_w(d, w):
+    """IJIS v12: corrected resampled t-test for paired differences d_j with weights w_j in (0, 1] (the probability that
+    both designs are deployed in split j when each method breaks fold-A ties independently and at random before fold B
+    is used).  Weighted mean; reliability-weighted variance; effective number of splits K_eff = (sum w)^2 / sum w^2 in
+    place of K, with K_eff - 1 degrees of freedom.  With all weights equal to one it is corrected_t(d)."""
+    d = np.asarray(d, float); w = np.asarray(w, float)
+    if np.allclose(w, 1.0): return corrected_t(d)
+    sw = w.sum(); m = float((w * d).sum() / sw); keff = sw ** 2 / (w ** 2).sum()
+    v = float((w * (d - m) ** 2).sum() / (sw - (w ** 2).sum() / sw))
+    se = np.sqrt((1.0 / keff + N_TE_OVER_N_TR) * v)
+    if se == 0: return m, (m, m), (0.0 if m != 0 else 1.0)
+    t = m / se; p = 2 * stats.t.sf(abs(t), keff - 1); h = stats.t.ppf(0.975, keff - 1) * se
+    return m, (m - h, m + h), p
+
 def load():
     fs = sorted(glob.glob(f"{R}/E3b/main_*.csv"))
     return pd.concat([pd.read_csv(f) for f in fs], ignore_index=True), fs

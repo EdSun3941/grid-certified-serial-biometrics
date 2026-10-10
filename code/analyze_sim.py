@@ -3,7 +3,10 @@ Per training size N, genuine correlation rho_g and alpha: coverage of the popula
 (selected, tie-averaged) proposed design and by all calibrated designs, Wilson 95% interval of the selected-design
 coverage, mean population FAR / alpha, how often the step-(iii) prediction bounds the population FRR and the joint
 training FRR, and how often it bounds the training FRR under the product of the per-matcher training distributions
-(Lemma, Proposition 1).  Output: results/tables/T_sim.csv"""
+(Lemma, Proposition 1).  v12: the coverage of a replicate is tie-averaged and can be fractional; the Wilson interval
+treats it as a Bernoulli outcome, which is conservative because an outcome in [0, 1] with mean p has variance at most
+p(1 - p); the number of replicates with a fractional outcome is reported (frac_reps, xfit_frac_reps).
+Output: results/tables/T_sim.csv"""
 import glob, numpy as np, pandas as pd
 R = "../results"; OUT = f"{R}/tables"
 
@@ -24,9 +27,10 @@ def main():
         w = 1.0 / sel.groupby("rep").order.transform("size")                     # tie-averaging weights
         ok = (sel.far_pop <= a).astype(float)
         k_sel = float((w * ok).sum()); n_sel = float(w.sum())
+        y_r = (w * ok).groupby(sel.rep).sum(); frac = int(((y_r > 1e-12) & (y_r < 1 - 1e-12)).sum())
         lo, hi = wilson(k_sel, n_sel)
         two = f[f.n_stages == 2]
-        row = dict(N=N, rho_g=rho, rho_i=g.rho_i.iloc[0], alpha=a, reps=reps, reps_deployed=int(sel.rep.nunique()),
+        row = dict(N=N, rho_g=rho, rho_i=g.rho_i.iloc[0], alpha=a, reps=reps, reps_deployed=int(sel.rep.nunique()), frac_reps=frac,
                    cov_selected=k_sel / n_sel, cov_lo=lo, cov_hi=hi,
                    far_pop_over_alpha=float((w * sel.far_pop).sum() / n_sel / a),
                    cov_all=float((f.far_pop <= a).mean()), n_designs=len(f),
@@ -45,7 +49,8 @@ def main():
             dep = xs.deployed.astype(bool); n_dep = float((wx * dep).sum())
             okx = ((xs.far_pop <= a) & dep).astype(float); k_x = float((wx * okx).sum())
             lo2, hi2 = wilson(k_x, n_dep)
-            row.update(xfit_reps=int(x.rep.nunique()), xfit_deployed=n_dep / x.rep.nunique(), xfit_cov_deployed=k_x / n_dep if n_dep else np.nan,
+            yd = (wx * dep).groupby(xs.rep).sum(); xfrac = int(((yd > 1e-12) & (yd < 1 - 1e-12)).sum())
+            row.update(xfit_frac_reps=xfrac, xfit_reps=int(x.rep.nunique()), xfit_deployed=n_dep / x.rep.nunique(), xfit_cov_deployed=k_x / n_dep if n_dep else np.nan,
                        xfit_cov_lo=lo2, xfit_cov_hi=hi2, xfit_cov_all=k_x / x.rep.nunique(),
                        xfit_far_pop_over_alpha=float((wx[dep] * xs.far_pop[dep]).sum() / n_dep / a) if n_dep else np.nan,
                        xfit_frr_pop=float((wx[dep] * xs.frr_pop[dep]).sum() / n_dep) if n_dep else np.nan)

@@ -80,6 +80,17 @@ fold A with seed 3000 + split and fold B with seed 4000 + split. Further seeds a
 
 ## Version history
 
+- **v1.3.0** (October 2026, second revision after review): estimand of the held-out calibration. All counts and means are
+  expectations over a uniform random tie-break among the best fold-A orders, made before fold B is used; means over the
+  deployed designs (test FRR, FAR, stages) are now weighted by the deployment probability p_j of each split
+  (`analyze_fresh.py`, `analyze_foldA.py`, `analyze_mlp.py`), and the paired tests of the held-out calibration weight
+  each split by the probability that both designs are deployed (`corrected_t_w` in `analyze_rev.py`). Only D1 and D4
+  change (held-out FRRs by -8.5 % to +10.4 %); no Holm decision changes. New: the fold-A-only control by the outcome of
+  the held-out calibration with paired differences (`T_foldA_categories.csv`, `T_foldA_pairdiff.csv`), a single random
+  tie-break sensitivity analysis (`tiebreak_sens.py`), the count of fractional simulation outcomes (`analyze_sim.py`),
+  and checks for the revised article in `verify_numbers.py`, whose solver-version check now reports a different
+  running environment as information instead of a failure. Runs are unchanged. The preferred citation lists the six
+  authors of the article. See `code/README.md`, section "IJIS v12".
 - **v1.2.0** (October 2026, revision after review): new title of the article ("Grid-Certified Corner-Dominating
   FAR–FRR Envelopes ..."). New: a fold-A-only control of the held-out calibration (`run_foldA.py`, `analyze_foldA.py`,
   `results/E3foldA`; the fold-A designs reproduce those of `results/E3fresh`), and a sensitivity analysis of the
@@ -99,8 +110,8 @@ fold A with seed 3000 + split and fold B with seed 4000 + split. Further seeds a
 
 ## Citation
 
-See `CITATION.cff`. Every release is archived at Zenodo; version 1.0.0 (first submission) is
-https://doi.org/10.5281/zenodo.23072674, and version 1.2.0 (revision) is the version used for the revised article.
+See `CITATION.cff`. Version 1.0.0 (first submission) is archived at Zenodo, https://doi.org/10.5281/zenodo.23072674;
+version 1.3.0 is the version used for the revised article (version 1.2.0 was used for the previous revision).
 Please cite the article once it is published.
 
 ## License

@@ -3,9 +3,11 @@ Holm family.  For each subset, split set (original splits 0-9 of D1-D3; new spli
 calibration and alpha: mean test FRR, FAR compliance and mean test FAR / alpha of the MLP, and paired differences of
 the MLP to the proposed design and to logistic-regression fusion (selected designs of T_rev_selected.csv or
 T_fresh_selected.csv), with the corrected resampled t-test (unadjusted p and 95% CI).
+v12: paired with a held-out design that is deployed with probability p_j < 1 (random tie-break before fold B), split j has
+weight p_j (the MLP is always deployed) and the weighted corrected t-test of analyze_rev.corrected_t_w is used.
 Outputs results/tables/T_mlp_system.csv and T_mlp_stats.csv."""
 import glob, numpy as np, pandas as pd
-from analyze_rev import corrected_t, MAIN
+from analyze_rev import corrected_t, corrected_t_w, MAIN
 
 R = "../results"; OUT = f"{R}/tables"
 
@@ -26,19 +28,21 @@ def main():
     sysr["source"] = src; sysr.to_csv(f"{OUT}/T_mlp_system.csv", index=False)
     old = pd.read_csv(f"{OUT}/T_rev_selected.csv").assign(calib="boot")
     new = pd.read_csv(f"{OUT}/T_fresh_selected.csv")
-    ref = pd.concat([old[["dataset", "seed", "alpha", "method", "calib", "frr_test"]], new[["dataset", "seed", "alpha", "method", "calib", "frr_test"]]],
+    old["p_deploy"] = 1.0
+    ref = pd.concat([old[["dataset", "seed", "alpha", "method", "calib", "frr_test", "p_deploy"]], new[["dataset", "seed", "alpha", "method", "calib", "frr_test", "p_deploy"]]],
                     ignore_index=True).dropna(subset=["frr_test"])     # v08: held-out splits without a deployed design are excluded
     rows = []
     for (ds, ss, cal, a), g in m[m.feasible == True].groupby(["dataset", "split_set", "calib", "alpha"]):
         mv = g.set_index("seed").frr_test
         for other in [MAIN, "P2-LogReg", "P1-LLR"]:
-            o = ref[(ref.dataset == ds) & (ref.calib == cal) & np.isclose(ref.alpha, a) & (ref.method == other)].set_index("seed").frr_test
-            c = mv.index.intersection(o.index)
+            oo = ref[(ref.dataset == ds) & (ref.calib == cal) & np.isclose(ref.alpha, a) & (ref.method == other)].set_index("seed")
+            o = oo.frr_test; c = mv.index.intersection(o.index)
             if len(c) < 5: continue
-            d = (mv[c] - o[c]).values; mean, ci, p = corrected_t(d)
+            w = oo.p_deploy[c].values                                   # v12: probability that the compared design is deployed
+            d = (mv[c] - o[c]).values; mean, ci, p = corrected_t_w(d, w)
             rows.append(dict(dataset=ds, split_set=ss, calib=cal, alpha=a, other=other, n=len(c), mean_diff=mean, ci_lo=ci[0], ci_hi=ci[1],
                              p_unadj=p, n_mlp_lower=int((d < 0).sum()), n_mlp_higher=int((d > 0).sum()),
-                             frr_mlp=mv[c].mean(), frr_other=o[c].mean()))
+                             frr_mlp=float((w * mv[c].values).sum() / w.sum()), frr_other=float((w * o[c].values).sum() / w.sum())))
     st = pd.DataFrame(rows); st["source"] = f"{src}; T_rev_selected.csv, T_fresh_selected.csv; corrected resampled t-test (unadjusted)"
     st.to_csv(f"{OUT}/T_mlp_stats.csv", index=False)
     pd.set_option("display.width", 220)

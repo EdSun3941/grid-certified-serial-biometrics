@@ -12,7 +12,12 @@ the held-out calibration (xfit) of results/E3fresh.
     Compliance of the three arms on the splits in which xfit deployed every / none of the tied fold-A orders.
 (4) Pooled over subsets and requirements, per method: share of splits with a compliant deployed design and share of the
     deployed designs that met alpha.
-Outputs: results/tables/T_foldA_repro.csv, T_foldA_selected.csv, T_foldA_system.csv, T_foldA_paired.csv, T_foldA_methods.csv"""
+(5) v12 (review of v11, R2): the proposed design by deployment category of the held-out calibration (all / partly / no tied
+    fold-A order deployed): paired test FAR/alpha and FRR of the fold-A-only and held-out designs on the deployed orders,
+    and the fold-A-only designs on the undeployed orders; per subset and requirement, the weighted corrected t interval of
+    the paired differences.  v12 also reports the held-out FRR and FAR as deployment-conditional means (weights p_j).
+Outputs: results/tables/T_foldA_repro.csv, T_foldA_selected.csv, T_foldA_system.csv, T_foldA_paired.csv, T_foldA_methods.csv,
+         T_foldA_categories.csv, T_foldA_category_splits.csv, T_foldA_pairdiff.csv"""
 import glob, json, numpy as np, pandas as pd
 from analyze_rev import MAIN
 R = "../results"; OUT = f"{R}/tables"
@@ -82,7 +87,9 @@ def main():
     SEL.assign(source=f"T_fresh_selected.csv + {src}").to_csv(f"{OUT}/T_foldA_selected.csv", index=False)
     # (3) system summary
     agg = SEL.groupby(["dataset", "alpha", "calib", "method"]).agg(n_splits=("seed", "size"), n_deployed=("p_deploy", "sum"), n_met=("met", "sum")).reset_index()
-    dep = SEL[SEL.p_deploy > 0].groupby(["dataset", "alpha", "calib", "method"]).agg(frr_test=("frr_test", "mean"), far_test=("far_test", "mean")).reset_index()
+    dd = SEL[SEL.p_deploy > 0].assign(pfrr=lambda x: x.p_deploy * x.frr_test, pfar=lambda x: x.p_deploy * x.far_test)   # v12: deployment-conditional means
+    dep = dd.groupby(["dataset", "alpha", "calib", "method"]).agg(sp=("p_deploy", "sum"), pfrr=("pfrr", "sum"), pfar=("pfar", "sum")).reset_index()
+    dep["frr_test"] = dep.pfrr / dep.sp; dep["far_test"] = dep.pfar / dep.sp; dep = dep.drop(columns=["sp", "pfrr", "pfar"])
     agg = agg.merge(dep, on=["dataset", "alpha", "calib", "method"], how="left")
     agg["far_ok"] = agg.n_met / agg.n_deployed.where(agg.n_deployed > 0); agg["met_share"] = agg.n_met / agg.n_splits
     agg["far_over_alpha"] = agg.far_test / agg.alpha; agg["source"] = f"T_fresh_selected.csv + {src}"
@@ -107,7 +114,62 @@ def main():
     pm = agg[agg.method != "HYP"].groupby(["method", "calib"])[["n_splits", "n_deployed", "n_met"]].sum().reset_index()
     pm["met_share"] = pm.n_met / pm.n_splits; pm["far_ok"] = pm.n_met / pm.n_deployed; pm["source"] = f"T_foldA_system.csv"
     pm.to_csv(f"{OUT}/T_foldA_methods.csv", index=False)
+    # (5) v12 (review R2): the proposed design by deployment category of the held-out calibration, at the level of the
+    # tied fold-A orders: all deployed (p = 1), partly deployed (0 < p < 1), none deployed (p = 0).  For every deployed
+    # order the fold-A-only design and the held-out design share all thresholds except the final one, so their test FAR
+    # and FRR can be paired; undeployed orders failed because the early acceptances of the fold-A design exceeded alpha at
+    # the 95th bootstrap percentile on fold B (the only failure mode of final_threshold_boot).  Weights: p_j for the
+    # deployed orders, 1 - p_j for the undeployed ones (uniform tie-break), so sums are expected numbers of designs.
+    Ai2 = A.set_index(["dataset", "seed", "alpha", "method", "order"]); Xi2 = xf.set_index(["dataset", "seed", "alpha", "method", "order"])
+    xs_ = old[(old.calib == "xfit") & (old.method == MAIN) & (old.design_foldA == True)]
+    rows5 = []
+    for _, r in xs_.iterrows():
+        orders = str(r.orders).split("|"); a = r.alpha
+        recs = []
+        for o in orders:
+            fa = Ai2.loc[(r.dataset, r.seed, a, MAIN, o)]; xx = Xi2.loc[(r.dataset, r.seed, a, MAIN, o)]
+            recs.append(dict(dep=bool(xx.feasible == True), far_A=fa.far_test / a, frr_A=fa.frr_test,
+                             far_X=(xx.far_test / a) if xx.feasible == True else np.nan, frr_X=xx.frr_test if xx.feasible == True else np.nan))
+        R_ = pd.DataFrame(recs); p_ = R_.dep.mean()
+        cat = "all deployed" if p_ == 1 else ("none deployed" if p_ == 0 else "partly deployed")
+        d_, u_ = R_[R_.dep], R_[~R_.dep]
+        rows5.append(dict(dataset=r.dataset, seed=r.seed, alpha=a, category=cat, p=p_,
+                          far_A_dep=d_.far_A.mean() if len(d_) else np.nan, far_X_dep=d_.far_X.mean() if len(d_) else np.nan,
+                          frr_A_dep=d_.frr_A.mean() if len(d_) else np.nan, frr_X_dep=d_.frr_X.mean() if len(d_) else np.nan,
+                          met_A_dep=(d_.far_A <= 1).mean() if len(d_) else np.nan, met_X_dep=(d_.far_X <= 1).mean() if len(d_) else np.nan,
+                          far_A_und=u_.far_A.mean() if len(u_) else np.nan, met_A_und=(u_.far_A <= 1).mean() if len(u_) else np.nan,
+                          frr_A_und=u_.frr_A.mean() if len(u_) else np.nan))
+    C5 = pd.DataFrame(rows5); C5.to_csv(f"{OUT}/T_foldA_category_splits.csv", index=False)
+    out5 = []
+    for cat, g in [("all deployed", C5[C5.category == "all deployed"]), ("partly deployed", C5[C5.category == "partly deployed"]),
+                   ("none deployed", C5[C5.category == "none deployed"]), ("all", C5)]:
+        w = g.p.values; dmask = w > 0; u = 1 - w; umask = u > 0
+        wm = lambda col, ww, mk: float((ww[mk] * g[col].values[mk]).sum() / ww[mk].sum()) if mk.any() and ww[mk].sum() > 0 else np.nan
+        out5.append(dict(category=cat, n_combinations=len(g), deployed_expected=float(w.sum()),
+                         met_foldA_deployed=float((w[dmask] * g.met_A_dep.values[dmask]).sum()), met_xfit_deployed=float((w[dmask] * g.met_X_dep.values[dmask]).sum()),
+                         far_alpha_foldA_deployed=wm("far_A_dep", w, dmask), far_alpha_xfit_deployed=wm("far_X_dep", w, dmask),
+                         frr_foldA_deployed=wm("frr_A_dep", w, dmask), frr_xfit_deployed=wm("frr_X_dep", w, dmask),
+                         undeployed_expected=float(u.sum()), met_foldA_undeployed=float((u[umask] * g.met_A_und.values[umask]).sum()),
+                         far_alpha_foldA_undeployed=wm("far_A_und", u, umask), frr_foldA_undeployed=wm("frr_A_und", u, umask)))
+    O5 = pd.DataFrame(out5); O5["source"] = "T_foldA_category_splits.csv (proposed design; E3foldA vs E3fresh xfit, paired by tied fold-A order)"
+    O5.to_csv(f"{OUT}/T_foldA_categories.csv", index=False)
+    # per subset and requirement: paired FAR/alpha and FRR differences (held-out minus fold-A-only) over the deployed designs,
+    # weighted corrected resampled t (overlapping splits)
+    from analyze_rev import corrected_t_w
+    pd5 = []
+    for (ds, a), g in C5[C5.p > 0].groupby(["dataset", "alpha"]):
+        w = g.p.values
+        for nm, x_, y_ in [("far_over_alpha", "far_X_dep", "far_A_dep"), ("frr", "frr_X_dep", "frr_A_dep")]:
+            d = (g[x_] - g[y_]).values
+            if len(d) >= 5: m_, ci_, p_ = corrected_t_w(d, w)
+            else: m_, ci_, p_ = float((w * d).sum() / w.sum()), (np.nan, np.nan), np.nan
+            pd5.append(dict(dataset=ds, alpha=a, quantity=nm, n=len(d), n_eff=float(w.sum() ** 2 / (w ** 2).sum()), mean_diff=m_, ci_lo=ci_[0], ci_hi=ci_[1], p=p_,
+                            identical=bool(np.all(d == 0))))
+    P5 = pd.DataFrame(pd5); P5["source"] = ("T_foldA_category_splits.csv; held-out minus fold-A-only on the deployed tied orders; both arms use the same fold-A order, "
+                   "so they share the tie-break and split j has weight p_j; n_eff = (sum p)^2 / sum p^2")
+    P5.to_csv(f"{OUT}/T_foldA_pairdiff.csv", index=False)
     pd.set_option("display.width", 250)
+    print(O5.drop(columns="source").round(4).to_string()); print(P5.drop(columns="source").round(4).to_string())
     print(rep.drop(columns="source").to_string())
     print(agg[agg.method == MAIN].pivot_table(index=["dataset", "alpha"], columns="calib", values=["n_deployed", "n_met", "far_ok", "frr_test", "far_over_alpha"]).round(3).to_string())
     print(pr.drop(columns="source").round(4).to_string())

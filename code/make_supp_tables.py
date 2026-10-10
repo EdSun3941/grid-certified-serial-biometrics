@@ -289,11 +289,11 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_fresh_system.csv"):
     for cal, lab, dss, cap in [("boot", "tab:s-fresh", ["fing_x_face", "fing_x_fing", "face_x_face"],
                                 r"Replication on 20 further splits of D1--D3 (seeds 10--29; new halvings of the same subjects) with the calibration of the paper: test FRR of the selected designs (mean over the new splits) and, in parentheses, number of splits with test FAR $\le\alpha$ (tie-averaged)"),
                                ("xfit", "tab:s-xfit", ["fing_x_face", "fing_x_fing", "face_x_face", "lfw_x_fing"],
-                                r"Held-out calibration (20 new splits of D1--D3, ten splits of D4): design, stage thresholds and order fixed on one half of the training subjects, final threshold by the subject bootstrap on the other half for that design only (no reselection if it fails); test FRR (mean over the deployed designs) and, in parentheses, deployed designs with test FAR $\le\alpha$ / deployed designs (tie-averaged, one decimal)")]:
+                                r"Held-out calibration (20 new splits of D1--D3, ten splits of D4): design, stage thresholds and order fixed on one half of the training subjects, final threshold by the subject bootstrap on the other half for that design only (no reselection if it fails); test FRR (mean over the deployed designs, each split weighted by the probability that a uniform random tie-break among its best fold-A orders deploys a design) and, in parentheses, deployed designs with test FAR $\le\alpha$ / deployed designs (expected values under the same tie-break, one decimal)")]:
         a_ = fsy[fsy.calib == cal]; b_ = fst[fst.calib == cal]
         out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{" + lab + r"}\scriptsize\setlength{\tabcolsep}{" + ("1.2pt" if cal == "xfit" else "2.5pt") + "}" + _HDR)
         out += _grid(a_, b_, "frr_test", dss, xfit=(cal == "xfit"))
-        note_ = (" FRR averaged over the splits in which the fold-A design was deployed. --, no deployed design." if cal == "xfit"
+        note_ = (r" FRR averaged over the splits in which the fold-A design was deployed, weighted by the deployment probability; the paired tests use the splits in which both designs were deployed, weighted by the product of the two deployment probabilities (independent tie-breaks; Sect.~\ref{sec:s-results}). --, no deployed design." if cal == "xfit"
                  else " $^{\mathrm{c}}$Mean over the splits with a feasible design only. --, no feasible design.")
         out.append(r"\bottomrule\end{tabular}" + _NOTE(note_) + r"\end{table*}")
         NEW_CAP[lab] = cap
@@ -353,7 +353,7 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_d4_subsets.csv"):
     out[-1] = r"\bottomrule\end{tabular}\end{table*}"
     NEW_CAP["tab:s-dfour"] = (r"D4 with the candidate orders of the proposed design restricted to the face matcher alone, to the face and one finger, "
                               r"and to the three-stage chains, each with the subject-bootstrap calibration and selection by training FRR of the paper "
-                              r"(ten splits): mean test FRR, number of splits with test FAR $\le\alpha$, stages per genuine claim (parallel fusion acquires all three), "
+                              r"(ten splits): mean test FRR, number of splits with test FAR $\le\alpha$, stages per genuine claim (parallel fusion invokes all three matchers), "
                               r"and mean FRR difference to the face-only design with its corrected resampled 95\% confidence interval")
 if "ijis" in _PAPER and os.path.exists(f"{T}/T_sens_summary.csv"):
     ss = pd.read_csv(f"{T}/T_sens_summary.csv").set_index("variant"); sy = pd.read_csv(f"{T}/T_sens_system.csv")
@@ -400,7 +400,10 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_sim.csv"):
                             r"training subjects and with the held-out calibration (order fixed on $N/2$ subjects, final threshold on the other $N/2$; share of "
                             r"replicates with a deployed design and compliance among them), and share of the calibrated two-stage designs whose step-(iii) "
                             r"prediction is at least the population FRR and at least the joint training FRR; $\rho$, genuine-score correlation (impostor $\rho/3$); "
-                            r"200 ($N=500$) and 100 ($N=1500$) replicates")
+                            r"200 ($N=500$) and 100 ($N=1500$) replicates. Ties among the best orders are averaged, so 13 of the 3000 bootstrap and 38 of the 3000 "
+                            r"held-out replicates have a fractional outcome in $[0,1]$; because the variance of such outcomes is at most $p(1-p)$, they do not make the "
+                            r"Wilson interval, computed from the summed outcomes, narrower than for Bernoulli outcomes, but the interval remains approximate and can "
+                            r"undercover for shares near one")
 # ---- IJIS v09: fold-A-only control (review M1) and presentation-attack sensitivity (review M8) (Springer version only)
 _cnt = lambda v: f"{v:.1f}"[:-2] if f"{v:.1f}".endswith(".0") else f"{v:.1f}"     # tie-averaged counts, one decimal as in Table S17
 if "ijis" in _PAPER and os.path.exists(f"{T}/T_foldA_system.csv"):
@@ -421,8 +424,8 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_foldA_system.csv"):
                        f"{int(p_.n_none)} & {_cnt(p_.met_foldA_none) if p_.n_none else '--'} \\\\")
         out.append(r"\midrule")
     out[-1] = r"\bottomrule\end{tabular}\end{table*}"
-    NEW_CAP["tab:s-folda"] = (r"Fold-A-only control (proposed design; 20 new splits of D1--D3 and ten splits of D4): splits whose deployed design met $\alpha$ "
-                              r"on the test half (tie-averaged), mean test FAR$/\alpha$, and mean test FRR of the deployed designs under the bootstrap calibration "
+    NEW_CAP["tab:s-folda"] = (r"Fold-A-only control (exploratory, specified after the results of both calibrations were known; proposed design; 20 new splits of D1--D3 and ten splits of D4): splits whose deployed design met $\alpha$ "
+                              r"on the test half (expected values over the random tie-break), mean test FAR$/\alpha$, and mean test FRR of the deployed designs (held-out: weighted by the deployment probability) under the bootstrap calibration "
                               r"on the whole training half (as in the paper), under the fold-A-only calibration (design, order selection, and bootstrap "
                               r"calibration on fold~A; fold~B unused), and under the held-out calibration (order fixed on fold~A, final threshold re-set on "
                               r"fold~B; splits with a deployed design). Last four columns: splits in which the held-out calibration deployed every tied "
@@ -453,6 +456,69 @@ if "ijis" in _PAPER and os.path.exists(f"{T}/T_spoof_sens.csv"):
                                r"that passes an artifact with probability APCER and rejects a bona fide presentation with probability BPCER $=0.01$, "
                                r"independently of the scores; test FRR without and with the PAD, and mean number of traits acquired per genuine and per "
                                r"impostor claim (both face matchers of D1 and D3 use one face image)")
+# ---- IJIS v12: fold-A-only control by deployment category (review R2) and tie-break sensitivity (review R1)
+if "ijis" in _PAPER and os.path.exists(f"{T}/T_foldA_categories.csv"):
+    fc_ = pd.read_csv(f"{T}/T_foldA_categories.csv").set_index("category"); pdf_ = pd.read_csv(f"{T}/T_foldA_pairdiff.csv")
+    _c1 = lambda v: f"{v:.1f}"; _r2 = lambda v: "--" if pd.isna(v) else f"{v:.2f}"; _r4 = lambda v: "--" if pd.isna(v) else f"{v:.4f}"
+    out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-foldcat}\footnotesize\setlength{\tabcolsep}{4pt}"
+               r"\begin{tabular}{@{}lcccccccccc@{}}\toprule & & \multicolumn{5}{c}{Deployed tied orders: fold A only / held-out} & \multicolumn{4}{c}{Undeployed tied orders: fold A only} \\"
+               r"\cmidrule(lr){3-7}\cmidrule(lr){8-11}"
+               r"Held-out deployment & Combinations & Designs & Met $\alpha$ & FAR$/\alpha$ & FRR & & Designs & Met $\alpha$ & FAR$/\alpha$ & FRR \\\midrule")
+    for cat, lab in [("all deployed", "Every tied order"), ("partly deployed", "Some tied orders"), ("none deployed", "No tied order"), ("all", "All")]:
+        r = fc_.loc[cat]
+        dep = r.deployed_expected > 0; und = r.undeployed_expected > 0
+        cells = [lab, str(int(r.n_combinations)), _c1(r.deployed_expected) if dep else "0",
+                 (f"{_c1(r.met_foldA_deployed)} / {_c1(r.met_xfit_deployed)}") if dep else "--",
+                 (f"{_r2(r.far_alpha_foldA_deployed)} / {_r2(r.far_alpha_xfit_deployed)}") if dep else "--",
+                 (f"{_r4(r.frr_foldA_deployed)} / {_r4(r.frr_xfit_deployed)}") if dep else "--", "",
+                 _c1(r.undeployed_expected) if und else "0", _c1(r.met_foldA_undeployed) if und else "--",
+                 _r2(r.far_alpha_foldA_undeployed) if und else "--", _r4(r.frr_foldA_undeployed) if und else "--"]
+        if cat == "all": out.append(r"\midrule")
+        out.append(" & ".join(cells) + r" \\")
+    out.append(r"\midrule \multicolumn{11}{@{}l}{(b) Held-out minus fold-A-only on the deployed tied orders, per subset and requirement: mean difference [95\% CI]} \\\midrule")
+    out.append(r"Set, $\alpha$ & Splits ($K$) & \multicolumn{4}{c}{FAR$/\alpha$} & & \multicolumn{4}{c}{FRR} \\\midrule")
+    fmt = lambda v: f"{v:+.2f}".replace("+", "$+$").replace("-", "$-$")
+    fmt4 = lambda v: f"{v:+.4f}".replace("+", "$+$").replace("-", "$-$")
+    for ds in ["fing_x_face", "fing_x_fing", "face_x_face", "lfw_x_fing"]:
+        for a in sorted(pdf_[pdf_.dataset == ds].alpha.unique(), reverse=True):
+            q = pdf_[(pdf_.dataset == ds) & np.isclose(pdf_.alpha, a)].set_index("quantity")
+            fa_, fr_ = q.loc["far_over_alpha"], q.loc["frr"]
+            frc_ = ("0 (identical in every split)" if bool(fr_.get("identical", False))
+                    else f"{fmt4(fr_.mean_diff)} [{fmt4(fr_.ci_lo)}, {fmt4(fr_.ci_hi)}]")
+            out.append(f"{_DS4[ds]}, {_AL[a]} & {int(fa_.n)} ({fa_.n_eff:.1f}) & \\multicolumn{{4}}{{c}}{{{fmt(fa_.mean_diff)} [{fmt(fa_.ci_lo)}, {fmt(fa_.ci_hi)}]}} & & "
+                       f"\\multicolumn{{4}}{{c}}{{{frc_}}} \\\\")
+    out.append(r"\bottomrule\end{tabular}\end{table*}")
+    NEW_CAP["tab:s-foldcat"] = (r"Exploratory fold-A-only control of the proposed design by the outcome of the held-out calibration (190 combinations of subset, "
+                                r"split, and requirement; uniform random tie-break among the best fold-A orders before fold~B is used; descriptive, because the "
+                                r"groups are defined by the outcome on fold~B and the combinations share subjects). (a) Deployed tied "
+                                r"orders: expected number of deployed designs and the number of them meeting $\alpha$ on the test half with the fold-A-only and "
+                                r"with the held-out calibration (the two designs of an order share every threshold except the final one), and their mean test FAR$/\alpha$ and FRR; "
+                                r"undeployed tied orders, withheld because their early stages accepted too many fold-B impostors: the same for their fold-A-only designs. "
+                                r"(b) Paired differences over the splits with a deployed design; both calibrations use the same fold-A order and hence share the "
+                                r"tie-break, so split $j$ is weighted by its deployment probability, and $K$ is the effective number of splits of the "
+                                r"corrected resampled 95\% confidence interval for overlapping splits")
+if "ijis" in _PAPER and os.path.exists(f"{T}/T_tiebreak_summary.csv"):
+    tb_ = pd.read_csv(f"{T}/T_tiebreak_summary.csv"); td_ = pd.read_csv(f"{T}/T_tiebreak_decisions.csv"); fsx_ = pd.read_csv(f"{T}/T_fresh_system.csv")
+    fsx_ = fsx_[(fsx_.calib == "xfit") & (fsx_.method == "LR-P1-N2")]
+    out.append(r"\begin{table*}[!t]\centering\caption{CAPTION}\label{tab:s-tiebreak}\footnotesize\setlength{\tabcolsep}{5pt}"
+               r"\begin{tabular}{@{}llcccccc@{}}\toprule & & \multicolumn{2}{c}{Deployed} & \multicolumn{2}{c}{Met $\alpha$} & FRR & FAR$/\alpha$ \\"
+               r"\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-7}\cmidrule(lr){8-8}"
+               r"Set & $\alpha$ & Expected & Range & Expected & Range & Expected [5\%, 95\%] & Expected [5\%, 95\%] \\\midrule")
+    for ds in ["fing_x_face", "fing_x_fing", "face_x_face", "lfw_x_fing"]:
+        als = sorted(tb_[tb_.dataset == ds].alpha.unique(), reverse=True)
+        for k, a in enumerate(als):
+            r = tb_[(tb_.dataset == ds) & np.isclose(tb_.alpha, a)].iloc[0]; e = fsx_[(fsx_.dataset == ds) & np.isclose(fsx_.alpha, a)].iloc[0]
+            n_ = int(r.n_splits); c1 = lambda v: f"{v:.1f}".rstrip("0").rstrip(".")
+            out.append(f"{_DS4[ds] if k == 0 else ''} & {_AL[a]} & {c1(e.n_deployed)}/{n_} & {int(r.deployed_min)}--{int(r.deployed_max)} & "
+                       f"{c1(e.n_met)} & {int(r.met_min)}--{int(r.met_max)} & {e.frr_test:.4f} [{r.frr_q05:.4f}, {r.frr_q95:.4f}] & "
+                       f"{e.far_test / a:.2f} [{r.far_alpha_q05:.2f}, {r.far_alpha_q95:.2f}] \\\\")
+        out.append(r"\midrule")
+    out[-1] = r"\bottomrule\end{tabular}\end{table*}"
+    NEW_CAP["tab:s-tiebreak"] = (r"Held-out calibration of the proposed design with the expectation over a uniform random tie-break among the best fold-A "
+                                 r"orders (as reported, Table~6 of the paper and Table~\ref{tab:s-xfit}) and with a single random tie-break per method "
+                                 r"and split instead, repeated in 1000 independent draws: deployed designs and designs meeting $\alpha$ (expected value and "
+                                 r"range over the draws), and mean test FRR and FAR$/\alpha$ of the deployed designs (expected value and 5th and 95th "
+                                 r"percentiles over the draws)")
 text = "\n".join(out) + "\n"
 PAPER = os.environ.get("PAPER", "../paper")
 if "ijis" in PAPER:
@@ -472,7 +538,7 @@ if "ijis" in PAPER:
         "tab:s-reject": r"Stage FAR at the accept and reject thresholds of the uncalibrated proposed GP designs (all multi-stage orders, ten splits)",
         "tab:s-abl": r"Ablations on D1 at $\alpha=10^{-3}$ (uncalibrated; test FRR, variant versus main setting on the same splits; Wilcoxon $p$ where differences exist)",
         "tab:s-noise": r"Robustness of D1 designs to additive Gaussian test-score noise (SD = 5\% or 10\% of the impostor-score SD; uncalibrated): test FAR / FRR (means over all feasible orders and splits)",
-        "tab:s-farstage": r"Selected designs under subject-bootstrap calibration: mean test FAR$/\alpha$ and stages per genuine / impostor claim (means over ten splits; parallel fusion acquires all modalities)",
+        "tab:s-farstage": r"Selected designs under subject-bootstrap calibration: mean test FAR$/\alpha$ and stages per genuine / impostor claim (means over ten splits; parallel fusion invokes all matchers)",
         "tab:s-refit": r"Envelopes fitted by the subgradient LR-BB of the preliminary implementation (used in the uncalibrated and Clopper--Pearson analyses) compared with their refit by the exact-dual LR-BB (used in the calibrated designs): number of envelopes, share with identical curves (largest relative difference $<10^{-6}$), and largest relative curve difference",
     }
     CAP.update(NEW_CAP)

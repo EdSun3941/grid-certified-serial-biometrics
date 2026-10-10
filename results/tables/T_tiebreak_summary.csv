@@ -1,0 +1,12 @@
+dataset,alpha,n_splits,deployed_min,deployed_max,deployed_mean,met_min,met_max,frr_q05,frr_q95,far_alpha_q05,far_alpha_q95,draws,source
+face_x_face,0.0001,20,17,17,17.0,16,16,0.2860980392156862,0.28660784313725485,0.6928802208007818,0.6954963439678605,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+face_x_face,0.001,20,19,19,19.0,18,18,0.17091228070175438,0.17136842105263156,0.7927273152861579,0.7934646489471947,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+face_x_face,0.01,20,20,20,20.0,20,20,0.07751666666666665,0.07771666666666663,0.8493751389815385,0.8513331109628594,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+fing_x_face,0.001,20,7,16,11.071,7,15,0.016087516087516043,0.021411021411021365,0.41528239202655,0.5469358667032715,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+fing_x_face,0.01,20,9,16,12.685,9,15,0.008106353106353057,0.014157014157014114,0.675269105501658,0.7784798918519796,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+fing_x_fing,0.0001,20,20,20,20.0,20,20,0.10298333333333332,0.10323333333333332,0.671557185728576,0.6745581860620204,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+fing_x_fing,0.001,20,20,20,20.0,20,20,0.06929999999999996,0.06974999999999995,0.7866566633321599,0.7973657885961399,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+fing_x_fing,0.01,20,20,20,20.0,20,20,0.04296666666666664,0.04321666666666663,0.8100678003778986,0.812707013448923,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+lfw_x_fing,0.0001,10,4,7,5.466,4,7,0.0047619047619047,0.008809523809523741,0.35827799534593335,0.4611498949997162,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+lfw_x_fing,0.001,10,4,10,7.723,4,10,0.003720238095238037,0.006466836734693812,0.7285116817882951,0.8213839767133986,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split
+lfw_x_fing,0.01,10,7,10,9.235,7,10,0.00321428571428565,0.004767857142857087,0.750978347238771,0.8417290992678319,1000,results/E3fresh xfit rows + T_fresh_selected.csv; single random tie-break per method and split

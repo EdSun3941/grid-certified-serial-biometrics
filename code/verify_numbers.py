@@ -18,7 +18,7 @@ NUMBERS_ONLY = "--numbers-only" in sys.argv or not os.path.exists(SUPP)
 SRC = ({} if NUMBERS_ONLY else
        {os.path.basename(f): open(f).read() for f in glob.glob(f"{P}/sections/*.tex") + [SUPP] + ([f"{P}/main.tex"] if SPRINGER else [])})
 ALL = "\n".join(SRC.values())
-fails = []; n_ok = 0; n_skip = 0
+fails = []; n_ok = 0; n_skip = 0; n_info = 0
 SKIP = object()
 def TXT(fn):
     """A condition that needs the manuscript source: evaluated lazily, SKIP in --numbers-only mode."""
@@ -245,7 +245,7 @@ check_true("16 = 4 SPRT + 12 parallel comparisons", len(sp) + len(par) == 16)
 sg = sy[sy.method == "LR-P1-N2"].stages_gen
 if SPRINGER:   # IJIS v02: range restricted to the settings of the sentence (D2 and D3, alpha <= 1e-3)
     sg = sy[(sy.method == "LR-P1-N2") & sy.dataset.isin([DS["D2"], DS["D3"]]) & (sy.alpha <= 1e-3)].stages_gen
-check("stages per genuine claim min", sg.min(), IJ("1.10", "1.17"), IJ("against 1.10--1.29 modalities per genuine claim", "against 1.17--1.29 modalities per genuine claim")); check("stages per genuine claim max", sg.max(), "1.29")
+check("stages per genuine claim min", sg.min(), IJ("1.10", "1.17"), IJ("against 1.10--1.29 modalities per genuine claim", "against 1.17--1.29 matcher invocations per genuine claim")); check("stages per genuine claim max", sg.max(), "1.29")
 check_true("no significant difference on D1", (pr[pr.dataset == DS["D1"]].p_holm.dropna() >= 0.05).all(), "no difference was significant")
 llr1 = pr[(pr.dataset == DS["D1"]) & (pr.method == "P1-LLR")]
 check_true("LLR lower in 9 of 10 D1 splits at both alpha", (llr1.n_worse == 9).all() and len(llr1) == 2, "LLR fusion had the lower FRR in 9 of the 10 splits at both $\\alpha$")
@@ -445,6 +445,24 @@ if SPRINGER:
                and "Grid-Certified Corner-Dominating FAR--FRR Envelopes" in SRC["ESM_1.tex"] and "grid-certified posynomial" not in ALL.lower()
                and "\\titlerunning{Online Resource 1: grid-certified corner-dominating FAR--FRR envelopes}" in SRC["ESM_1.tex"]))
     check_true("v03: title", TXT(lambda: "Grid-Certified Corner-Dominating FAR--FRR Envelopes for Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound" in mt_))
+    au10 = "\\author{Chuan-Hsiang Su \\and Frank Yeong-Sung Lin \\and Tzu-Lung Sun \\and Chih-Chun Yeh \\and Ming-Chi Tsai \\and Chiu-Han Hsiao}"
+    def _cite_order():
+        aux = open(f"{P}/main.aux").read(); lab = dict(re.findall(r"\\newlabel\{([^}]*)\}\{\{([^}]*)\}", aux))
+        txt = "".join(open(f"{P}/{x}.tex").read() for x in re.findall(r"\\input\{(sections/[^}]*)\}", mt_))
+        ok = True
+        for pfx in ["tab:", "fig:"]:
+            seen = []
+            for m_ in re.finditer(r"\\ref\{(" + pfx + r"[^}]*)\}", txt):
+                if m_.group(1) not in seen: seen.append(m_.group(1))
+            nums = [int(lab[l_]) for l_ in seen]; ok = ok and nums == list(range(1, len(nums) + 1))
+        return ok
+    check_true("v11: tables and figures of the paper first cited in consecutive numerical order (Springer guideline)",
+               TXT(lambda: os.path.exists(f"{P}/main.aux") and _cite_order()))
+    check_true("v11: svjour3 default section and float spacing in the manuscript (no layout overrides); MIP spelled out",
+               TXT(lambda: "\\def\\section" not in mt_ and "\\setlength\\floatsep" not in mt_ and "MIP gaps" not in ALL))
+    check_true("v10: six authors, M.-C. Tsai second to last, in the manuscript and Online Resource 1, with his institute entry",
+               TXT(lambda: au10 in mt_ and au10 in SRC["ESM_1.tex"] and "M.-C. Tsai \\at Department of Information Management, National Taiwan University, Taipei 10617, Taiwan" in mt_
+                   and mt_.index("C.-C. Yeh \\at") < mt_.index("M.-C. Tsai \\at") < mt_.index("C.-H. Hsiao \\at")))
     refq = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2ref/ref_*.csv")], ignore_index=True); refq = refq[refq.obj == "P1"]
     mq2 = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2miqp/miqp_*_N2.csv")], ignore_index=True)
     mq2 = mq2.merge(refq[["dataset", "seed", "matcher", "value"]].rename(columns={"value": "opt"}), on=["dataset", "seed", "matcher"])
@@ -564,7 +582,7 @@ if SPRINGER:
     check_true(f"v02: most D4 baselines met alpha in fewer halves ({len(fewer)} of 21)", len(fewer) > 21 / 2, "Most baselines also met $\\alpha$ in fewer test halves than the proposed design")
     # D4 system results (Sect. 6.3)
     sg4 = fsy[(fsy.dataset == D4) & (fsy.calib == "boot") & (fsy.method == "LR-P1-N2")]
-    check("v02: D4 proposed stages min", sg4.stages_gen.min(), "1.02", "(1.02--1.05 modalities per genuine claim)"); check("v02: D4 proposed stages max", sg4.stages_gen.max(), "1.05")
+    check("v02: D4 proposed stages min", sg4.stages_gen.min(), "1.02", "(1.02--1.05 matcher invocations per genuine claim)"); check("v02: D4 proposed stages max", sg4.stages_gen.max(), "1.05")
     check("v02: D4 proposed FRR min", sg4.frr_test.min(), "0.0023", "reached a test FRR of 0.0023--0.0042"); check("v02: D4 proposed FRR max", sg4.frr_test.max(), "0.0042")
     lk = fsy[(fsy.dataset == D4) & (fsy.calib == "boot") & fsy.method.isin(["S3-SPRT", "P1-LLR", "P2-LogReg"])].frr_test
     check("v02: D4 SPRT/LLR/LogReg min", lk.min(), "0.0007", "This was higher than that of the SPRT and the LLR and logistic-regression fusions (0.0007--0.0011)"); check("v02: D4 SPRT/LLR/LogReg max", lk.max(), "0.0011")
@@ -609,7 +627,7 @@ if SPRINGER:
                (xd_("D2").n_deployed == 20).all() and sorted(xd_("D3").n_deployed.round(2)) == [17, 19, 20]
                and round(xd_("D1").loc[1e-3, "n_deployed"], 1) == 11.1 and round(xd_("D1").loc[1e-2, "n_deployed"], 1) == 12.7
                and round(xd_("D4").n_deployed.min(), 1) == 5.5 and round(xd_("D4").n_deployed.max(), 1) == 9.2,
-               "the fold-A design could be calibrated on fold~B in every split of D2, in 17 to 20 of the 20 splits of D3, in 11.1 and 12.7 of 20 on D1 ($\\alpha=10^{-3}$ and $10^{-2}$; tie-averaged), and in 5.5 to 9.2 of 10 on D4")
+               "the fold-A design could be calibrated on fold~B in every split of D2, in 17 to 20 of the 20 splits of D3, in 11.1 and 12.7 of 20 on D1 ($\\alpha=10^{-3}$ and $10^{-2}$; expected values over the random tie-break), and in 5.5 to 9.2 of 10 on D4")
     check("v08: xfit compliance among deployed D1 min %", xd_("D1").far_ok.min(), "91", "The deployed designs met $\\alpha$ in 91\\%--94\\% of their test halves on D1, 94\\%--100\\% on D3, and in all of them on D2 and D4", scale=100)
     check("v08: ... D1 max %", xd_("D1").far_ok.max(), "94", scale=100); check("v08: ... D3 min %", xd_("D3").far_ok.min(), "94", scale=100)
     check_true("v08: ... D3 max 100%, D2 and D4 all", xd_("D3").far_ok.max() == 1 and (xd_("D2").far_ok == 1).all() and (xd_("D4").far_ok == 1).all())
@@ -631,7 +649,7 @@ if SPRINGER:
     check_true("v02: boot below 88% on D1, D3 and D4 at 1e-3 only", (bD1.far_ok < 0.8776).all() and (bD3.far_ok < 0.8776).all() and (bD2.far_ok > 0.8776).all()
                and sorted(bD4[bD4.far_ok < 0.8776].alpha.round(6)) == [0.001], "below the 88\\% benchmark on D1 and D3 and at $\\alpha=10^{-3}$ on D4")
     fb = fco[(fco.split_set != "original 0-9")].groupby("calib").far_over_alpha.agg(["min", "max"])
-    check("v02: held-out FAR/alpha min", fb.loc["xfit", "min"], "0.43", "(mean test FAR of the deployed designs 0.43$\\alpha$--0.85$\\alpha$, against 0.73$\\alpha$--0.92$\\alpha$)")
+    check("v02: held-out FAR/alpha min", fb.loc["xfit", "min"], "0.42", "the mean test FAR of its deployed designs was 0.42$\\alpha$--0.85$\\alpha$, against 0.73$\\alpha$--0.92$\\alpha$, a difference that also reflects the withholding of designs")
     check("v02: held-out FAR/alpha max", fb.loc["xfit", "max"], "0.85"); check("v02: boot FAR/alpha min", fb.loc["boot", "min"], "0.73"); check("v02: boot FAR/alpha max", fb.loc["boot", "max"], "0.92")
     bl = fsy[fsy.method.isin(["S3-SPRT", "P0-Parallel", "P1-LLR", "P2-LogReg"])].groupby("calib").far_ok.agg(["min", "max"])
     check("v02: SPRT/fusion compliance boot min %", bl.loc["boot", "min"], "60", "The SPRT and parallel fusion met $\\alpha$ in 60\\%--100\\% of the test halves with the bootstrap and in 70\\%--100\\% of their deployed test halves with the held-out calibration", scale=100)
@@ -644,15 +662,19 @@ if SPRINGER:
     sl8 = tab("T_fresh_selected"); sl8 = sl8[sl8.method == "LR-P1-N2"]
     pr8 = sl8[sl8.calib == "boot"][["dataset", "seed", "alpha", "frr_test"]].merge(sl8[sl8.calib == "xfit"][["dataset", "seed", "alpha", "frr_test", "p_deploy"]],
                                                                                  on=["dataset", "seed", "alpha"], suffixes=("_b", "_x"))
-    pr8 = pr8[pr8.p_deploy > 0].groupby(["dataset", "alpha"])[["frr_test_b", "frr_test_x"]].mean()
+    pr8 = pr8[pr8.p_deploy > 0].assign(wb=lambda x: x.p_deploy * x.frr_test_b, wx=lambda x: x.p_deploy * x.frr_test_x)
+    pr8 = pr8.groupby(["dataset", "alpha"])[["wb", "wx", "p_deploy"]].sum()          # v12: deployment-conditional (p-weighted) means
+    pr8["frr_test_b"] = pr8.wb / pr8.p_deploy; pr8["frr_test_x"] = pr8.wx / pr8.p_deploy
     pr8["rel"] = pr8.frr_test_x / pr8.frr_test_b - 1; pr8["abs"] = pr8.frr_test_x - pr8.frr_test_b
     rr = lambda d: pr8.loc[DS.get(d, D4)]
-    check("v08: xfit cost D2 min %", rr("D2").rel.min(), "1", "it raised the FRR of the proposed designs by 1\\%--2\\% on D2 and 3\\%--4\\% on D3", scale=100); check("v08: xfit cost D2 max %", rr("D2").rel.max(), "2", scale=100)
+    check("v08: xfit cost D2 min %", rr("D2").rel.min(), "1", "raised the FRR of the proposed designs by 1\\%--2\\% on D2 and 3\\%--4\\% on D3", scale=100); check("v08: xfit cost D2 max %", rr("D2").rel.max(), "2", scale=100)
     check("v08: xfit cost D3 min %", rr("D3").rel.min(), "3", scale=100); check("v08: xfit cost D3 max %", rr("D3").rel.max(), "4", scale=100)
-    check("v08: xfit cost D1 min %", rr("D1").rel.min(), "53", "but by 53\\%--97\\% on D1 (0.006) and 61\\%--84\\% on D4 (at most 0.0029)", scale=100); check("v08: xfit cost D1 max %", rr("D1").rel.max(), "97", scale=100)
-    check("v08: xfit cost D1 abs min", rr("D1")["abs"].min(), "0.006"); check("v08: xfit cost D1 abs max", rr("D1")["abs"].max(), "0.006")
-    check("v08: xfit cost D4 min %", rr("D4").rel.min(), "61", scale=100); check("v08: xfit cost D4 max %", rr("D4").rel.max(), "84", scale=100)
-    check("v08: xfit cost D4 max abs", rr("D4")["abs"].max(), "0.0029")
+    check("v08: xfit cost D1 min %", rr("D1").rel.min(), "67", "but by 67\\%--78\\% on D1 (0.005--0.007) and 47\\%--88\\% on D4 (at most 0.0023)", scale=100); check("v08: xfit cost D1 max %", rr("D1").rel.max(), "78", scale=100)
+    check("v08: xfit cost D1 abs min", rr("D1")["abs"].min(), "0.005"); check("v08: xfit cost D1 abs max", rr("D1")["abs"].max(), "0.007")
+    check("v08: xfit cost D4 min %", rr("D4").rel.min(), "47", scale=100); check("v08: xfit cost D4 max %", rr("D4").rel.max(), "88", scale=100)
+    check_true("v12: conclusion - held-out FRR cost on D1 and D4", round(100 * rr("D1").rel.min()) == 67 and round(100 * rr("D1").rel.max()) == 78
+               and round(100 * rr("D4").rel.min()) == 47 and round(100 * rr("D4").rel.max()) == 88, "their FRR rose by 67\\%--78\\% on D1 and 47\\%--88\\% on D4, against 1\\%--4\\% on the two larger subsets")
+    check("v08: xfit cost D4 max abs", rr("D4")["abs"].max(), "0.0023")
     # D4 presentation attacks (Sect. 6.5)
     r4 = pd.read_csv(f"{T}/spoof_trait_raw_lfw_x_fing.csv").groupby("method")[["spoof_face", "spoof_right_index"]].mean()
     check("v02: D4 face spoof proposed", r4.loc["LR-P1-N2", "spoof_face"], "0.96", "a perfect face artifact was accepted in 0.96 of the attempts by the proposed designs")
@@ -811,10 +833,13 @@ if SPRINGER:
                and "\\section*{Supplementary Information}" in SRC["main.tex"]))
     check_true("v05: US spelling", TXT(lambda: not re.search(r"analys(ed|e\b)|favour|colour|behaviour|modelling", ALL)))
     doi5 = "10.5281/zenodo.23072674"
-    rel8 = "https://github.com/EdSun3941/grid-certified-serial-biometrics/releases/tag/v1.2.0"
-    check_true("v09: release v1.2.0 cited in Code availability, ESM S5 and the reference list; v1.0.0 Zenodo DOI kept for the first submission",
-               TXT(lambda: "the version used for this article is release v1.2.0~\\cite{su2026code}" in SRC["main.tex"] and doi5 in SRC["main.tex"]
-                   and rel8 in SRC["ESM_1.tex"] and doi5 in SRC["ESM_1.tex"] and rel8 in refs5 and "v1.2.0. GitHub release (2026)" in refs5
+    rel8 = "https://github.com/EdSun3941/grid-certified-serial-biometrics/releases/tag/v1.3.0"     # v12: release 1.3.0 with its commit
+    check_true("v12: release v1.3.0 (with commit) cited in Code availability, ESM S5 and the reference list; v1.2.0 commit recorded; v1.0.0 Zenodo DOI kept for the first submission",
+               TXT(lambda: re.search(r"the version used for this article is release v1\.3\.0~\\cite\{su2026code\} \(commit \\texttt\{[0-9a-f]{12}\}\)\.", SRC["main.tex"]) is not None
+                   and re.search(r"releases/tag/v1\.3\.0\}; commit \\texttt\{[0-9a-f]{12}\}\); release 1\.2\.0 \(commit \\texttt\{d7ce4f39ed3f\}\)", SRC["ESM_1.tex"]) is not None
+                   and "@@" not in SRC["main.tex"] + SRC["ESM_1.tex"] and doi5 in SRC["main.tex"]
+                   and rel8 in SRC["ESM_1.tex"] and doi5 in SRC["ESM_1.tex"] and rel8 in refs5 and "v1.3.0. GitHub release (2026)" in refs5
+                   and "Ming-Chi Tsai contributed to the interpretation of the results and critically revised the manuscript" in SRC["main.tex"]
                    and "Grid-certified corner-dominating FAR--FRR envelopes for serial multibiometric threshold design: code and per-split results" in refs5
                    and "v1.1.0" not in ALL))
     check_true("v05: logarithmic change of variables (no z overload); tolerance of the certificate stated",
@@ -839,10 +864,20 @@ if SPRINGER:
     check_true("v08: lowest realized FAR at the cap on D2", tab("T_fresh_matchedfar_system").sort_values("far_matched_over_alpha").dataset.iloc[0] == DS["D2"]
                and tab("T_rev_matchedfar_system").sort_values("far_matched_over_alpha").dataset.iloc[0] == DS["D2"])
     # minor 5: HiGHS version bundled with SciPy
-    import scipy as _sp_; from scipy.optimize._highspy import _core as _hc
-    check_true(f"v08: HiGHS {_hc.HIGHS_VERSION_MAJOR}.{_hc.HIGHS_VERSION_MINOR}.{_hc.HIGHS_VERSION_PATCH} bundled with SciPy {_sp_.__version__}",
-               (_hc.HIGHS_VERSION_MAJOR, _hc.HIGHS_VERSION_MINOR, _hc.HIGHS_VERSION_PATCH) == (1, 12, 0) and _sp_.__version__ == "1.17.1",
-               "(version 1.12.0, bundled with SciPy 1.17.1)")
+    # v12 (review of v11): the versions of the running environment describe the machine, not the paper, so a different
+    # environment is reported as INFO and is not counted as a failure; the stated versions are still checked in the text
+    check_true("v08: article states HiGHS 1.12.0 bundled with SciPy 1.17.1", True, "(version 1.12.0, bundled with SciPy 1.17.1)")
+    import scipy as _sp_
+    try:
+        from scipy.optimize._highspy import _core as _hc
+        _hv = f"{_hc.HIGHS_VERSION_MAJOR}.{_hc.HIGHS_VERSION_MINOR}.{_hc.HIGHS_VERSION_PATCH}"
+    except Exception:
+        _hv = "unknown"
+    if _hv == "1.12.0" and _sp_.__version__ == "1.17.1":
+        check_true(f"v08: running environment matches the article (HiGHS {_hv}, SciPy {_sp_.__version__})", True)
+    else:
+        print(f"INFO running environment HiGHS {_hv} / SciPy {_sp_.__version__} differs from that of the article (1.12.0 / 1.17.1); "
+              "environment information only, not counted as a check"); n_info += 1
     # M6: D4 candidate sets (Table S20)
     d4s = tab("T_d4_subsets"); g4 = lambda a, d: d4s[np.isclose(d4s.alpha, a) & (d4s.design == d)].iloc[0]
     for a_, v_ in [(1e-2, "0.0069"), (1e-3, "0.0132"), (1e-4, "0.0271")]:
@@ -854,7 +889,7 @@ if SPRINGER:
     check_true(f"v08: D4 selected designs lower than face-only in all ten splits, significant (unadjusted) at alpha <= 1e-3 only ({ap4.p.round(4).tolist()})",
                (ap4.n_lower == 10).all() and (ap4.loc[[1e-3, 1e-4], "p"] < 0.05).all() and ap4.loc[1e-2, "p"] >= 0.05,
                "the selected designs had lower FRR than the face-only design in all ten splits at every $\\alpha$, significantly at $\\alpha\\le10^{-3}$ (unadjusted corrected $t$-test)")
-    check("v08: D4 selected designs stages per genuine claim min", ap4.stages_gen.min(), "1.02", "while using 1.02--1.05 modalities per genuine claim"); check("v08: ... max", ap4.stages_gen.max(), "1.05")
+    check("v08: D4 selected designs stages per genuine claim min", ap4.stages_gen.min(), "1.02", "while using 1.02--1.05 matcher invocations per genuine claim"); check("v08: ... max", ap4.stages_gen.max(), "1.05")
     # M5/M6: controlled simulation (Sect. 6.5, Table S22)
     sm8 = tab("T_sim")
     check("v08: sim - designs checked for the Lemma", sm8.lemma_n.sum(), "11999", "in all 11{,}999 calibrated designs")
@@ -940,13 +975,12 @@ if SPRINGER:
     check("v09: control - D2 met min", g9("D2").min(), "19"); check("v09: control - D2 met max", g9("D2").max(), "20")
     check("v09: control - D4 met min", g9("D4").min(), "8.3"); check("v09: control - D4 met max", g9("D4").max(), "9.2")
     check_true("v09: control - D1/D3 below the 91% benchmark at every alpha", (fa9[fa9.dataset.isin([DS["D1"], DS["D3"]])].far_ok < _ndist.cdf(1.645 * np.sqrt(2 / 3))).all(),
-               "the fold-A-only calibration also stayed below the 91\\% benchmark on D1 and D3")
+               "also stayed below the 91\\% benchmark on D1 and D3")
     pp9 = tab("T_foldA_paired"); sm9 = pp9[["n_xfit", "met_boot_full", "met_foldA_full", "met_xfit_full", "n_none", "met_foldA_none"]].sum()
-    check("v09: control - combinations with every tied order deployed", sm9.n_xfit, "147", "In the 147 combinations in which the held-out calibration deployed every tied fold-A order, the fold-A-only designs met $\\alpha$ almost as often as the held-out designs (140.3 against 144.2 times; 129.1 with the bootstrap on the whole training half)")
+    check("v09: control - combinations with every tied order deployed", sm9.n_xfit, "147", "In the 147 in which it deployed every tied fold-A order, the fold-A-only designs met $\\alpha$ in 140.3 and the held-out designs in 144.2 (129.1 with the bootstrap on the whole training half)")
     check("v09: control - met fold A only there", sm9.met_foldA_full, "140.3"); check("v09: control - met held-out there", sm9.met_xfit_full, "144.2"); check("v09: control - met bootstrap there", sm9.met_boot_full, "129.1")
     mt9 = tab("T_foldA_methods").set_index(["method", "calib"]); par9 = ["P0-Parallel", "P1-LLR", "P2-LogReg"]
-    check("v09: control - added by re-setting on fold B where all deployed", sm9.met_xfit_full - sm9.met_foldA_full, "3.9",
-          "re-setting the threshold of the deployed designs on new subjects added 3.9 compliant cases in 147, and none for parallel fusion")
+    check("v09: control - added by re-setting on fold B where all deployed", sm9.met_xfit_full - sm9.met_foldA_full, "3.9")   # v12: no longer quoted (R2)
     check_true("v09: control - parallel fusion: held-out never more compliant than fold A only",
                all(mt9.loc[(m_, "xfit"), "met_share"] <= mt9.loc[(m_, "foldA"), "met_share"] + 1e-12 for m_ in par9))
     for c_, v_ in [("foldA", "90"), ("boot", "86"), ("xfit", "83")]:
@@ -958,7 +992,7 @@ if SPRINGER:
     f13 = fa9[fa9.dataset.isin([DS["D1"], DS["D3"]])].far_ok
     check("v09: control - fold A only D1/D3 compliance min %", f13.min(), "80", "stayed below the 91\\% benchmark on D1 and D3 (80\\%--90\\%)", scale=100)
     check("v09: control - ... max %", f13.max(), "90", scale=100)
-    check("v09: control - combinations with no held-out design", sm9.n_none, "12", "and in the 12 in which it deployed none, they met it only 6.4 times (never in the four on D3)")
+    check("v09: control - combinations with no held-out design", sm9.n_none, "12", "In the 12 in which it deployed none, the fold-A-only designs met $\\alpha$ in 6.4 (never in the four on D3; mean test FAR 0.92$\\alpha$)")
     check("v09: control - met fold A only there", sm9.met_foldA_none, "6.4")
     d3n = pp9[pp9.dataset == DS["D3"]]; check_true("v09: control - D3: four combinations without held-out design, none met", d3n.n_none.sum() == 4 and d3n.met_foldA_none.sum() == 0)
     mt9 = tab("T_foldA_methods").set_index(["method", "calib"]); par9 = ["P0-Parallel", "P1-LLR", "P2-LogReg"]
@@ -973,9 +1007,119 @@ if SPRINGER:
     check("v09: control - held-out vs fold A where all deployed min %", pp9.xfit_rel_foldA.min(), "-4", "and the held-out designs differed from them by $-4\\%$ to $+2\\%$ where every tied order was deployed", scale=100)
     check("v09: control - ... max %", pp9.xfit_rel_foldA.max(), "2", scale=100)
     check_true("v09: control - arm described in Sect. 5.2 (specified after the results were known; deploys whenever fold A yields a design)",
-               TXT(lambda: "A control arm, specified after the results of both calibrations were known, repeats the held-out calibration up to fold~A" in SRC["s5_setup.tex"]
+               TXT(lambda: "A control arm, specified after the results of both calibrations were known and therefore exploratory, repeats the held-out calibration up to fold~A" in SRC["s5_setup.tex"]
                    and "and therefore deploys a design in every split in which fold~A yields one" in SRC["s5_setup.tex"]))
     check_true("v09: control - fold A yields a proposed design in every combination", (fa9.n_deployed == fa9.n_splits).all())
+    # ------------------------------------------------------------------ IJIS v12 (review of v11): estimand R1, control R2, wording
+    print("=" * 30, "IJIS v12: deployment-conditional estimand, control by category, tie-break sensitivity")
+    from analyze_rev import corrected_t as _ct12, holm as _holm12
+    se12 = tab("T_fresh_selected"); x12 = se12[(se12.calib == "xfit") & (se12.design_foldA == True)]
+    # (a) Table 6 / S17 means are sum_j p_j r_j / sum_j p_j, recomputed here from the per-split selection
+    w12 = x12[x12.p_deploy > 0].assign(wr=lambda d: d.p_deploy * d.frr_test, wf=lambda d: d.p_deploy * d.far_test / d.alpha)
+    w12 = w12.groupby(["dataset", "alpha", "method"])[["wr", "wf", "p_deploy"]].sum()
+    w12["frr"] = w12.wr / w12.p_deploy; w12["fa"] = w12.wf / w12.p_deploy
+    fs12 = tab("T_fresh_system"); fs12 = fs12[fs12.calib == "xfit"].set_index(["dataset", "alpha", "method"])
+    j12 = w12.join(fs12[["frr_test"]], how="inner")
+    check_true(f"v12: held-out FRR of every method = deployment-weighted mean over splits ({len(j12)} settings)", len(j12) > 80 and np.allclose(j12.frr, j12.frr_test, rtol=0, atol=1e-12))
+    co12 = tab("T_fresh_compliance"); co12 = co12[(co12.calib == "xfit")].set_index(["dataset", "alpha"])
+    pw12 = w12.xs("LR-P1-N2", level="method").join(co12[["frr_test", "far_over_alpha"]], how="inner")
+    check_true("v12: Table 6 held-out FRR and FAR/alpha are deployment-weighted means", len(pw12) == 11 and np.allclose(pw12.frr, pw12.frr_test, atol=1e-12) and np.allclose(pw12.fa, pw12.far_over_alpha, atol=1e-12),
+               "FAR$/\\alpha$ and FRR, means over the deployed designs, each split weighted by its deployment probability $\\pi_j$")
+    for (d_, a_, v_, f_) in [("D1", 1e-3, "0.0186", "0.47"), ("D1", 1e-2, "0.0112", "0.73"), ("D4", 1e-4, "0.0069", "0.42"), ("D4", 1e-3, "0.0049", "0.77"), ("D4", 1e-2, "0.0039", "0.79")]:
+        r_ = pw12.loc[(DS.get(d_, D4), a_)]; check(f"v12: reviewer table - {d_} {a_:g} FRR", r_.frr, v_); check(f"v12: reviewer table - {d_} {a_:g} FAR/alpha", r_.fa, f_)
+    # earlier estimand (equal weight for every split with p_j > 0): change of the held-out means and of the Holm decisions
+    u12 = x12[x12.p_deploy > 0].groupby(["dataset", "alpha", "method"]).frr_test.mean(); ch12 = (w12.frr / u12 - 1).dropna()
+    check("v12: change of held-out FRR by the weighting, min %", ch12.min(), "-8.5", "changed the mean held-out test FRRs of the deployed designs by $-8.5\\%$ to $+10.4\\%$ (all methods) and none of the Holm decisions", scale=100)
+    check("v12: ... max %", ch12.max(), "10.4", scale=100)
+    check_true("v12: ... only on D1 and D4", set(ch12[ch12.abs() > 1e-12].index.get_level_values(0)) == {DS["D1"], D4})
+    st12 = tab("T_fresh_stats"); st12 = st12[(st12.calib == "xfit") & st12.p_holm.notna()]
+    PRIM12 = ["HYP", "S1-Marcialis", "S2-Symmetric", "S4-Direct", "S3-SPRT", "P0-Parallel", "P1-LLR", "P2-LogReg"]
+    same12 = 0; tot12 = 0
+    for (d_, a_), g_ in st12.groupby(["dataset", "alpha"]):
+        xs_ = x12[(x12.dataset == d_) & np.isclose(x12.alpha, a_) & (x12.p_deploy > 0)].set_index(["method", "seed"]).frr_test
+        mv_ = xs_.loc["LR-P1-N2"]; ms_, ps_ = [], []
+        for m_ in g_.method:
+            o_ = xs_.loc[m_] if m_ in xs_.index.get_level_values(0) else pd.Series(dtype=float); c_ = mv_.index.intersection(o_.index)
+            mn_, _, pv_ = _ct12((mv_[c_] - o_[c_]).values); ms_.append(mn_); ps_.append(pv_)
+        old_ = np.where(_holm12(np.array(ps_)) < 0.05, np.where(np.array(ms_) < 0, "lower", "higher"), "none")
+        new_ = np.where(g_.p_holm.values < 0.05, np.where(g_.mean_diff.values < 0, "lower", "higher"), "none")
+        same12 += int((old_ == new_).sum()); tot12 += len(new_)
+    check_true(f"v12: Holm decisions of the held-out comparisons identical under both estimands ({same12} of {tot12})", same12 == tot12 == 82)
+    check_true("v12: estimand and weighted paired test defined in Sects. 5.2 and 5.4",
+               TXT(lambda: "the random tie-break deploys a design in that split with probability $\\pi_j$" in _norm(SRC["s5_setup.tex"]) and "the deployment-conditional mean $\\sum_j\\pi_j\\theta_j/\\sum_j\\pi_j$" in _norm(SRC["s5_setup.tex"])
+                   and "$J_{\\mathrm{eff}}=(\\sum_j\\omega_j)^2/\\sum_j\\omega_j^2$" in _norm(SRC["s5_setup.tex"]) and "with $J_{\\mathrm{eff}}-1$ degrees of freedom" in _norm(SRC["s5_setup.tex"])
+                   and "A comparison with fewer than five splits in which both designs were deployed is not tested." in _norm(SRC["s5_setup.tex"])))
+    # (b) control arm by category of the held-out deployment (Table S25)
+    ca12 = tab("T_foldA_categories").set_index("category")
+    p12 = x12[x12.method == "LR-P1-N2"].p_deploy
+    check_true(f"v12: categories from p_deploy: all {int((p12 == 1).sum())}, some {int(((p12 > 0) & (p12 < 1)).sum())}, none {int((p12 == 0).sum())}",
+               (p12 == 1).sum() == 147 and ((p12 > 0) & (p12 < 1)).sum() == 31 and (p12 == 0).sum() == 12
+               and ca12.loc["all deployed", "n_combinations"] == 147 and ca12.loc["partly deployed", "n_combinations"] == 31 and ca12.loc["none deployed", "n_combinations"] == 12,
+               "By the outcome of the held-out calibration, the 190 combinations fall into three groups")
+    ad12 = ca12.loc["all deployed"]; pd12 = ca12.loc["partly deployed"]; nd12 = ca12.loc["none deployed"]; al12 = ca12.loc["all"]
+    check("v12: all-deployed fold A met", ad12.met_foldA_deployed, "140.3"); check("v12: all-deployed held-out met", ad12.met_xfit_deployed, "144.2")
+    check("v12: all-deployed FAR/alpha fold A", ad12.far_alpha_foldA_deployed, "0.76", "with mean test FAR 0.76$\\alpha$ and 0.74$\\alpha$ and mean test FRR 0.0967 and 0.0971")
+    check("v12: all-deployed FAR/alpha held-out", ad12.far_alpha_xfit_deployed, "0.74"); check("v12: all-deployed FRR fold A", ad12.frr_foldA_deployed, "0.0967"); check("v12: all-deployed FRR held-out", ad12.frr_xfit_deployed, "0.0971")
+    check("v12: partly - deployed (expected)", pd12.deployed_expected, "15.2", "In the 31 in which it deployed some of the tied orders, the 15.2 deployed designs (expected number) met $\\alpha$ in 13.1 cases with the fold-A threshold and in 14.3 with the fold-B threshold, and the fold-A-only versions of the 15.8 withheld designs met it in 11.8")
+    check("v12: partly - met fold A", pd12.met_foldA_deployed, "13.1"); check("v12: partly - met held-out", pd12.met_xfit_deployed, "14.3")
+    check("v12: partly - withheld", pd12.undeployed_expected, "15.8"); check("v12: partly - withheld met fold A", pd12.met_foldA_undeployed, "11.8")
+    check("v12: none - met fold A", nd12.met_foldA_undeployed, "6.4"); check("v12: none - FAR/alpha fold A", nd12.far_alpha_foldA_undeployed, "0.92")
+    check("v12: withheld designs met alpha (fold A) %", al12.met_foldA_undeployed / al12.undeployed_expected, "65",
+          "the fold-A-only versions of the withheld designs met $\\alpha$ in 65\\% of the cases, against 95\\% for those of the deployed designs", scale=100)
+    check("v12: deployed designs met alpha (fold A) %", al12.met_foldA_deployed / al12.deployed_expected, "95", scale=100)
+    check_true("v12: categories add up", np.isclose(ca12.loc[["all deployed", "partly deployed", "none deployed"], "deployed_expected"].sum(), al12.deployed_expected)
+               and al12.n_combinations == 190 and np.isclose(al12.deployed_expected + al12.undeployed_expected, 190))
+    pf12 = tab("T_foldA_pairdiff"); fa12 = pf12[pf12.quantity == "far_over_alpha"]; fr12 = pf12[pf12.quantity == "frr"]
+    check("v12: paired FAR/alpha mean diff min", fa12.mean_diff.min(), "-0.04", "had mean differences between $-0.04$ and $+0.02$, with corrected 95\\% CIs of half-width 0.07--0.38")
+    check("v12: paired FAR/alpha mean diff max", fa12.mean_diff.max(), "0.02")
+    hw12 = (fa12.ci_hi - fa12.ci_lo) / 2; check("v12: CI half-width min", hw12.min(), "0.07"); check("v12: CI half-width max", hw12.max(), "0.38")
+    check("v12: paired FRR |diff| max", fr12.mean_diff.abs().max(), "0.0021", "and the FRR differences lay within $\\pm0.0021$, with every CI containing zero (on D4 at $\\alpha\\ge10^{-3}$ the FRRs were identical in every split)")
+    check_true("v12: D4 FRR identical in every split at 1e-2 and 1e-3 (held-out vs fold A only)", set(np.round(fr12[fr12.identical].alpha, 6)) == {0.01, 0.001} and (fr12[fr12.identical].dataset == D4).all())
+    check_true("v12: every paired CI contains zero (11 settings x 2 quantities)", len(pf12) == 22 and ((pf12.ci_lo <= 0) & (pf12.ci_hi >= 0)).all())
+    check_true("v12: R2 wording - no upper-bound claim on calibration optimism; descriptive framing; reviewer's suggested statement",
+               TXT(lambda: "at most a minor cause" not in ALL and "added 3.9 compliant cases" not in ALL
+                   and "can neither quantify nor exclude an optimistic bias of the threshold calibration" in _norm(SRC["s6_results.tex"])
+                   and "can neither quantify nor exclude an optimistic bias of the threshold calibration" in _norm(SRC["s7_discussion.tex"])
+                   and "These comparisons are descriptive" in SRC["s6_results.tex"]))
+    # (c) tie-break sensitivity (Table S26)
+    tb12 = tab("T_tiebreak_summary").set_index(["dataset", "alpha"]); td12 = tab("T_tiebreak_decisions")
+    check_true("v12: D1 deployed 7-16 and 9-16 of 20; D4 4-10 of 10; D2/D3 fixed",
+               (tb12.loc[(DS["D1"], 1e-3), "deployed_min"], tb12.loc[(DS["D1"], 1e-3), "deployed_max"], tb12.loc[(DS["D1"], 1e-2), "deployed_min"], tb12.loc[(DS["D1"], 1e-2), "deployed_max"]) == (7, 16, 9, 16)
+               and tb12.loc[D4].deployed_min.min() == 4 and tb12.loc[D4].deployed_max.max() == 10
+               and (tb12.loc[[DS["D2"], DS["D3"]]].deployed_min == tb12.loc[[DS["D2"], DS["D3"]]].deployed_max).all(),
+               "ranged from 7 to 16 (D1, $\\alpha=10^{-3}$) and from 9 to 16 ($10^{-2}$) of 20 and from 4 to 10 of 10 on D4")
+    check("v12: D1 1e-3 FRR q05", tb12.loc[(DS["D1"], 1e-3), "frr_q05"], "0.016", "lay between 0.016 and 0.021 (5th and 95th percentiles over the draws; expected value 0.0186)")
+    check("v12: D1 1e-3 FRR q95", tb12.loc[(DS["D1"], 1e-3), "frr_q95"], "0.021")
+    check("v12: all Holm decisions agree, share of draws %", td12.all_agree_share.iloc[0], "52", "In 52\\% of the draws, all Holm decisions of the held-out comparisons that the draw allowed", scale=100)
+    dis12 = td12[td12.agree_share < 1]
+    check_true(f"v12: disagreements only on D3 1e-4, sum fusion and SPRT ({dis12[['dataset', 'alpha', 'method']].values.tolist()})",
+               len(dis12) == 2 and (dis12.dataset == DS["D3"]).all() and np.allclose(dis12.alpha, 1e-4) and set(dis12.method) == {"P0-Parallel", "S3-SPRT"}
+               and (dis12.reference == "higher").all() and (dis12.share_lower == 0).all())
+    g12 = dis12.set_index("method").agree_share
+    check("v12: D3 1e-4 sum fusion significant share %", g12["P0-Parallel"], "52", "sum fusion was significant in 52\\% of the draws and than that of the SPRT in 77\\%", scale=100)
+    check("v12: D3 1e-4 SPRT significant share %", g12["S3-SPRT"], "77", scale=100)
+    check_true("v12: at most two decisions differ per draw -> 11 to 13 of 16", td12.disagree_max_per_draw.iloc[0] == 2,
+               "a single draw would leave 11 to 13 of the 16 held-out comparisons with the SPRT and parallel fusion at $\\alpha\\le10^{-3}$ significant, instead of 13")
+    # (d) simulation: fractional (tie-averaged) replicate outcomes and the scope of the simulation
+    sim12 = tab("T_sim")
+    check("v12: sim fractional bootstrap replicates", sim12.frac_reps.sum(), "13", "this occurred in 13 of the 3000 replicates of the bootstrap arm and in 38 of the 3000 of the held-out arm")
+    check("v12: sim fractional held-out replicates", sim12.xfit_frac_reps.sum(), "38"); check("v12: sim replicates per arm", sim12.reps.sum(), "3000")
+    check_true("v12: sim fractional replicates in the main text", sim12.frac_reps.sum() == 13 and sim12.xfit_frac_reps.sum() == 38 and sim12.xfit_reps.sum() == 3000,
+               "Ties among the best orders make 13 of the 3000 replicate outcomes of the bootstrap arm and 38 of the 3000 of the held-out arm fractional")
+    check_true("v12: simulation scope stated (N, orders, alpha; not D1 folds, 64 orders, 1e-4)", sorted(sim12.N.unique()) == [500, 1500] and sorted(sim12.alpha.unique()) == [1e-3, 1e-2],
+               "it covers neither folds as small as those of D1, with about 130 genuine comparisons, nor a selection among 64 orders, nor $\\alpha=10^{-4}$")
+    check_true("v12: Wilson intervals described as conservative for fractional outcomes (S22 caption, Sect. S4)",
+               TXT(lambda: "narrower than for Bernoulli outcomes, but the interval remains approximate and can undercover for shares near one" in _norm(open(f"{P}/supp_tables.tex").read())
+                   and "but the Wilson interval itself remains an approximation and can undercover for shares near one" in _norm(SRC["ESM_1.tex"])
+                   and "Wilson intervals computed from them are then conservative" not in _norm(SRC["s6_results.tex"])))
+    # (e) wording of the review of v11 (minor items and the scope of "fixed in advance")
+    check_true("v12: minor wording items revised", TXT(lambda: all(x_ not in ALL for x_ in [
+        "all procedures fixed in advance", "every procedure, including the analysis, fixed", "enforced by calibration", "up to sampling error",
+        "did not constrain the fits", "modalities per genuine claim", "acquiring every modality", "satisfy the independence assumption",
+        "this tolerance does not affect the FAR requirement", "full acquisition for parallel fusion", "controlled by the calibration"])))
+    check_true("v12: scope of the fixed procedures and of the later changes stated", TXT(lambda: "Later changes are identified as such below: an implementation error in the order selection of the held-out calibration was corrected" in _norm(SRC["s5_setup.tex"])
+               and "This weighting replaces an earlier equal weighting" in SRC["s5_setup.tex"] and "after the further splits had been run" in SRC["s5_setup.tex"]
+               and "This is a structural observation on these staircases; other data need not share this sparse structure." in _norm(SRC["s6_results.tex"])))
     # attack sensitivity (Table S24)
     sp9 = tab("T_spoof_sens"); t89 = tab("T_rev_spoof_trait").merge(sp9, on=["dataset", "method"])
     check_true("v09: attack - lambda = 1 reproduces Table 8 exactly", np.allclose(t89.spoof_trait_max, t89.strength_1_worst, rtol=0, atol=0) and np.allclose(t89.spoof_trait_mean, t89.strength_1_mean, rtol=0, atol=0))
@@ -1056,8 +1200,10 @@ if SPRINGER:
                        "(Online Resource~1, Sect.~S4 and Table~S22)")
             check_true("v04: MLP table is S19 in ESM_1", esm.get("tab:s-mlp") == "S19", "(Online Resource~1, Table~S19)")
             check_true("v09: new ESM tables S23 (fold-A control) and S24 (attack sensitivity)", esm.get("tab:s-folda") == "S23" and esm.get("tab:s-attack") == "S24",
-                       "(Online Resource~1, Table~S23)")
-            check_true("v09: main text cites Table S24 and lists Tables S1-S24", TXT(lambda: "Online Resource~1, Table~S24 varies it" in SRC["s6_results.tex"] and "Tables~S1--S24" in SRC["main.tex"]))
+                       "(Online Resource~1, Tables~S23 and~S25)")
+            check_true("v12: new ESM tables S25 (fold-A control by category) and S26 (tie-break sensitivity), cited in the main text",
+                       esm.get("tab:s-foldcat") == "S25" and esm.get("tab:s-tiebreak") == "S26", "(Online Resource~1, Table~S26)")
+            check_true("v09: main text cites Table S24 and lists Tables S1-S26", TXT(lambda: "Online Resource~1, Table~S24 varies it" in SRC["s6_results.tex"] and "Tables~S1--S26" in SRC["main.tex"]))
         else:
             check_true("IJIS: main.aux and ESM_1.aux present (compile first)", False)
 
@@ -1070,7 +1216,7 @@ check("FAR-range restriction FRR", av("abl_region", 1e-3, "frr_test_variant"), "
 print("=" * 30, "Generated tables are current")
 if NUMBERS_ONLY:
     print("SKIP regenerated table files (need the manuscript tables)"); n_skip += 1
-    print(f"\n{n_ok} checks passed, {len(fails)} failed, {n_skip} skipped (--numbers-only)" + (": " + "; ".join(fails) if fails else ""))
+    print(f"\n{n_ok} checks passed, {len(fails)} failed, {n_skip} skipped (--numbers-only)" + (f", {n_info} environment notes (INFO)" if n_info else "") + (": " + "; ".join(fails) if fails else ""))
     sys.exit(1 if fails else 0)
 before = {f: hashlib.md5(open(f, "rb").read()).hexdigest() for f in glob.glob(f"{P}/tables/*.tex")}
 subprocess.run([sys.executable, "make_main_tables.py"], capture_output=True, check=True, env={**os.environ, "PAPER": P})
@@ -1080,5 +1226,5 @@ s_before = hashlib.md5(open(f"{P}/supp_tables.tex", "rb").read()).hexdigest()
 subprocess.run([sys.executable, "make_supp_tables.py"], capture_output=True, check=True, env={**os.environ, "PAPER": P})
 check_true("supplementary tables unchanged after regeneration", TXT(lambda: s_before == hashlib.md5(open(f"{P}/supp_tables.tex", "rb").read()).hexdigest()))
 
-print(f"\n{n_ok} checks passed, {len(fails)} failed" + (f", {n_skip} skipped (--numbers-only)" if n_skip else "") + (": " + "; ".join(fails) if fails else ""))
+print(f"\n{n_ok} checks passed, {len(fails)} failed" + (f", {n_skip} skipped (--numbers-only)" if n_skip else "") + (f", {n_info} environment notes (INFO)" if n_info else "") + (": " + "; ".join(fails) if fails else ""))
 sys.exit(1 if fails else 0)

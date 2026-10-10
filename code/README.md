@@ -202,3 +202,35 @@ therefore also run on the PC; `merge_d4_spoof.py` keeps the PC rows of splits 2-
 two machines), keeps the local files as `*_local.csv`, writes `results/D4_spoof_provenance.csv`, and re-aggregates
 `T_rev_spoof_trait.csv` and `T_spoof_sens.csv`. This corrects the D4 SPRT entry of Table 8 (0.956 / 0.587 in v08,
 now 0.981 / 0.596); the evaluated test FRR now equals that of `results/E3fresh` for every method and split.
+
+## IJIS v12: estimand of the held-out calibration and the fold-A-only control (release v1.3.0)
+Changes after the second-round review of the v11 manuscript (items R1, R2, and the minor items). Table numbers follow the
+v12 manuscript; Online Resource 1 Tables S25 and S26 are new.
+
+* Tie-break (R1). All counts and means are expectations over a uniform random tie-break among the orders with the best
+  training (or fold-A) FRR, drawn independently for every method and split before fold B is used. With the held-out
+  calibration, a split j with m_j tied orders of which d_j can be calibrated on fold B deploys a design with probability
+  p_j = d_j / m_j (`p_deploy` in `T_fresh_selected.csv`). Means over the deployed designs (test FRR, FAR, FAR / alpha,
+  stages) are now the deployment-conditional means sum_j p_j r_j / sum_j p_j, where r_j is the mean over the deployable tied
+  orders (`analyze_fresh.py`, `analyze_foldA.py`, `analyze_mlp.py`). Up to v1.2.0, every split with p_j > 0 had equal
+  weight; deployment and compliance counts were already p-weighted and do not change. Only D1 and D4 have 0 < p_j < 1;
+  their held-out FRRs change by -8.5 % to +10.4 %.
+* Paired tests of the held-out calibration (Tables S17 and S19): conditional on both designs being deployed, with
+  independent tie-breaks for the two methods, so split j has the weight w_j = p_j p'_j and the per-split difference is that
+  of the means over the deployable tied orders. `corrected_t_w` in `analyze_rev.py` applies the Nadeau-Bengio correction
+  with the effective number of splits K = (sum w)^2 / sum w^2 and K - 1 degrees of freedom; with all weights one it equals
+  `corrected_t`. No Holm decision changed (checked in `verify_numbers.py` by recomputing the earlier unweighted tests).
+* `analyze_foldA.py` (R2) adds `T_foldA_category_splits.csv` and `T_foldA_categories.csv` (Table S25 a: the 190
+  combinations of the proposed design by the outcome of the held-out calibration, every / some / no tied order deployed,
+  with the fold-A-only results of the withheld designs) and `T_foldA_pairdiff.csv` (Table S25 b: held-out minus
+  fold-A-only test FAR / alpha and FRR of the deployed designs, weighted corrected resampled t per subset and requirement).
+* `tiebreak_sens.py` (new, about 3 min): a single random tie-break per method and split instead of the expectation,
+  1000 draws (`numpy.random.default_rng(9000 + draw)`); `T_tiebreak_summary.csv` (deployment, compliance, FRR and
+  FAR / alpha of the proposed design) and `T_tiebreak_decisions.csv` (Holm decisions of the held-out comparisons against
+  the expectation-based ones; a comparison with fewer than five jointly deployed splits is not tested in that draw).
+* `analyze_sim.py` adds `frac_reps` and `xfit_frac_reps`, the replicates whose outcome is fractional because tied orders
+  are averaged (13 and 38 of 3000). The Wilson interval is computed from the summed outcomes; for outcomes in [0, 1] the
+  variance is at most p (1 - p), so the interval is conservative.
+* `verify_numbers.py`: new checks for all numbers and statements of this revision. The check of the HiGHS and SciPy
+  versions now distinguishes the paper from the running environment: the versions stated in the paper are checked in the
+  text, and a different running environment is printed as INFO and not counted as a failure.

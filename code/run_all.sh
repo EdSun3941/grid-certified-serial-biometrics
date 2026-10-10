@@ -65,7 +65,10 @@ python3 analyze_sens.py          # T_sens_* (Table S21; Proposition 1 at all dep
 python3 analyze_sim.py           # T_sim (Table S22)
 # ---- IJIS v09: fold-A-only control of the held-out calibration (review M1) and presentation-attack sensitivity (review M8)
 ./launch.sh jobs_foldA.txt "$NP" foldA                          # E3foldA: fold A only, same seeds as E3fresh (or python run_local_foldA.py [workers])
-python3 analyze_foldA.py         # T_foldA_* (Table S23); checks that the fold-A designs reproduce those of E3fresh
+python3 analyze_foldA.py         # T_foldA_* (Tables S23, S25); checks that the fold-A designs reproduce those of E3fresh
+# ---- IJIS v12: deployment-weighted means and paired tests of the held-out calibration are computed by analyze_fresh.py,
+#      analyze_mlp.py and analyze_foldA.py above (corrected_t_w in analyze_rev.py); tie-break sensitivity:
+python3 tiebreak_sens.py         # T_tiebreak_summary, T_tiebreak_decisions (Table S26); 1000 draws, about 3 min
 # ---- IJIS (Springer) version: per-trait spoof analysis, Springer tables/figures/references, checks
 python3 spoof_trait.py fing_x_face fing_x_fing face_x_face lfw_x_fing   # T_rev_spoof_trait, T_rev_cost_spoof_trait
 python3 spoof_sens.py            # T_spoof_sens (Table S24): attack strength, score shift, PAD; lambda = 1 reproduces Table 8

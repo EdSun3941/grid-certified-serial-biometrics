@@ -1,0 +1,16 @@
+        dataset   alpha  n_splits  deployed_min  deployed_max  deployed_mean  met_min  met_max  frr_q05  frr_q95  far_alpha_q05  far_alpha_q95  draws
+0   face_x_face  0.0001        20            17            17         17.000       16       16   0.2861   0.2866         0.6929         0.6955   1000
+1   face_x_face  0.0010        20            19            19         19.000       18       18   0.1709   0.1714         0.7927         0.7935   1000
+2   face_x_face  0.0100        20            20            20         20.000       20       20   0.0775   0.0777         0.8494         0.8513   1000
+3   fing_x_face  0.0010        20             7            16         11.071        7       15   0.0161   0.0214         0.4153         0.5469   1000
+4   fing_x_face  0.0100        20             9            16         12.685        9       15   0.0081   0.0142         0.6753         0.7785   1000
+5   fing_x_fing  0.0001        20            20            20         20.000       20       20   0.1030   0.1032         0.6716         0.6746   1000
+6   fing_x_fing  0.0010        20            20            20         20.000       20       20   0.0693   0.0697         0.7867         0.7974   1000
+7   fing_x_fing  0.0100        20            20            20         20.000       20       20   0.0430   0.0432         0.8101         0.8127   1000
+8    lfw_x_fing  0.0001        10             4             7          5.466        4        7   0.0048   0.0088         0.3583         0.4611   1000
+9    lfw_x_fing  0.0010        10             4            10          7.723        4       10   0.0037   0.0065         0.7285         0.8214   1000
+10   lfw_x_fing  0.0100        10             7            10          9.235        7       10   0.0032   0.0048         0.7510         0.8417   1000
+       dataset  alpha       method reference  agree_share     n  share_lower  share_none  share_higher  tested_share  decisions_per_draw_min  decisions_per_draw_max  all_agree_share  disagree_max_per_draw
+0  face_x_face    0.0  P0-Parallel    higher        0.520  1000          0.0       0.480         0.520           1.0                      67                      82             0.52                      2
+5  face_x_face    0.0      S3-SPRT    higher        0.768  1000          0.0       0.232         0.768           1.0                      67                      82             0.52                      2
+decisions per draw: 67 - 82 all agree in share of draws: 0.52 max disagreements per draw: 2
