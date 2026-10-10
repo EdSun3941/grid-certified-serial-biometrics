@@ -80,6 +80,10 @@ fold A with seed 3000 + split and fold B with seed 4000 + split. Further seeds a
 
 ## Version history
 
+- **v1.3.1** (October 2026): citation metadata and manuscript checks only. The preferred citation in `CITATION.cff` follows
+  the revised author order of the article (M.-C. Tsai last), and `verify_numbers.py` checks the revised author list and
+  affiliation and no longer mistakes the LaTeX primitive `\@@input` for an unreplaced placeholder. Code, results and
+  all other checks are unchanged from v1.3.0.
 - **v1.3.0** (October 2026, second revision after review): estimand of the held-out calibration. All counts and means are
   expectations over a uniform random tie-break among the best fold-A orders, made before fold B is used; means over the
   deployed designs (test FRR, FAR, stages) are now weighted by the deployment probability p_j of each split
@@ -111,7 +115,7 @@ fold A with seed 3000 + split and fold B with seed 4000 + split. Further seeds a
 ## Citation
 
 See `CITATION.cff`. Version 1.0.0 (first submission) is archived at Zenodo, https://doi.org/10.5281/zenodo.23072674;
-version 1.3.0 is the version used for the revised article (version 1.2.0 was used for the previous revision).
+version 1.3.1 is the version used for the revised article (analysis identical to v1.3.0; version 1.2.0 was used for the previous revision).
 Please cite the article once it is published.
 
 ## License

@@ -234,3 +234,6 @@ v12 manuscript; Online Resource 1 Tables S25 and S26 are new.
 * `verify_numbers.py`: new checks for all numbers and statements of this revision. The check of the HiGHS and SciPy
   versions now distinguishes the paper from the running environment: the versions stated in the paper are checked in the
   text, and a different running environment is printed as INFO and not counted as a failure.
+
+Release v1.3.1 changes only `CITATION.cff` (author order of the preferred citation) and the manuscript-text checks of
+`verify_numbers.py` (revised author list and affiliation; the commit-placeholder check no longer matches `\@@input`).

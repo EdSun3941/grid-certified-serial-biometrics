@@ -445,7 +445,7 @@ if SPRINGER:
                and "Grid-Certified Corner-Dominating FAR--FRR Envelopes" in SRC["ESM_1.tex"] and "grid-certified posynomial" not in ALL.lower()
                and "\\titlerunning{Online Resource 1: grid-certified corner-dominating FAR--FRR envelopes}" in SRC["ESM_1.tex"]))
     check_true("v03: title", TXT(lambda: "Grid-Certified Corner-Dominating FAR--FRR Envelopes for Serial Multibiometric Threshold Design via Lagrangian Relaxation-Based Branch-and-Bound" in mt_))
-    au10 = "\\author{Chuan-Hsiang Su \\and Frank Yeong-Sung Lin \\and Tzu-Lung Sun \\and Chih-Chun Yeh \\and Ming-Chi Tsai \\and Chiu-Han Hsiao}"
+    au10 = "\\author{Chuan-Hsiang Su \\and Frank Yeong-Sung Lin \\and Tzu-Lung Sun \\and Chih-Chun Yeh \\and Chiu-Han Hsiao \\and Ming-Chi Tsai}"   # v13: Tsai last
     def _cite_order():
         aux = open(f"{P}/main.aux").read(); lab = dict(re.findall(r"\\newlabel\{([^}]*)\}\{\{([^}]*)\}", aux))
         txt = "".join(open(f"{P}/{x}.tex").read() for x in re.findall(r"\\input\{(sections/[^}]*)\}", mt_))
@@ -460,9 +460,10 @@ if SPRINGER:
                TXT(lambda: os.path.exists(f"{P}/main.aux") and _cite_order()))
     check_true("v11: svjour3 default section and float spacing in the manuscript (no layout overrides); MIP spelled out",
                TXT(lambda: "\\def\\section" not in mt_ and "\\setlength\\floatsep" not in mt_ and "MIP gaps" not in ALL))
-    check_true("v10: six authors, M.-C. Tsai second to last, in the manuscript and Online Resource 1, with his institute entry",
-               TXT(lambda: au10 in mt_ and au10 in SRC["ESM_1.tex"] and "M.-C. Tsai \\at Department of Information Management, National Taiwan University, Taipei 10617, Taiwan" in mt_
-                   and mt_.index("C.-C. Yeh \\at") < mt_.index("M.-C. Tsai \\at") < mt_.index("C.-H. Hsiao \\at")))
+    check_true("v13: six authors, M.-C. Tsai last, in the manuscript and Online Resource 1, with his ITRI institute entry and e-mail",
+               TXT(lambda: au10 in mt_ and au10 in SRC["ESM_1.tex"]
+                   and "M.-C. Tsai \\at Industry, Science and Technology International Strategy Center, Industrial Technology Research Institute (ITRI), Chutung, Hsinchu 31040, Taiwan" in mt_
+                   and "\\email{d05725001@ntu.edu.tw}" in mt_ and mt_.index("C.-C. Yeh \\at") < mt_.index("C.-H. Hsiao \\at") < mt_.index("M.-C. Tsai \\at")))
     refq = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2ref/ref_*.csv")], ignore_index=True); refq = refq[refq.obj == "P1"]
     mq2 = pd.concat([pd.read_csv(f) for f in glob.glob(f"{R}/E2miqp/miqp_*_N2.csv")], ignore_index=True)
     mq2 = mq2.merge(refq[["dataset", "seed", "matcher", "value"]].rename(columns={"value": "opt"}), on=["dataset", "seed", "matcher"])
@@ -833,12 +834,12 @@ if SPRINGER:
                and "\\section*{Supplementary Information}" in SRC["main.tex"]))
     check_true("v05: US spelling", TXT(lambda: not re.search(r"analys(ed|e\b)|favour|colour|behaviour|modelling", ALL)))
     doi5 = "10.5281/zenodo.23072674"
-    rel8 = "https://github.com/EdSun3941/grid-certified-serial-biometrics/releases/tag/v1.3.0"     # v12: release 1.3.0 with its commit
-    check_true("v12: release v1.3.0 (with commit) cited in Code availability, ESM S5 and the reference list; v1.2.0 commit recorded; v1.0.0 Zenodo DOI kept for the first submission",
-               TXT(lambda: re.search(r"the version used for this article is release v1\.3\.0~\\cite\{su2026code\} \(commit \\texttt\{[0-9a-f]{12}\}\)\.", SRC["main.tex"]) is not None
-                   and re.search(r"releases/tag/v1\.3\.0\}; commit \\texttt\{[0-9a-f]{12}\}\); release 1\.2\.0 \(commit \\texttt\{d7ce4f39ed3f\}\)", SRC["ESM_1.tex"]) is not None
-                   and "@@" not in SRC["main.tex"] + SRC["ESM_1.tex"] and doi5 in SRC["main.tex"]
-                   and rel8 in SRC["ESM_1.tex"] and doi5 in SRC["ESM_1.tex"] and rel8 in refs5 and "v1.3.0. GitHub release (2026)" in refs5
+    rel8 = "https://github.com/EdSun3941/grid-certified-serial-biometrics/releases/tag/v1.3.1"     # v13: release 1.3.1 with its commit
+    check_true("v13: release v1.3.1 (with commit) cited in Code availability, ESM S5 and the reference list; v1.3.0 and v1.2.0 commits recorded; v1.0.0 Zenodo DOI kept for the first submission",
+               TXT(lambda: re.search(r"the version used for this article is release v1\.3\.1~\\cite\{su2026code\} \(commit \\texttt\{[0-9a-f]{12}\}\)\.", SRC["main.tex"]) is not None
+                   and re.search(r"releases/tag/v1\.3\.1\}; commit \\texttt\{[0-9a-f]{12}\}\), which differs from release 1\.3\.0 \(commit \\texttt\{838c572f32dc\}\) only in the citation metadata and the checks of the manuscript text; release 1\.2\.0 \(commit \\texttt\{d7ce4f39ed3f\}\)", SRC["ESM_1.tex"]) is not None
+                   and re.search(r"@@C\d+@@", SRC["main.tex"] + SRC["ESM_1.tex"]) is None and doi5 in SRC["main.tex"]   # commit placeholder replaced (v1.3.1: "@@" alone also matched \\@@input)
+                   and rel8 in SRC["ESM_1.tex"] and doi5 in SRC["ESM_1.tex"] and rel8 in refs5 and "v1.3.1. GitHub release (2026)" in refs5
                    and "Ming-Chi Tsai contributed to the interpretation of the results and critically revised the manuscript" in SRC["main.tex"]
                    and "Grid-certified corner-dominating FAR--FRR envelopes for serial multibiometric threshold design: code and per-split results" in refs5
                    and "v1.1.0" not in ALL))

@@ -13,7 +13,7 @@ authors:
   - family-names: Hsiao
     given-names: Chiu-Han
 license: MIT
-version: "1.3.0"
+version: "1.3.1"
 date-released: "2026-10-10"
 abstract: "Code, per-split results, tables, figures and run logs for the design of serial (sequential) multibiometric verification thresholds by geometric programming with corner-dominating posynomial FAR-FRR envelopes fitted by exact-dual Lagrangian-relaxation branch-and-bound, evaluated on NIST BSSR1 and a chimeric LFW + BSSR1 subset."
 keywords:
@@ -36,9 +36,9 @@ preferred-citation:
       given-names: Tzu-Lung
     - family-names: Yeh
       given-names: Chih-Chun
-    - family-names: Tsai
-      given-names: Ming-Chi
     - family-names: Hsiao
       given-names: Chiu-Han
+    - family-names: Tsai
+      given-names: Ming-Chi
   journal: "International Journal of Information Security"
   status: submitted
